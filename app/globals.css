@@ -2,26 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-}
+} */
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-}
+} */
 
 body {
-  color: rgb(var(--foreground-rgb));
+  @apply font-segoe
+  /* color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
-    rgb(var(--background-start-rgb));
+    rgb(var(--background-start-rgb)); */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.wrapper {
+  @apply max-w-[1366px] px-8 mx-auto;
+}
+
+.head_text {
+  @apply text-blue-green font-ubuntu text-3xl;
+}
+
+.link {
+  @apply text-orange font-segoe border-b-2 hover:border-orange transition-all duration-150 ease-in-out cursor-pointer;
+}
+
+.btn_base {
+  @apply outline-none transition-all duration-300 ease-in-out;
+}
+
+.primary_btn {
+  @apply rounded-md py-3 px-5 text-light-gray bg-gradient-to-r from-gray-800 to-zinc-700 uppercase tracking-widest border-2 border-transparent hover:text-orange hover:bg-gradient-to-r hover:from-gray-900 hover:to-zinc-800;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 5px;
+}
+
+@keyframes twinkle {
+  0% {
+    transform: scale(1, 1);
+    background: rgba(255, 255, 255, 0);
+    animation-timing-function: linear;
+  }
+
+  40% {
+    transform: scale(0.8, 0.8);
+    background: rgba(255, 255, 255, 1);
+    animation-timing-function: ease-out;
+  }
+
+  80% {
+    background: rgba(255, 255, 255, 0);
+    transform: scale(1, 1);
+  }
+
+  100% {
+    background: rgba(255, 255, 255, 0);
+    transform: scale(1, 1);
+  }
 }
