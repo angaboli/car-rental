@@ -31,20 +31,20 @@ const CarsFiltersOption = ({carsList, setCat, setType, orderCarList, resetFilter
           <h1 className="text-[30px] text-blue-green font-bold">Réservation</h1>
           <h2 className="text-dark-gray">Choisissez votre Voitures</h2>
         </div>
-        <div className="flex flex-col md:flex-row font-[10px] text-center">
-          <select onChange={e => setCat(e.target.value)} value="" className="select appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
+        <div className="flex flex-col md:flex-row text-center">
+          <select onChange={e => setCat(e.target.value)} value="" className="select text-xs appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
             <option disabled value="">Catégorie</option>
             {categoryList && categoryList.map(( cat: string, index: number) => (
               <option key={index} value={cat} >{cat}</option>
             ))}
           </select>
-          <select onChange={e => setType(e.target.value)} value="" className="select appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
+          <select onChange={e => setType(e.target.value)} value="" className="select text-xs appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
             <option disabled value="">Transmission</option>
             {transmissionList && transmissionList.map(( trans: string, index: number) => (
               <option key={index} value={trans} >{trans}</option>
             ))}
           </select>
-          <select onChange={e => orderCarList(e.target.value)} value="" className="select appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
+          <select onChange={e => orderCarList(e.target.value)} value="" className="select text-xs appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
             <option disabled value="">Prix</option>
             <option value={-1}>Min à Max</option>
             <option value={1}>Max à Min</option>
