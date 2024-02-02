@@ -1,4 +1,5 @@
-import request, { gql } from "graphql-request";
+import { request, gql } from "graphql-request";
+//import { gql, useQuery } from '@apollo/client';
 
 const MASTER_URL="https://api-eu-west-2.hygraph.com/v2/clrtbrrae0lgu01uurnnsod74/master"
 
@@ -71,4 +72,40 @@ export const createBooking = async (formValue: any) => {
   `
   const res = await request(MASTER_URL, mutationQuery);
   return res;
+}
+
+const GET_RESERVATIONS = gql`
+  query GetReservations($carId: ID!, $startDate: DateTime!, $endDate: DateTime!) {
+    bookings(
+      where: {
+        car: { id: $carId }
+        AND: [
+          { startDate_lte: $dropOffDate }
+          { endDate_gte: $pickUpDate }
+        ]
+      }
+    ) {
+      id
+      startDate
+      endDate
+    }
+  }
+`;
+
+export async function checkCarAvailability(carId: string, startDate: string, endDate: string) {
+    try {
+        const variables = { carId, startDate, endDate };
+        const data = await request<any>(MASTER_URL, GET_RESERVATIONS, variables);
+        return {
+            loading: false,
+            error: null,
+            isAvailable: data.reservations.length === 0,
+        };
+    } catch (error) {
+        return {
+            loading: false,
+            error,
+            isAvailable: false,
+        };
+    }
 }
