@@ -28,8 +28,8 @@ const CarsFiltersOption = ({carsList, setCat, setType, orderCarList, resetFilter
     <div className="shadow-3xl border-t border-light-gray bg-white">
       <div className="wrapper flex md:items-center py-3 justify-between">
         <div className="items-start">
-          <h1 className="text-[30px] text-blue-green font-bold">Réservation</h1>
-          <h2 className="text-dark-gray">Choisissez votre Voitures</h2>
+          <h2 className="text-[30px] text-blue-green font-bold">Nos voitures</h2>
+          <p className="text-dark-gray">Choisissez votre Voitures</p>
         </div>
         <div className="flex flex-col md:flex-row text-center">
           <select onChange={e => setCat(e.target.value)} value="" className="select text-xs appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
@@ -38,7 +38,7 @@ const CarsFiltersOption = ({carsList, setCat, setType, orderCarList, resetFilter
               <option key={index} value={cat} >{cat}</option>
             ))}
           </select>
-          <select onChange={e => setType(e.target.value)} value="" className="select text-xs appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
+          {/* <select onChange={e => setType(e.target.value)} value="" className="select text-xs appearance-none h-full rounded-l border block w-full bg-white border-light-gray text-dark-gray py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-light-gray focus:border-blue-green">
             <option disabled value="">Transmission</option>
             {transmissionList && transmissionList.map(( trans: string, index: number) => (
               <option key={index} value={trans} >{trans}</option>
@@ -48,7 +48,7 @@ const CarsFiltersOption = ({carsList, setCat, setType, orderCarList, resetFilter
             <option disabled value="">Prix</option>
             <option value={-1}>Min à Max</option>
             <option value={1}>Max à Min</option>
-          </select>
+          </select> */}
           <button onClick={resetFilters} className="px-3  bg-light-gray text-dark-gray rounded">Réinitialiser</button>
         </div>
       </div>

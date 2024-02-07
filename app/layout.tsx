@@ -1,10 +1,10 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { ClerkProvider, SignIn, SignedIn } from '@clerk/nextjs'
-import { SignedOut } from '@clerk/nextjs'
-import Header from '../components/header'
-import Footer from '../components/footer'
+//import { ClerkProvider, SignIn, SignedIn } from '@clerk/nextjs'
+//import { SignedOut } from '@clerk/nextjs'
+import Header from '@/components/header'
+import Footer from '@/components/footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,19 +19,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
     <html lang="en">
       <body className="bg-white">
-        <SignedIn>
-          <Header />
-          {children}
-        </SignedIn>
-        <SignedOut>
-          <SignIn />
-        </SignedOut>
+        <Header />
+        {children}
         <Footer />
       </body>
     </html>
-    </ClerkProvider>
   )
 }

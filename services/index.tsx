@@ -40,9 +40,13 @@ export const getCarsList = async () : Promise<CarsListResponse> => {
           url
         }
         name
+        description
         price
         places
         carCategory
+        gallery {
+          url
+        }
         publishedAt
         updatedAt
       }
