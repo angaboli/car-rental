@@ -165,7 +165,7 @@ const Form = ({ car }: any) => {
         </div>
       )}
 
-      <div className="modal-action">
+      <div className="modal-action absolute bottom-2 right-0">
         <button className="btn bg-orange hover:bg-light-orange text-light-gray hover:text-dark-gray">Annuler</button>
         {/* <button className="group overflow-hidden btn_base py-1 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0" onClick={handleSubmit}>
           <span className="z-40"> Enregistrer</span>

@@ -5,7 +5,6 @@ import { IoCarSportOutline } from "react-icons/io5";
 import { Carousel, IconButton  } from "@material-tailwind/react";
 import { TbManualGearbox } from "react-icons/tb";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
-import { CarouselStylesType } from "@material-tailwind/react";
 
 export default function CarDetails(props:any) {
 
@@ -48,7 +47,7 @@ export default function CarDetails(props:any) {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="h-6 w-6 -mt-3 -ml-3"
+                className="h-6 w-6 "
               >
                 <path
                   strokeLinecap="round"
@@ -73,7 +72,7 @@ export default function CarDetails(props:any) {
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="h-6 w-6 -mt-3 -ml-3"
+                className="h-6 w-6 "
               >
                 <path
                   strokeLinecap="round"
