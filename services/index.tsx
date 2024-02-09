@@ -40,7 +40,11 @@ export const getCarsList = async () : Promise<CarsListResponse> => {
           url
         }
         name
-        description
+        shortDescription
+        description{
+          html
+          text
+        }
         price
         places
         carCategory

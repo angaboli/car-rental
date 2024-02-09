@@ -71,58 +71,7 @@ const Hero = () => {
     return true;
   };
 
-  const handlePickupDateChange = (e:any) => {
-    const newDate = e.target.value;
-    setPickupDate(newDate);
-    validatePickupDate(newDate);
-  };
-
-  const handlePickupTimeChange = (e:any) => {
-    const newTime = e.target.value;
-    setPickupTime(newTime);
-    if (pickupDate) {
-      validatePickupTime(newTime);
-    }
-  };
-
-  const handleDropoffDateChange = (e:any) => {
-    const newDate = e.target.value;
-    setDropoffDate(newDate);
-    validateDropoffDate(newDate);
-  };
-
-  const handleDropoffTimeChange = (e:any) => {
-    const newTime = e.target.value;
-    setDropoffTime(newTime);
-    if (dropoffDate) {
-      validateDropoffTime(newTime);
-    }
-  };
-
-  // Correction pour la gestion de l'emplacement
-  const handleLocationChange = (e:any) => {
-    setPickUpLoc(e.target.value);
-  };
-
-  const handleCheckboxChange = (e:any) => {
-    setSameAgency(e.target.checked);
-  };
-
-
-
-  const handleSubmit = (e:any) => {
-    e.preventDefault();
-
-    if (!pickUpLoc || !openTab || !pickupDate || !dropoffDate || !pickupTime || !dropoffTime) {
-      setError("Tous les champs doivent être remplis.");
-      return;
-    }
-
-
-
-    router.push(`/reservation?pickupLocation=${pickUpLoc}&carCategory=${openTab}&pickupDate=${pickupDate}&pickupTime=${pickupTime}&dropoffDate=${dropoffDate}&dropoffTime=${dropoffTime}`);
-  };
-
+ 
   return (
     <div id="reservez" className="bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">
       <div className="wrapper  min-h-[200px]">

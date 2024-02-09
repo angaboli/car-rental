@@ -23,8 +23,8 @@ export default function CarDetails(props:any) {
   };
 
   const gallery = props.car?.gallery || [];
-  const frontImage = props.car?.image?.url
-  console.log(props.car.description)
+  const frontImage = props.car?.image?.url;
+  const description = { __html: props.car.description?.html };
 
  return (
   <div className="w-full">
@@ -121,13 +121,14 @@ export default function CarDetails(props:any) {
           </div>
         </div>
         <p className="text-lg font-semibold text-gray-900 mb-0">{ props.car.name}</p>
-        <div className="flex justify-between">
+        <div className="flex flex-col">
           <p className="text-md text-gray-800 mt-0">
             <span className="font-semibold text-md">{
               new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( props.car.price) }&nbsp;
             </span>
             <span className="font-12px">/jr</span>
           </p>
+          <p className="mt-1 mb-1">{props.car.shortDescription}</p>
         </div>
       </div>
       </div>
@@ -136,7 +137,7 @@ export default function CarDetails(props:any) {
           Description
         </div>
         <div className="collapse-content">
-          <p>{props.car.decription}</p>
+          <div dangerouslySetInnerHTML={description} />
         </div>
     </div>
   </div>

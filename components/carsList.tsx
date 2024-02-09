@@ -5,7 +5,6 @@ import { useState } from "react"
 
 export default function CarsList (props:any) {
   const [selectedCar, setSelectedCar ] = useState<any>([]);
-
   return (
     <div className="wrapper flex">
       <div className="relative m-3 flex flex-wrap gap-1 mx-auto justify-center">

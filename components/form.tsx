@@ -1,14 +1,48 @@
 import { createBooking } from "@/services";
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import InputField from "./inputField";
+import SelectField from "./selectField";
+import ToggleCheck from "./toggleCheck";
+import InputDateTime from "./inputDateTime";
+import { CiLocationOn } from "react-icons/ci";
 
 const Form = ({ car }: any) => {
-  const [formValue, setFormValue] = useState({ location: '', pickupDate: '', dropOffDate: '', pickUpTime: '', dropoffDate: '', contactNumber: '', carId: '' })
+  const nextHourDate = getNextHour();
+  const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
+  const formattedTime = formatTime(nextHourDate); // HH:MM
   const [ finalPrice, setFinalPrice ] = useState(car.price)
+  const [formValue, setFormValue] = useState({
+    pickupLocation: '',
+    dropoffLocation: '',
+    pickupDate: formattedDate,
+    dropoffDate: formattedDate,
+    pickupTime: formattedTime,
+    dropoffTime: "20:00",
+    firstName: '',
+    lastName: '',
+    emailAdress: '',
+    age: '30+',
+    phoneNumber: '',
+    whatsAppNumber: '',
+    carId: car.id,
+    bookingPrice: finalPrice
+  })
   const [withDriver, setWithDriver] = useState(false);
   const [outCapital, setOutCapital] = useState(false);
   const [addDropoff, setAddDropoff] = useState(false)
   const [step, setStep] = useState(1);
 
+  /* useEffect(() => {
+
+
+    setFormValue(prevState => ({
+      ...prevState,
+      pickupDate: formattedDate,
+      pickupTime: formattedTime,
+      dropoffDate: formattedDate,
+      dropoffTime: "20:00"
+    }));
+  }, []); */
 
   const nextStep = () => {
     setStep(step + 1);
@@ -21,7 +55,7 @@ const Form = ({ car }: any) => {
   const updatePrice = (e: any) => {
     if(e.target.name == "withDriver") {
       setWithDriver(e.target.checked)
-    } else if(e.target.name == "outAbidjan") {
+    } else if(e.target.name == "outCapital") {
       setOutCapital(e.target.checked)
     }
   }
@@ -39,11 +73,14 @@ const Form = ({ car }: any) => {
     setFinalPrice(price);
   }, [withDriver, outCapital, car.price])
   useEffect(() => {
-    if (car) setFormValue({ ...formValue, carId: car.id });
+    if (car) setFormValue({ ...formValue, carId: car.id, bookingPrice: finalPrice });
   }, [car])
-  const handleChange = (event: any) => {
-    setFormValue({ ...formValue, [event.target.name]: event.target.value });
-  }
+
+  const handleChange = (event:any) => {
+    const { name, value } = event.target;
+    setFormValue(prevState => ({ ...prevState, [name]: value }));
+  };
+
   const handleSubmit = async () => {
     console.log(formValue)
     const resp = await createBooking(formValue);
@@ -55,64 +92,41 @@ const Form = ({ car }: any) => {
       {
         step === 1 && (
           <div>
-            <div className="flex flex-col w-full mb-5">
-              <label className="text-gray-400 mb-2">Lieu de récuperation</label>
-              <select className="select bg-white select-bordered w-full " name="pickupLocation" onChange={handleChange}>
-                <option defaultValue="Lieu de récuperation ?">Lieu de récuperation ?</option>
-                <option>Riviéra M'badon, Abidjan</option>
-                <option>Aéroport Félix Houphouet Boigny, Abidjan</option>
-              </select>
-            </div>
-            <div className="form-control flex-col mb-2">
-              <label htmlFor="returnAgency" className="label cursor-pointer ">
-                <span className="label-text text-gray-400">Retour dans une autre agence&nbsp;?</span>
-                <input name="returnAgency" type="checkbox" className="toggle toggle-accent" onChange={updateDropoffLocation} />
-              </label>
-            </div>
+            <SelectField
+              label="Lieu de récuperation ?"
+              name="pickupLocation"
+              onChange={handleChange}
+              options={[
+                { value: "Riviéra M'badon, Abidjan" },
+                { value: "Aéroport Félix Houphouet Boigny, Abidjan" },
+              ]}
+              defaultValue=""
+              Icon={CiLocationOn}
+              className=""
+            />
+            <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" />
             {
               addDropoff == true && (
-              <div className="flex flex-col w-full mb-5">
-                <label className="text-gray-400 mb-2">Lieu de retour</label>
-                <select className="select bg-white select-bordered w-full " name="dropoffLocation" onChange={handleChange}>
-                  <option defaultValue="Lieu de retour ?">Lieu de retour ?</option>
-                  <option>Riviéra M'badon, Abidjan</option>
-                  <option>Aéroport Félix Houphouet Boigny, Abidjan</option>
-                </select>
-              </div>
+                <SelectField
+                  label="Lieu de récuperation ?"
+                  name="dropoffLocation"
+                  onChange={handleChange}
+                  options={[
+                    { value: "Riviéra M'badon, Abidjan" },
+                    { value: "Aéroport Félix Houphouet Boigny, Abidjan" },
+                  ]}
+                  defaultValue=""
+                  className=""
+                  Icon={CiLocationOn}
+                />
             )}
-          <div className="flex flex-row gap-5 mb-5">
-            <div className="flex flex-col w-3/5">
-              <label className="text-gray-400 mb-2">Date de récuperation</label>
-              <input type="date" placeholder="Type here" name="pickUpDate" className="input input-bordered bg-white w-full max-w-lg" onChange={handleChange} />
-            </div>
-            <div className="flex flex-col w-2/5">
-              <label className="text-gray-400 mb-2">Heure de récuperation</label>
-              <input type="time" name="pickUpTime" placeholder="Type here" className="input input-bordered bg-white w-full max-w-lg" onChange={handleChange} />
-            </div>
-          </div>
           <div className="flex gap-5 mb-5">
-            <div className="flex flex-col  w-3/5">
-              <label className="text-gray-400 mb-2">Date de retour</label>
-              <input type="date" placeholder="Type here" name="dropOffDate" className="input input-bordered bg-white w-full max-w-lg" onChange={handleChange} />
-            </div>
-            <div className="flex flex-col w-2/5">
-              <label className="text-gray-400 mb-2">Heure de retour</label>
-              <input type="time" name="dropOffTime" placeholder="Type here" className="input input-bordered bg-white w-full max-w-lg" onChange={handleChange} />
-            </div>
+            <InputDateTime label="Date de récuperation" nameDate="pickupDate" nameTime="pickupTime" valueDate={formValue.pickupDate} valueTime={formValue.pickupTime} onChange={handleChange} className="" />
+            <InputDateTime label="Date de retour" nameDate="dropoffDate" nameTime="dropoffTime" valueDate={formValue.dropoffDate} valueTime={formValue.dropoffTime} onChange={handleChange} className="" />
           </div>
-          <div className="flex flex-row w-full mb-5 gap-6">
-            <div className="form-control flex-col basis-1/2">
-              <label className="label cursor-pointer ">
-                <span className="label-text">Avec chauffeur ?</span>
-                <input name="withDriver" type="checkbox" className="toggle toggle-accent" onChange={updatePrice} />
-              </label>
-            </div>
-            <div className="form-control flex-col basis-1/2">
-              <label className="label cursor-pointer">
-                <span className="label-text">Hors Abijan ?</span>
-                <input name="outAbidjan" type="checkbox" className="toggle toggle-accent" onChange={updatePrice} />
-              </label>
-            </div>
+          <div className="flex flex-row w-full mb-5 gap-5">
+            <ToggleCheck label="Avec chauffeur ?" name="withDriver" type="checkbox" onChange={updatePrice} className="w-1/2" />
+            <ToggleCheck label="Heure de retour" name="outCapital" type="checkbox" onChange={updatePrice} className="w-1/2" />
           </div>
           <FinalPrice price={finalPrice} />
           <button className="btn bg-light-orange text-dark-gray" onClick={nextStep}>Suivant</button>
@@ -121,53 +135,39 @@ const Form = ({ car }: any) => {
       {step === 2 && (
         <div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <div className="flex flex-col w-1/2">
-              <label className="text-gray-400 mb-2">Nom</label>
-              <input type="text" placeholder="Nom" name="lastName" className="input input-bordered w-full bg-white max-w-lg" onChange={handleChange} />
-            </div>
-            <div className="flex flex-col w-1/2">
-              <label className="text-gray-400 mb-2">Prénom</label>
-              <input type="text" placeholder="Prénom" name="firstName" className="input input-bordered w-full bg-white max-w-lg" onChange={handleChange} />
-            </div>
+            <InputField label="Prénom" placeholder="Votre Prénom" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} />
+            <InputField label="Nom" placeholder="Votre Nom" type='text' name="lastName" value={formValue.lastName} onChange={handleChange} />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <div className="flex flex-col w-1/2">
-              <label className="text-gray-400 mb-2">Email</label>
-              <input type="email" placeholder="Email" name="email" className="input input-bordered w-full bg-white max-w-lg" onChange={handleChange} />
-            </div>
-            <div className="flex flex-col w-1/2">
-              <label className="text-gray-400 mb-2">Age</label>
-              <select className="select bg-white select-bordered w-full " name="age" defaultValue="30+" onChange={handleChange}>
-                <option value="21-24">21-24</option>
-                <option value="25-29">25-29</option>
-                <option value="30+">30+</option>
-              </select>
-            </div>
+            <InputField label="Numéro de tél" placeholder="Numéro de tél" type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange} />
+            <InputField label="Numéro de WhatsApp" placeholder="Numéro de WhatsApp" type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <div className="flex flex-col w-1/2">
-              <label className="text-gray-400 mb-2">Numéro de tél</label>
-              <input type="tel" placeholder="Votre numéro de tél" name="phoneNumber" className="input input-bordered w-full bg-white max-w-lg" onChange={handleChange} />
-            </div>
-            <div className="flex flex-col w-1/2">
-              <label className="text-gray-400 mb-2">Numéro de WhatsApp</label>
-              <input type="tel" placeholder="Votre numéro de WhatsApp" name="whatsAppNumber" className="input input-bordered w-full bg-white max-w-lg" onChange={handleChange} />
-            </div>
+            <InputField label="Email" placeholder="Votre email" type='email' className="w-1/2" name="emailAdress" value={formValue.emailAdress} onChange={handleChange} />
+            <SelectField
+              label="Votre age"
+              name="age"
+              onChange={handleChange}
+              options={[
+                { value: "21-24" },
+                { value: "25-29" },
+                { value: "30+" },
+              ]}
+              defaultValue={formValue.age}
+              className="w-1/2"
+            />
           </div>
           <FinalPrice price={ finalPrice } />
-          <div className="flex flex-col gap-5">
+          <div className="flex gap-5">
             <button className="btn bg-light-orange text-dark-gray w-40" onClick={prevStep}>Précédent</button>
-            <div className="flex gap-5" >
-              <button className="btn w-40 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange  hover:border-transparent transition ease-in duration-200" onClick={handleSubmit}>Payer plut tard</button>
-              <button className="btn w-40 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange  hover:border-transparent transition ease-in duration-200" onClick={handleSubmit}>Payer maintenant</button>
-            </div>
+            <button className="btn w-40 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange  hover:border-transparent transition ease-in duration-200" onClick={handleSubmit}>Réserver</button>
           </div>
         </div>
       )}
 
       <div className="modal-action">
-        {/* <button className="btn bg-light-orange text-dark-gray">Fermer</button>
-        <button className="group overflow-hidden btn_base py-1 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0" onClick={handleSubmit}>
+        <button className="btn bg-orange hover:bg-light-orange text-light-gray hover:text-dark-gray">Annuler</button>
+        {/* <button className="group overflow-hidden btn_base py-1 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0" onClick={handleSubmit}>
           <span className="z-40"> Enregistrer</span>
         </button> */}
       </div>
@@ -185,5 +185,25 @@ const FinalPrice = ({ price }: { price: number }) => (
     </p>
   </div>
 )
+
+// Fonction pour recuperer un heure après
+function getNextHour() {
+  const now = new Date();
+  now.setMinutes(0);
+  now.setSeconds(0);
+  now.setMilliseconds(0);
+  now.setHours(now.getHours() + 1);
+  return now;
+}
+
+// Fonction pour formater une date en format YYYY-MM-DD
+function formatDate(date: Date) {
+  return date.toISOString().split('T')[0];
+}
+
+// Fonction pour formater une date en format HH:MM
+function formatTime(date: Date) {
+  return date.toISOString().split('T')[1].slice(0, 5);
+}
 
 export default Form
