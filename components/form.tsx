@@ -6,6 +6,14 @@ import ToggleCheck from "./toggleCheck";
 import InputDateTime from "./inputDateTime";
 import { CiLocationOn } from "react-icons/ci";
 
+interface FormErrors {
+  pickupLocation?: string;
+  dropoffLocation?: string;
+  firstName?: string;
+  lastName?: string;
+  emailAdress?: string;
+}
+
 const Form = ({ car }: any) => {
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
@@ -31,7 +39,7 @@ const Form = ({ car }: any) => {
   const [outCapital, setOutCapital] = useState(false);
   const [addDropoff, setAddDropoff] = useState(false)
   const [step, setStep] = useState(1);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
   /* useEffect(() => {
 
@@ -163,8 +171,11 @@ const Form = ({ car }: any) => {
     setFormValue(prevState => ({ ...prevState, [name]: value }));
 
     // Optionnel: Valider à la modification pour une rétroaction instantanée
-    const error = validateStep2();
-    setErrors(prevErrors => ({ ...prevErrors, [name]: error }));
+    setErrors((prevErrors: FormErrors) => {
+      const error = validateStep2();
+      //const error = validateField(name, value); // Supposez que cette fonction renvoie un message d'erreur ou null
+      return { ...prevErrors, [name]: error };
+    });
   };
 
 /*   // Valider tous les champs à la soumission
