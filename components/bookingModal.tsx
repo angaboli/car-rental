@@ -7,7 +7,7 @@ const BookingModal = ({car} :any) => {
     <form method="dialog"  className="modal-box w-11/12 max-w-7xl bg-light-gray ">
       <div className="relative">
         <div className='border-b-[1px] pb-2 '>
-          <h3 className=" text-[30px] font-light text-gray-400">
+          <h3 className=" text-[30px] font-light text-blue-green">
             Réservez maintenant
           </h3>
         </div>

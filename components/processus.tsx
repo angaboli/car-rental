@@ -2,7 +2,7 @@
 const Processus = () => {
   return (
     <div id="processus">
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 text-light-gray py-8">
+      <div className="bg-blue-green bg-gradient-to-r from-slate-800 to-slate-900 text-light-gray py-8">
         <div className="wrapper mx-auto flex flex-col items-start md:flex-row lg:flex-row xl:flex-row 2xl:flex-row my-12 md:my-24 overscroll-none  ">
           <div className="flex flex-col sticky md:top-36 lg:w-1/3 xl:w-1/3 2xl:w-1/4 mt-2 md:mt-12 px-8">
             <h2 className="text-orange uppercase tracking-loose">Processus de réservation</h2>

@@ -25,7 +25,7 @@ export default function CarCard(props:any) {
   };
 
   return (
-    <div className="relative max-w-sm min-w-[540px] bg-white shadow-md rounded-3xl p-2 mx-1 my-3 cursor-pointer">
+    <div className="relative max-w-80 md:max-w-sm min-w-11/12 md:min-w-[540px] bg-white shadow-md rounded-3xl p-2 mx-1 my-3 cursor-pointer">
           <div className="overflow-x-hidden rounded-2xl relative">
             { props.car?.image ?
               <Image

@@ -25,7 +25,7 @@ const Contact = () => {
 
   return (
     <div id="contact" className="flex min-h-screen items-center justify-start bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">
-      <div className="mx-auto w-full max-w-lg">
+      <div className="mx-auto w-5/6 md:w-full max-w-lg">
         <h2 className="head_text uppercase mb-3">Contactez-nous</h2>
         <p className="mt-3">Envoyez-nous un e-mail à contact@ivoirewheels.com ou envoyez-nous un message ici&nbsp;:</p>
 

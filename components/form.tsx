@@ -31,6 +31,7 @@ const Form = ({ car }: any) => {
   const [outCapital, setOutCapital] = useState(false);
   const [addDropoff, setAddDropoff] = useState(false)
   const [step, setStep] = useState(1);
+  const [errors, setErrors] = useState<any>({});
 
   /* useEffect(() => {
 
@@ -44,9 +45,9 @@ const Form = ({ car }: any) => {
     }));
   }, []); */
 
-  const nextStep = () => {
+  /* const nextStep = () => {
     setStep(step + 1);
-  };
+  }; */
 
   const prevStep = () => {
     setStep(step - 1);
@@ -76,16 +77,115 @@ const Form = ({ car }: any) => {
     if (car) setFormValue({ ...formValue, carId: car.id, bookingPrice: finalPrice });
   }, [car])
 
-  const handleChange = (event:any) => {
-    const { name, value } = event.target;
-    setFormValue(prevState => ({ ...prevState, [name]: value }));
+  // Fonction de validation pour l'étape 1
+  const validateStep1 = () => {
+    const errors: any = {};
+    // Validation du lieu de récupération
+    if (!formValue.pickupLocation) errors.pickupLocation = 'Le lieu de récupération est requis';
+    // Validation conditionnelle du lieu de retour
+    if (addDropoff && !formValue.dropoffLocation) errors.dropoffLocation = 'Le lieu de retour est requis lorsque cette option est sélectionnée';
+    // Ajouter d'autres validations pour l'étape 1 si nécessaire
+    return errors;
   };
 
-  const handleSubmit = async () => {
-    console.log(formValue)
-    const resp = await createBooking(formValue);
-    console.log(resp);
-  }
+  // Fonction de validation pour l'étape 2
+  const validateStep2 = () => {
+    const errors: any = {};
+    // Validation du prénom
+    if (!formValue.firstName) errors.firstName = 'Le prénom est requis';
+    // Validation du nom
+    if (!formValue.lastName) errors.lastName = 'Le nom est requis';
+    // Ajouter d'autres validations pour l'étape 2 si nécessaire
+    return errors;
+  };
+
+  // Fonction pour passer à l'étape suivante
+  const nextStep = () => {
+    // Si nous sommes à l'étape 1, valider avant de passer à l'étape 2
+    if (step === 1) {
+      const step1Errors = validateStep1();
+      if (Object.keys(step1Errors).length === 0) {
+        setStep(step + 1); // Aucune erreur, passer à l'étape suivante
+      } else {
+        setErrors(step1Errors); // Afficher les erreurs de l'étape 1
+      }
+    } else {
+      // Si nécessaire, ajoutez ici la logique pour gérer d'autres transitions d'étapes
+    }
+  };
+
+ // Fonction pour gérer la soumission du formulaire
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    // Valider l'étape 2 lors de la soumission du formulaire
+    const step2Errors = validateStep2();
+    if (Object.keys(step2Errors).length === 0) {
+      console.log('Form is valid, submitting...', formValue);
+      // Logique de soumission ici
+    } else {
+      setErrors(step2Errors); // Afficher les erreurs de l'étape 2
+    }
+  };
+
+/*
+  const validateField = (name: string, value: any) => {
+    let errorMsg = null;
+    switch (name) {
+      case 'pickupLocation':
+        if (!value) errorMsg = 'Le lieu de récupération est requis';
+        break;
+      case 'dropoffLocation':
+        // Valider seulement si returnAgency (ajout de dropoff est coché)
+        if (addDropoff && !value) errorMsg = 'Le lieu de retour est requis';
+        break;
+      case 'emailAdress':
+        if (!value) {
+          errorMsg = 'L\'email est requis';
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          errorMsg = 'L\'email n\'est pas valide';
+        }
+        break;
+      // Ajoutez ici les validations pour d'autres champs
+      case 'firstName':
+        if (!value) errorMsg = 'Le prénom est requis';
+        break;
+      case 'lastName':
+        if (!value) errorMsg = 'Le nom est requis';
+        break;
+      // Vous pouvez ajouter plus de cas pour d'autres champs selon vos besoins
+    }
+    return errorMsg;
+  }; */
+
+  // Gérer les changements de champ et valider en temps réel
+  const handleChange = (event: any) => {
+    const { name, value } = event.target;
+    setFormValue(prevState => ({ ...prevState, [name]: value }));
+
+    // Optionnel: Valider à la modification pour une rétroaction instantanée
+    const error = validateStep2();
+    setErrors(prevErrors => ({ ...prevErrors, [name]: error }));
+  };
+
+/*   // Valider tous les champs à la soumission
+  const handleSubmit = async (event:any) => {
+    event.preventDefault();
+
+    // Valider tous les champs avant la soumission
+    const newErrors: any = {};
+    Object.keys(formValue).forEach(key => {
+      const error = validateField(key, formValue[key]);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.keys(newErrors).length === 0) {
+      console.log('Form is valid, submitting...', formValue);
+      // Logique de soumission ici
+    } else {
+      console.log('Validation errors', newErrors);
+      setErrors(newErrors);
+    }
+  }; */
 
   return (
     <div>
@@ -165,7 +265,7 @@ const Form = ({ car }: any) => {
         </div>
       )}
 
-      <div className="modal-action absolute bottom-2 right-0">
+      <div className="modal-action absolute bottom-7 right-7">
         <button className="btn bg-orange hover:bg-light-orange text-light-gray hover:text-dark-gray">Annuler</button>
         {/* <button className="group overflow-hidden btn_base py-1 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0" onClick={handleSubmit}>
           <span className="z-40"> Enregistrer</span>
