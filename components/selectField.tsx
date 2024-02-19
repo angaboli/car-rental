@@ -1,4 +1,4 @@
-const SelectField = ({ label, name, options, onChange, className, defaultValue, Icon } :any) => {
+const SelectField = ({ label, name, options, onChange, className, defaultValue, Icon, errors } :any) => {
   return (
     <div className={`${className}`}>
       <label className="text-gray-400 mb-2">{label}</label>
@@ -16,6 +16,7 @@ const SelectField = ({ label, name, options, onChange, className, defaultValue, 
         </select>
       {Icon && <Icon />}
     </div>
+    {errors[defaultValue] && <span className="error_message">{errors[defaultValue]}</span>}
     </div>
   );
 };

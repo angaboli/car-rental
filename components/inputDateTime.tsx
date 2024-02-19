@@ -1,5 +1,5 @@
 
-const InputDateTime = ({ label, nameDate, nameTime, valueDate, valueTime, onChange, className }:any) => {
+const InputDateTime = ({ label, nameDate, nameTime, valueDate, valueTime, onChange, className, errors }:any) => {
   return (
     <div>
       <label className="text-gray-400 mb-2">{label}</label>
