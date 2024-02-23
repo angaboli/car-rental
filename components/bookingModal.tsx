@@ -9,6 +9,7 @@ import { Carousel, IconButton  } from "@material-tailwind/react";
 import { TbManualGearbox } from "react-icons/tb";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { MdOutlineCarRental } from "react-icons/md";
+import Link from "next/link";
 
 const BookingModal = ({car} :any) => {
 
@@ -25,6 +26,13 @@ const BookingModal = ({car} :any) => {
     }
   };
 
+  function createCarSlug(name: string) {
+    if (!name) return ''; // Retourne une chaîne vide si name est undefined ou vide
+    return name.split(" ").join("-").toLowerCase();
+  }
+
+
+
   const gallery = car?.gallery || [];
   const frontImage = car?.image?.url;
   const description = { __html: car.description?.html };
@@ -37,6 +45,7 @@ const BookingModal = ({car} :any) => {
           </h3>
         </div>
       </div>
+      <div>
       <div className='flex flex-col md:flex-row md:gap-10 md:p-5'>
         <div className="w-full md:w-2/3">
           {/* <CarDetails car={car} /> */}
@@ -173,14 +182,15 @@ const BookingModal = ({car} :any) => {
             </div>
           }
         </div>
-        <div className="modal-action fixed bottom-7 right-7">
+        </div>
+        <div className="modal-action">
           <button className="btn_base py-2 px-3 rounded bg-orange hover:bg-light-orange text-light-gray hover:text-dark-gray">Fermer</button>
-          <button className="float-right w-40 group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
+          <Link href={`/reservation/${createCarSlug(car.name)}`} className="float-right w-40 group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
             <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
             <span className="z-40">Je rèserve</span>
             <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
 	          </div>
-          </button>
+          </Link>
         </div>
       </div>
     </form>

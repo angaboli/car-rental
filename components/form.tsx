@@ -195,6 +195,7 @@ const Form = ({ car }: any) => {
   }, [formValue.pickupDate, formValue.pickupTime, formValue.dropoffDate, formValue.dropoffTime, addDropoff]);
 
   return (
+    <form method=""  className="modal-box w-11/12 max-w-7xl bg-light-gray ">
     <div>
       {
         step === 1 && (
@@ -281,6 +282,7 @@ const Form = ({ car }: any) => {
         </button> */}
       </div>
     </div>
+    </form>
   )
 }
 
