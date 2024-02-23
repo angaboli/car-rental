@@ -30,7 +30,7 @@ export default function CarCard(props:any) {
             { props.car?.image ?
               <Image
                 src={props.car?.image?.url}
-                className="h-64 rounded-2xl w-full object-cover"
+                className=" rounded-2xl w-full object-cover"
                 alt={props.car.name}
                 width={520}
                 height={320}

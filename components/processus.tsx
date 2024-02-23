@@ -3,7 +3,7 @@ const Processus = () => {
   return (
     <div id="processus">
       <div className="bg-blue-green bg-gradient-to-r from-slate-800 to-slate-900 text-light-gray py-8">
-        <div className="wrapper mx-auto flex flex-col items-start md:flex-row lg:flex-row xl:flex-row 2xl:flex-row my-12 md:my-24 overscroll-none  ">
+        <div className="w-11/12 md:max-w-[1366px] md:px-8 mx-auto flex flex-col items-start md:flex-row lg:flex-row xl:flex-row 2xl:flex-row my-12 md:my-24 overscroll-none  ">
           <div className="flex flex-col sticky md:top-36 lg:w-1/3 xl:w-1/3 2xl:w-1/4 mt-2 md:mt-12 px-8">
             <h2 className="text-orange uppercase tracking-loose">Processus de réservation</h2>
             <p className="text-sm md:text-base text-gray-50 mb-4">
@@ -16,7 +16,7 @@ const Processus = () => {
           </div>
           <div className="ml-0 md:ml-12 lg:w-2/3 xl:w-2/3 2xl:w-2/3 sticky">
             <div className="container mx-auto w-full h-full">
-              <div className="relative wrap overflow-hidden p-10 h-full">
+              <div className="relative wrap overflow-hidden py-5 md:p-10 h-full">
                 {/* Lines for timeline */}
                 <div className="border-2-2 absolute h-full border"
                   style={{ right: '50%', border: '2px solid #DE5E0A', borderRadius: '1%' }}></div>
