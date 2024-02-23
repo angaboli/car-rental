@@ -8,6 +8,7 @@ import { IoCarSportOutline } from "react-icons/io5";
 import { Carousel, IconButton  } from "@material-tailwind/react";
 import { TbManualGearbox } from "react-icons/tb";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
+import { MdOutlineCarRental } from "react-icons/md";
 
 const BookingModal = ({car} :any) => {
 
@@ -27,7 +28,6 @@ const BookingModal = ({car} :any) => {
   const gallery = car?.gallery || [];
   const frontImage = car?.image?.url;
   const description = { __html: car.description?.html };
-
   return (
     <form method="dialog"  className="modal-box w-11/12 max-w-7xl bg-light-gray ">
       <div className="relative">
@@ -160,14 +160,27 @@ const BookingModal = ({car} :any) => {
               </div>
             </div>
           </div>
-          <div tabIndex={0} className="collapse collapse-plus border border-blue-green bg-base-200">
-            <div className="collapse-title text-md font-medium ">
-              Description
+          {
+            ( typeof(car.description?.html) !== 'undefined' && car.description?.html !== null ) &&
+
+            <div tabIndex={0} className="collapse collapse-plus border border-blue-green bg-base-200">
+              <div className="collapse-title text-md font-medium ">
+                Description
+              </div>
+              <div className="collapse-content">
+                <div dangerouslySetInnerHTML={description} />
+              </div>
             </div>
-            <div className="collapse-content">
-              <div dangerouslySetInnerHTML={description} />
-            </div>
-          </div>
+          }
+        </div>
+        <div className="modal-action fixed bottom-7 right-7">
+          <button className="btn_base py-2 px-3 rounded bg-orange hover:bg-light-orange text-light-gray hover:text-dark-gray">Fermer</button>
+          <button className="float-right w-40 group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
+            <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
+            <span className="z-40">Je rèserve</span>
+            <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
+	          </div>
+          </button>
         </div>
       </div>
     </form>
