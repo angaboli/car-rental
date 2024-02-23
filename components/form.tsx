@@ -24,7 +24,7 @@ const Form = ({ car }: any) => {
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
-  const [ finalPrice, setFinalPrice ] = useState(car.price)
+  const [ finalPrice, setFinalPrice ] = useState(car?.price)
   const [formValue, setFormValue] = useState({
     pickupLocation: '',
     dropoffLocation: '',
@@ -38,7 +38,7 @@ const Form = ({ car }: any) => {
     age: '30+',
     phoneNumber: '',
     whatsAppNumber: '',
-    carId: car.id,
+    carId: car?.id,
     bookingPrice: finalPrice
   })
   const [withDriver, setWithDriver] = useState(false);
@@ -67,11 +67,11 @@ const Form = ({ car }: any) => {
   }
 
   useEffect(() => {
-    let price = car.price;
+    let price = car?.price;
     if(withDriver) { price += 5000}
     if(outCapital) { price += 10000}
     setFinalPrice(price);
-  }, [withDriver, outCapital, car.price])
+  }, [withDriver, outCapital, car?.price])
   useEffect(() => {
     if (car) setFormValue({ ...formValue, carId: car.id, bookingPrice: finalPrice });
   }, [car])
@@ -195,10 +195,10 @@ const Form = ({ car }: any) => {
   }, [formValue.pickupDate, formValue.pickupTime, formValue.dropoffDate, formValue.dropoffTime, addDropoff]);
 
   return (
-    <form method=""  className="modal-box w-11/12 max-w-7xl bg-light-gray ">
-    <div>
-      {
-        step === 1 && (
+    <form method=""  className="w-11/12 max-w-7xl bg-light-gray ">
+      <div>
+        <div className="shadow-md rounded-3xl p-3 my-3">
+          <h3 className="font-bold text-blue-green text-xl mb-3">Votre réservation</h3>
           <div>
             <SelectField
               label="Lieu de récuperation ?"
@@ -239,10 +239,10 @@ const Form = ({ car }: any) => {
             <ToggleCheck label="Heure de retour" name="outCapital" type="checkbox" onChange={updatePrice} className="w-1/2" />
           </div>
           <FinalPrice price={finalPrice} />
-          <button className="btn bg-light-orange text-dark-gray" disabled={nextIsValid} onClick={nextStep}>Suivant</button>
         </div>
-      )}
-      {step === 2 && (
+      </div>
+      <div className="shadow-md rounded-3xl p-3">
+        <h3 className="font-bold text-blue-green text-xl mb-3">Vos Coordonnées</h3>
         <div>
           <div className="flex flex-row w-full mb-5 gap-5">
             <InputField label="Prénom" placeholder="Votre Prénom" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} />
@@ -268,20 +268,18 @@ const Form = ({ car }: any) => {
             />
           </div>
           <FinalPrice price={ finalPrice } />
-          <div className="flex gap-5">
+          {/* <div className="flex gap-5">
             <button className="btn bg-light-orange text-dark-gray w-40" onClick={prevStep}>Précédent</button>
             <button className="btn w-40 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange  hover:border-transparent transition ease-in duration-200" onClick={handleSubmit}>Réserver</button>
-          </div>
+          </div> */}
         </div>
-      )}
-
-      <div className="modal-action fixed bottom-7 right-7">
-        <button className="btn bg-orange hover:bg-light-orange text-light-gray hover:text-dark-gray">Annuler</button>
+      </div>
+        <div className="">
         {/* <button className="group overflow-hidden btn_base py-1 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0" onClick={handleSubmit}>
           <span className="z-40"> Enregistrer</span>
         </button> */}
+        </div>
       </div>
-    </div>
     </form>
   )
 }

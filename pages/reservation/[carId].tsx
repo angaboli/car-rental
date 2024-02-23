@@ -7,21 +7,21 @@ import { getCarsList } from '@/services';
 import CryptoJS from 'crypto-js';
 
 interface Car {
-  carAvg: number;
+  carAvg?: number;
   carBrand: string;
   carCategory: string;
   carType: string;
-  createdAt: string;
+  createdAt?: string;
   description?: string | null;
   gallery?: Array<{[key: string]: any}>;
   id: string;
   image: { url: string };
   name: string;
-  places: number;
+  places?: number;
   price: number;
-  publishedAt: string;
+  publishedAt?: string;
   shortDescription?: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 
@@ -40,9 +40,6 @@ export default function CarReservation() {
         const result = await getCarsList();
         const decryptedId = carId ? decryptID(Array.isArray(carId) ? carId[0] : carId) : null;
         const foundCar = result.carLists.find((car: any) => car.id === decryptedId);
-        console.log(result.carLists);
-        console.log(decryptedId);
-        //console.log(foundCar)
         (foundCar) && setCar(foundCar);
         //else setError('La voiture n\'apas été trouvé');
       } catch (error) {
@@ -73,12 +70,19 @@ export default function CarReservation() {
     <>
       <Header />
       <main className="scroll-smooth bg-light-gray">
+        <div id="reservez" className=" bg-gradient-to-r from-gray-200 to-slate-300">
+          <div className="wrapper  min-h-[200px]">
+            <h1 className="head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center uppercase">
+              Réservation de la&nbsp;
+              <span className="text-primary-black font-light">{car?.name}&nbsp;</span>
+            </h1>
+          </div>
+        </div>
         <div>
           {
             loading && !car ?
               <p>Loading...</p> :
-              <div>
-                <h1>Réservation pour {car?.name }</h1>
+              <div className='md:max-w-[1366px] md:px-8 mx-auto'>
                 <Form car={car} />
               </div>
           }
