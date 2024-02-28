@@ -17,8 +17,13 @@ const Header = () => {
   return (
     <header className="shadow-3xl sticky top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70">
         <div className="wrapper flex justify-between items-center">
-          <a href="/">
-            <img src={logo.src} width={180} height={170} alt="COCO GO Logo" />
+          <a href="/" className="p-3">
+            {/* <img src={logo.src} width={231} height={80} alt="COCO GO Logo" /> */}
+            <picture>
+              <source media="(min-width: 992px)" width={231} height={80} srcset={logo.src} type="image/svg+xml" />
+              <source media="(max-width: 991px)" width={180} height={62} srcset={logo.src} type="image/svg+xml" />
+              <img width={231} height={80} src={logo.src} alt="COCO GO Logo" />
+            </picture>
           </a>
           <div className="flex flex-between gap-5 items-center">
             <div className="flex items-center gap-[30px]">

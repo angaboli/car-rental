@@ -183,7 +183,6 @@ const Form = ({ car }: any) => {
     if (dropoffDate < pickupDate) {
       return "La date de retour ne peut pas être avant la date de récupération.";
     }
-
     return null; // Pas d'erreur
   }
 
@@ -201,7 +200,6 @@ const Form = ({ car }: any) => {
     if (formValue.pickupDate === formValue.dropoffDate && dropoffDate <= pickupDate) {
       return "L'heure de retour doit être après l'heure de récupération.";
     }
-
     return null; // Pas d'erreur
   }
 
@@ -227,7 +225,7 @@ const Form = ({ car }: any) => {
         <div className="shadow-md rounded-3xl p-5 my-3">
           <h3 className="font-bold text-blue-green text-xl mb-3">Votre réservation</h3>
           <div>
-            <Select className="" label="Lieu de récuperation ?" name="pickupLocation" onChange={(value) => handleChange(value, 'pickupLocation')} defaultValue={formValue.pickupLocation} color="teal" >
+            <Select className="" placeholder="Lieu de récuperation ?" label="Lieu de récuperation ?" name="pickupLocation" onChange={(value) => handleChange(value, 'pickupLocation')} defaultValue={formValue.pickupLocation} color="teal" >
               <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
               <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
             </Select>
@@ -277,7 +275,7 @@ const Form = ({ car }: any) => {
         </div>
       </div>
       <div>
-          <button className="float-right w-40 group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
+          <button className="float-right w-40 group my-5 overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
             <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
             <span className="z-40">Je rèserve</span>
             <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">

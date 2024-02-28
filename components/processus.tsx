@@ -10,7 +10,7 @@ const Processus = () => {
               Suivez ces étapes pour réserver votre voiture idéale.
             </p>
             <a href="#reservez"
-              className="xs:w-1/2 sm:w-1/2 md:w-full bg-transparent hover:bg-orange text-orange hover:text-white rounded transition ease-in duration-200 shadow hover:shadow-lg py-2 px-4 border border-orange hover:border-transparent">
+              className="xs:w-1/2 sm:w-1/2 md:w-full bg-transparent hover:bg-gradient-to-r from-orange to-light-orange text-orange hover:text-white rounded transition ease-in duration-200 shadow hover:shadow-lg py-2 px-4 border border-orange hover:border-transparent">
               Je réserve
             </a>
           </div>
