@@ -1,10 +1,12 @@
-import { createBooking } from "@/services";
-import { useEffect, useState, useMemo } from "react";
+import { createBooking, checkCarAvailability } from "@/services";
+import { useEffect, useState, useMemo, useRef } from "react";
 import InputField from "./inputField";
 import SelectField from "./selectField";
 import ToggleCheck from "./toggleCheck";
 import InputDateTime from "./inputDateTime";
 import { CiLocationOn } from "react-icons/ci";
+import { Input, Select, Option, Switch, Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
+import { MdOutlineCarRental } from "react-icons/md";
 
 interface FormErrors {
   pickupLocation?: string;
@@ -47,6 +49,12 @@ const Form = ({ car }: any) => {
   const [nextIsValid, setNextIsValid ] = useState(false)
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [availability, setAvailability] = useState({
+    loading: true,
+    error: null,
+    isAvailable: false,
+  });
+  const carId = car?.id
 
   const prevStep = () => {
     setStep(step - 1);
@@ -100,7 +108,7 @@ const Form = ({ car }: any) => {
   };
 
   // Fonction pour passer à l'étape suivante
- const nextStep = () => {
+/* const nextStep = () => {
   let valid = true;
   if (step === 1) {
     const step1Errors = validateStep1();
@@ -109,7 +117,7 @@ const Form = ({ car }: any) => {
   }
 
   if (valid) setStep(currentStep => currentStep + 1);
-};
+}; */
 
 
  // Fonction pour gérer la soumission du formulaire
@@ -125,10 +133,29 @@ const Form = ({ car }: any) => {
     }
   };
 
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      const result = await checkCarAvailability(carId, formValue.pickupDate, formValue.dropoffDate);
+      setAvailability(result);
+    };
+
+    fetchAvailability();
+  }, [carId, formValue.pickupDate, formValue.dropoffDate]);
+
   // Gérer les changements de champ et valider en temps réel
-  const handleChange = (event: any) => {
-    const { name, value } = event.target;
-    setFormValue(prevState => ({ ...prevState, [name]: value }));
+  const handleChange = (event: any | string, name?: string ) => {
+    let fieldName = name;
+    //let fieldValue = event;
+    let value: string;
+
+    if (typeof event === 'object' && event.target) {
+      fieldName = event.target.name;
+      value = event.target.value;
+    }else{
+      value = event;
+    }
+    //const { name, value } = event.target;
+    setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
 
     // Optionnel: Valider à la modification pour une rétroaction instantanée
     setErrors((prevErrors: FormErrors) => {
@@ -195,90 +222,68 @@ const Form = ({ car }: any) => {
   }, [formValue.pickupDate, formValue.pickupTime, formValue.dropoffDate, formValue.dropoffTime, addDropoff]);
 
   return (
-    <form method=""  className="w-11/12 max-w-7xl bg-light-gray ">
+    <form method=""  className="w-11/12 max-w-7xl bg-light-gray mb-3">
       <div>
-        <div className="shadow-md rounded-3xl p-3 my-3">
+        <div className="shadow-md rounded-3xl p-5 my-3">
           <h3 className="font-bold text-blue-green text-xl mb-3">Votre réservation</h3>
           <div>
-            <SelectField
-              label="Lieu de récuperation ?"
-              name="pickupLocation"
-              onChange={handleChange}
-              options={[
-                { value: "Riviéra M'badon, Abidjan" },
-                { value: "Aéroport Félix Houphouet Boigny, Abidjan" },
-              ]}
-              defaultValue=""
-              Icon={CiLocationOn}
-              className=""
-              errors={errors}
-            />
-            <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" />
+            <Select className="" label="Lieu de récuperation ?" name="pickupLocation" onChange={(value) => handleChange(value, 'pickupLocation')} defaultValue={formValue.pickupLocation} color="teal" >
+              <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+              <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
+            </Select>
+            <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updateDropoffLocation} color="teal" containerProps={{ className: "my-5", }}  />
+            {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" /> */}
             {
               addDropoff == true && (
-                <SelectField
-                  label="Lieu de récuperation ?"
-                  name="dropoffLocation"
-                  onChange={handleChange}
-                  options={[
-                    { value: "Riviéra M'badon, Abidjan" },
-                    { value: "Aéroport Félix Houphouet Boigny, Abidjan" },
-                  ]}
-                  defaultValue=""
-                  className=""
-                  Icon={CiLocationOn}
-                  errors={errors}
-                />
+                <Select className="" label="Lieu de retour ?" name="dropoffLocation" onChange={(value) => handleChange(value, 'dropoffLocation')} defaultValue={formValue.dropoffLocation} color="teal" >
+                  <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                  <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
+                </Select>
             )}
           <div className="flex gap-5 mb-5">
             <InputDateTime label="Date de récuperation" nameDate="pickupDate" nameTime="pickupTime" valueDate={formValue.pickupDate} valueTime={formValue.pickupTime} onChange={handleChange} className="" />
             <InputDateTime label="Date de retour" nameDate="dropoffDate" nameTime="dropoffTime" valueDate={formValue.dropoffDate} valueTime={formValue.dropoffTime} onChange={handleChange} className="" />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <ToggleCheck label="Avec chauffeur ?" name="withDriver" type="checkbox" onChange={updatePrice} className="w-1/2" />
-            <ToggleCheck label="Heure de retour" name="outCapital" type="checkbox" onChange={updatePrice} className="w-1/2" />
+            <Switch label="Avec chauffeur&nbsp;?" name="withDriver" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }}  />
+            <Switch label="Hors Abidjan&nbsp;?" name="outCapital" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }} />
+            {/* <ToggleCheck label="Avec chauffeur ?" name="withDriver" type="checkbox" onChange={updatePrice} className="w-1/2" />
+            <ToggleCheck label="Heure de retour" name="outCapital" type="checkbox" onChange={updatePrice} className="w-1/2" /> */}
           </div>
           <FinalPrice price={finalPrice} />
         </div>
       </div>
-      <div className="shadow-md rounded-3xl p-3">
+      <div className="shadow-md rounded-3xl p-5 text-primary-black">
         <h3 className="font-bold text-blue-green text-xl mb-3">Vos Coordonnées</h3>
         <div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <InputField label="Prénom" placeholder="Votre Prénom" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} />
-            <InputField label="Nom" placeholder="Votre Nom" type='text' name="lastName" value={formValue.lastName} onChange={handleChange} />
+            <Input label="Votre Prénom" color="teal" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} />
+            <Input label="Votre Nom" color="teal" type='text' name="lastName" value={formValue.lastName} onChange={handleChange}  />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <InputField label="Numéro de tél" placeholder="Numéro de tél" type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange} />
-            <InputField label="Numéro de WhatsApp" placeholder="Numéro de WhatsApp" type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} />
+            <Input label="Numéro de tél" color="teal" type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange}  />
+
+            <Input label="Numéro de WhatsApp" color="teal" type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <InputField label="Email" placeholder="Votre email" type='email' className="w-1/2" name="emailAdress" value={formValue.emailAdress} onChange={handleChange} />
-            <SelectField
-              label="Votre age"
-              name="age"
-              onChange={handleChange}
-              options={[
-                { value: "21-24" },
-                { value: "25-29" },
-                { value: "30+" },
-              ]}
-              defaultValue={formValue.age}
-              className="w-1/2"
-            />
+            <Input label="Votre email" color="teal" type='email' name="emailAdress" value={formValue.emailAdress} onChange={handleChange} />
+            <Select label="Votre age" name="age" onChange={(value) => handleChange(value, 'age')} defaultValue={formValue.age} color="teal" >
+              <Option value="21-24">21-24</Option>
+              <Option value="25-29">25-29</Option>
+              <Option value="30+">30+</Option>
+            </Select>
           </div>
           <FinalPrice price={ finalPrice } />
-          {/* <div className="flex gap-5">
-            <button className="btn bg-light-orange text-dark-gray w-40" onClick={prevStep}>Précédent</button>
-            <button className="btn w-40 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange  hover:border-transparent transition ease-in duration-200" onClick={handleSubmit}>Réserver</button>
-          </div> */}
         </div>
       </div>
-        <div className="">
-        {/* <button className="group overflow-hidden btn_base py-1 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0" onClick={handleSubmit}>
-          <span className="z-40"> Enregistrer</span>
-        </button> */}
-        </div>
+      <div>
+          <button className="float-right w-40 group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
+            <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
+            <span className="z-40">Je rèserve</span>
+            <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
+	          </div>
+          </button>
+      </div>
       </div>
     </form>
   )

@@ -83,7 +83,11 @@ export default function CarReservation() {
             loading && !car ?
               <p>Loading...</p> :
               <div className='md:max-w-[1366px] md:px-8 mx-auto'>
-                <Form car={car} />
+                <div className="flex">
+                  <Form className="w-3/5" car={car} />
+                  <div className="w-2/5">
+                  </div>
+                </div>
               </div>
           }
           {/* Affichez ici les détails de la réservation ou un formulaire */}

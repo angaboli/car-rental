@@ -82,7 +82,7 @@ export const createBooking = async (formValue: any) => {
   return res;
 }
 
-const GET_RESERVATIONS = gql`
+/* const GET_RESERVATIONS = gql`
   query GetReservations($carId: ID!, $startDate: DateTime!, $endDate: DateTime!) {
     bookings(
       where: {
@@ -101,19 +101,68 @@ const GET_RESERVATIONS = gql`
 `;
 
 export async function checkCarAvailability(carId: string, startDate: string, endDate: string) {
-    try {
-        const variables = { carId, startDate, endDate };
-        const data = await request<any>(MASTER_URL, GET_RESERVATIONS, variables);
-        return {
-            loading: false,
-            error: null,
-            isAvailable: data.reservations.length === 0,
-        };
-    } catch (error) {
-        return {
-            loading: false,
-            error,
-            isAvailable: false,
-        };
-    }
+  try {
+      const variables = { carId, startDate, endDate };
+      const data = await request<any>(MASTER_URL, GET_RESERVATIONS, variables);
+      return {
+          loading: false,
+          error: null,
+          isAvailable: data.reservations.length === 0,
+      };
+  } catch (error) {
+      return {
+          loading: false,
+          error,
+          isAvailable: false,
+      };
+  }
+} */
+
+export async function checkCarAvailability(carId: string, startDate: string, endDate: string) {
+  try {
+    const variables = {
+      where: {
+        carId: { equals: carId },
+        AND: [
+          { startDate: { lte: endDate } },
+          { endDate: { gte: startDate } },
+        ],
+      },
+      stage: 'PUBLISHED', // Assurez-vous que cette variable correspond à ce que votre API attend
+      first: 10, // Ajustez selon le besoin
+      skip: 0,
+    };
+
+    const query = `query GetReservations($first: Int, $skip: Int, $stage: Stage!, $where: BookingWhereInput, $orderBy: BookingOrderByInput) {
+      page: bookingsConnection(
+        first: $first
+        skip: $skip
+        stage: $stage
+        where: $where
+        orderBy: $orderBy
+      ) {
+        edges {
+          node {
+            id
+          }
+        }
+        aggregate {
+          count
+        }
+      }
+    }`;
+
+    const data = await request<any>(MASTER_URL, query, variables);
+    return {
+      loading: false,
+      error: null,
+      isAvailable: data.page.aggregate.count === 0, // Supposons que `data.page.aggregate.count` donne le nombre de réservations trouvées
+    };
+  } catch (error) {
+    return {
+      loading: false,
+      error,
+      isAvailable: false,
+    };
+  }
 }

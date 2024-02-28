@@ -9,8 +9,7 @@ import CryptoJS from 'crypto-js';
 export default function CarsList (props:any) {
   const [selectedCar, setSelectedCar ] = useState<any>([]);
   const createNameLink = (name: string) => name.split(" ").join("-").toLowerCase();
-  const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || ""; //process.env.CRYPTO_JS_KEY;
-  console.log(secretKey)
+  const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
 
   // Fonction pour crypter l'ID
   function encryptID(id: string) {

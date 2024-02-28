@@ -1,4 +1,5 @@
 "use client";
+import logo from '../public/logo.svg'
 import { TbMenuDeep } from "react-icons/tb"
 import Link from 'next/link'
 import { IoClose } from "react-icons/io5"
@@ -13,12 +14,11 @@ import { GiCarWheel } from "react-icons/gi";
 
 const Header = () => {
   const [isOpen, setOpen] = useState(false)
-
   return (
     <header className="shadow-3xl sticky top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70">
         <div className="wrapper flex justify-between items-center">
           <a href="/">
-            <img src="logo.svg" width={100} height={100} alt="Ivoire Wheels Logo " />
+            <img src={logo.src} width={180} height={170} alt="COCO GO Logo" />
           </a>
           <div className="flex flex-between gap-5 items-center">
             <div className="flex items-center gap-[30px]">
