@@ -22,6 +22,12 @@ interface FormErrors {
   whatsAppNumber?: string;
 }
 
+interface AvailabilityState {
+  loading: boolean;
+  error: Error | null;
+  isAvailable: boolean;
+}
+
 const Form = ({ car }: any) => {
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
@@ -49,7 +55,7 @@ const Form = ({ car }: any) => {
   const [nextIsValid, setNextIsValid ] = useState(false)
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [availability, setAvailability] = useState({
+  const [availability, setAvailability] = useState<AvailabilityState>({
     loading: true,
     error: null,
     isAvailable: false,
@@ -143,8 +149,8 @@ const Form = ({ car }: any) => {
   }, [carId, formValue.pickupDate, formValue.dropoffDate]);
 
   // Gérer les changements de champ et valider en temps réel
-  const handleChange = (event: any | string, name?: string ) => {
-    let fieldName = name;
+  const handleChange = (event: any | string, name?: any ) => {
+    let fieldName: any = name;
     //let fieldValue = event;
     let value: string;
 
@@ -229,11 +235,11 @@ const Form = ({ car }: any) => {
               <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
               <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
             </Select>
-            <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updateDropoffLocation} color="teal" containerProps={{ className: "my-5", }}  />
+            <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updateDropoffLocation} color="teal" containerProps={{ className: "my-5", }} crossOrigin="" />
             {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" /> */}
             {
               addDropoff == true && (
-                <Select className="" label="Lieu de retour ?" name="dropoffLocation" onChange={(value) => handleChange(value, 'dropoffLocation')} defaultValue={formValue.dropoffLocation} color="teal" >
+                <Select className="" label="Lieu de retour ?" name="dropoffLocation" onChange={(value) => handleChange(value, 'dropoffLocation')} defaultValue={formValue.dropoffLocation} color="teal" placeholder="Lieu de retour ?">
                   <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
                   <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                 </Select>
@@ -243,8 +249,8 @@ const Form = ({ car }: any) => {
             <InputDateTime label="Date de retour" nameDate="dropoffDate" nameTime="dropoffTime" valueDate={formValue.dropoffDate} valueTime={formValue.dropoffTime} onChange={handleChange} className="" />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <Switch label="Avec chauffeur&nbsp;?" name="withDriver" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }}  />
-            <Switch label="Hors Abidjan&nbsp;?" name="outCapital" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }} />
+            <Switch label="Avec chauffeur&nbsp;?" name="withDriver" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }} crossOrigin=""  />
+            <Switch label="Hors Abidjan&nbsp;?" name="outCapital" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }} crossOrigin="" />
             {/* <ToggleCheck label="Avec chauffeur ?" name="withDriver" type="checkbox" onChange={updatePrice} className="w-1/2" />
             <ToggleCheck label="Heure de retour" name="outCapital" type="checkbox" onChange={updatePrice} className="w-1/2" /> */}
           </div>
@@ -255,17 +261,16 @@ const Form = ({ car }: any) => {
         <h3 className="font-bold text-blue-green text-xl mb-3">Vos Coordonnées</h3>
         <div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <Input label="Votre Prénom" color="teal" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} />
-            <Input label="Votre Nom" color="teal" type='text' name="lastName" value={formValue.lastName} onChange={handleChange}  />
+            <Input label="Votre Prénom" color="teal" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} crossOrigin=""  />
+            <Input label="Votre Nom" color="teal" type='text' name="lastName" value={formValue.lastName} onChange={handleChange} crossOrigin=""  />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <Input label="Numéro de tél" color="teal" type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange}  />
-
-            <Input label="Numéro de WhatsApp" color="teal" type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} />
+            <Input label="Numéro de tél" color="teal" type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange} crossOrigin=""  />
+            <Input label="Numéro de WhatsApp" color="teal" type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} crossOrigin=""  />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <Input label="Votre email" color="teal" type='email' name="emailAdress" value={formValue.emailAdress} onChange={handleChange} />
-            <Select label="Votre age" name="age" onChange={(value) => handleChange(value, 'age')} defaultValue={formValue.age} color="teal" >
+            <Input label="Votre email" color="teal" type='email' name="emailAdress" value={formValue.emailAdress} onChange={handleChange} crossOrigin=""  />
+            <Select label="Votre age" name="age" onChange={(value) => handleChange(value, 'age')} defaultValue={formValue.age} color="teal" placeholder="Votre age"  >
               <Option value="21-24">21-24</Option>
               <Option value="25-29">25-29</Option>
               <Option value="30+">30+</Option>
