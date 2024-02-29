@@ -20,8 +20,8 @@ const Header = () => {
           <a href="/" className="p-3">
             {/* <img src={logo.src} width={231} height={80} alt="COCO GO Logo" /> */}
             <picture>
-              <source media="(min-width: 992px)" width={231} height={80} srcset={logo.src} type="image/svg+xml" />
-              <source media="(max-width: 991px)" width={180} height={62} srcset={logo.src} type="image/svg+xml" />
+              <source media="(min-width: 992px)" width={231} height={80} srcSet={logo.src} type="image/svg+xml" />
+              <source media="(max-width: 991px)" width={180} height={62} srcSet={logo.src} type="image/svg+xml" />
               <img width={231} height={80} src={logo.src} alt="COCO GO Logo" />
             </picture>
           </a>
