@@ -156,12 +156,12 @@ export async function checkCarAvailability(carId: string, startDate: string, end
     return {
       loading: false,
       error: null,
-      isAvailable: data.page.aggregate.count === 0, // Supposons que `data.page.aggregate.count` donne le nombre de réservations trouvées
+      isAvailable: true, //data.page.aggregate.count === 0, // Supposons que `data.page.aggregate.count` donne le nombre de réservations trouvées
     };
   } catch (error) {
     return {
       loading: false,
-      error,
+      error: error instanceof Error ? error : new Error("Une erreur inconnue est survenue"),
       isAvailable: false,
     };
   }

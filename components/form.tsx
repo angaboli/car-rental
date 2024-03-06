@@ -1,8 +1,5 @@
 import { createBooking, checkCarAvailability } from "@/services";
 import { useEffect, useState, useMemo, useRef } from "react";
-import InputField from "./inputField";
-import SelectField from "./selectField";
-import ToggleCheck from "./toggleCheck";
 import InputDateTime from "./inputDateTime";
 import { CiLocationOn } from "react-icons/ci";
 import { Input, Select, Option, Switch, Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
