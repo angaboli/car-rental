@@ -133,24 +133,16 @@ export async function checkCarAvailability(carId: string, startDate: string, end
       skip: 0,
     };
 
-    const query = `query GetReservations($first: Int, $skip: Int, $stage: Stage!, $where: BookingWhereInput, $orderBy: BookingOrderByInput) {
-      page: bookingsConnection(
-        first: $first
-        skip: $skip
-        stage: $stage
-        where: $where
-        orderBy: $orderBy
-      ) {
-        edges {
-          node {
-            id
-          }
+    const query = gql`
+      query MyBookings {
+        bookings(where: {carId: {}}) {
+          id
+          pickUpDate
+          pickUpTime
+          dropOffTime
+          dropOffDate
         }
-        aggregate {
-          count
-        }
-      }
-    }`;
+      }`;
 
     const data = await request<any>(MASTER_URL, query, variables);
     return {
