@@ -1,31 +1,9 @@
 import { request, gql } from "graphql-request";
+import {CarsListResponse } from "@/types/";
 //import { gql, useQuery } from '@apollo/client';
 
 const MASTER_URL="https://api-eu-west-2.hygraph.com/v2/clrtbrrae0lgu01uurnnsod74/master"
 
-
-interface CarImage {
-  url: string;
-}
-
-interface Car {
-  id: string;
-  carAvg: number;
-  carBrand: string;
-  carType: string;
-  createdAt: string;
-  image: CarImage;
-  name: string;
-  price: number;
-  places: number;
-  carCategory: string;
-  publishedAt: string;
-  updatedAt: string;
-}
-
-interface CarsListResponse {
-  carLists: Car[];
-}
 
 export const getCarsList = async () : Promise<CarsListResponse> => {
   const query = gql`
@@ -61,17 +39,8 @@ export const getCarsList = async () : Promise<CarsListResponse> => {
   return result
 }
 
-type Booking = {
-  id: string;
-  carId: string;
-  pickUpDate: string;
-  pickUpTime: string;
-  dropOffTime: string;
-  dropOffDate: string;
-  contactNumber: string;
-};
 
-export const createBooking = async (formValue: Booking) => {
+export const createBooking = async (formValue: any) => {
   const mutationQuery = gql `
   mutation MyMutation {
     createBooking(
@@ -90,6 +59,34 @@ export const createBooking = async (formValue: Booking) => {
   `
   const res = await request(MASTER_URL, mutationQuery);
   return res;
+}
+
+
+export async function GetAllBookings() {
+  try {
+    const query = gql`
+      query MyBookings {
+        bookings {
+          id
+          pickUpDate
+          pickUpTime
+          dropOffTime
+          dropOffDate
+        }
+      }`;
+      const data = await request<any>(MASTER_URL, query);
+    return {
+      loading: false,
+      error: null,
+      data: data,
+    };
+  } catch(error){
+    return {
+      loading: false,
+      error: error instanceof Error ? error : new Error("Une erreur inconnue est survenue"),
+      data: {},
+    };
+  }
 }
 
 export async function checkCarAvailability($pickUpDate: string, $dropOffDate: string) {

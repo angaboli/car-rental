@@ -8,6 +8,7 @@ import CarsList from '@/components/carsList'
 import Skeleton from '@/components/skeleton'
 import Processus from '@/components/processus'
 import { getCarsList } from '@/services';
+import { CarsProvider } from '@/contexts/carsContext'
 const DynamicContactWithNoSSR = dynamic(
   () => import('../components/contact'),
   { ssr: false }
@@ -65,31 +66,33 @@ export default function Home() {
   };
 
   return (
-    <main className="scroll-smooth bg-light-gray">
-      <Hero carsList={originalCarsList} />
-      <CarsFiltersOption
-        carsList={originalCarsList}
-        setCat={(value: string) => setSelectedCategory(value)}
-        setType={(value: string) => setSelectedType(value)}
-        orderCarList={(value: number) => setSelectedOrder(value)}
-        resetFilters={resetFilters}
-      />
-      {
-        loading ?
-          <Skeleton /> :
-            carsList.length > 0 ?
-              <CarsList carsList={carsList} /> :
-              <div className="w-1/2 h-50 mx-auto p-10">
-                <div className="flex gap-2 justify-center shadow bg-white text-center text-orange p-5 rounded-xl">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-orange shrink-0 w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <p>Aucun véhicule ne correspond aux critères sélectionnés.</p>
+    <CarsProvider>
+      <main className="scroll-smooth bg-light-gray">
+        <Hero carsList={carsList} />
+        <CarsFiltersOption
+          carsList={originalCarsList}
+          setCat={(value: string) => setSelectedCategory(value)}
+          setType={(value: string) => setSelectedType(value)}
+          orderCarList={(value: number) => setSelectedOrder(value)}
+          resetFilters={resetFilters}
+        />
+        {
+          loading ?
+            <Skeleton /> :
+              carsList.length > 0 ?
+                <CarsList carsList={carsList} /> :
+                <div className="w-1/2 h-50 mx-auto p-10">
+                  <div className="flex gap-2 justify-center shadow bg-white text-center text-orange p-5 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-orange shrink-0 w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p>Aucun véhicule ne correspond aux critères sélectionnés.</p>
+                  </div>
                 </div>
-              </div>
-      }
-      <Processus />
-      <DynamicContactWithNoSSR />
-    </main>
+        }
+        <Processus />
+        <DynamicContactWithNoSSR />
+      </main>
+    </CarsProvider>
   )
 }

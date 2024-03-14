@@ -1,13 +1,11 @@
 "use client";
 import InputDateTime from "@/components/inputDateTime";
-import { CiLocationOn } from "react-icons/ci";
 import { useState, useEffect } from "react";
 import { useRouter  } from "next/navigation"
-import { TbCarSuv } from "react-icons/tb";
-import { FaCar } from "react-icons/fa";
-import { IoCarSportOutline } from "react-icons/io5";
-import { filterAvailableCars, checkCarAvailability } from "@/services"
-import { Carousel, Input, Select, Option, Switch, Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
+import { GetAllBookings } from "@/services"
+import { Select, Option, Switch } from "@material-tailwind/react";
+import { useCars } from '@/contexts/carsContext';
+import { Car } from '@/types/';
 
 interface FormValues {
   pickUpLocation?: string;
@@ -24,7 +22,7 @@ interface AvailabilityState {
   isAvailable: boolean;
 }
 
-const Hero = ({carsList}) => {
+const Hero = (carsList: any ) => {
 
   const router = useRouter();
   //const [openTab, setOpenTab] = useState<string>("berline");
@@ -33,6 +31,7 @@ const Hero = ({carsList}) => {
   const formattedTime = formatTime(nextHourDate); // HH:MM
   const [addDropoff, setAddDropoff] = useState<Boolean>(false)
   const [error, setError] = useState('');
+  const { setCars } = useCars();
   const [formValue, setFormValue] = useState<FormValues>({
     pickUpLocation: 'Riviéra M&apos;badon, Abidjan',
     dropoffLocation: 'Riviéra M&apos;badon, Abidjan',
@@ -54,8 +53,12 @@ const Hero = ({carsList}) => {
 
   useEffect(() => {
     const fetchAvailability = async () => {
-      const result = await filterAvailableCars(formValue.pickUpDate, formValue.dropOffDate, carsList);
-      setAvailability(result);
+      console.log(carsList)
+      const bookings = await GetAllBookings();
+      const availableCars = await filterAvailableCars(bookings.data?.bookings, formValue.pickUpDate, formValue.dropOffDate, carsList);
+
+      console.log(availableCars);
+      setCars(availableCars);
     };
 
     fetchAvailability();
@@ -87,7 +90,6 @@ const Hero = ({carsList}) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(formValue)
-    console.log(availability)
   };
 
 
@@ -167,8 +169,7 @@ function formatTime(date: Date) {
   return date.toISOString().split('T')[1].slice(0, 5);
 }
 
-
-const filterAvailableCars = (bookings: Booking[], pickUpDate : string, dropOffDate: string, allCars: Car[] ): Car[] => {
+const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: string, allCars: Car[] ): Car[] => {
   // Convertissez les dates en objets Date pour la comparaison
   const start = new Date(pickUpDate);
   const end = new Date(dropOffDate);

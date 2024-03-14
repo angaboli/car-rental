@@ -22,6 +22,7 @@ const config: Config = {
         "primary-black": "#082130",
         "blue-green": "#05A3AB",
         "orange": "#FC9404",
+        "choco": "#4C2C2C",
         "light-orange": "#ECC19D",
         "light-gray": "#f1f1f1",
         "dark-gray": "#707070",
