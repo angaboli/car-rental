@@ -68,7 +68,7 @@ export default function Home() {
   return (
     <CarsProvider>
       <main className="scroll-smooth bg-light-gray">
-        <Hero carsList={carsList} />
+        <Hero carsList={originalCarsList} />
         <CarsFiltersOption
           carsList={originalCarsList}
           setCat={(value: string) => setSelectedCategory(value)}

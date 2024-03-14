@@ -22,7 +22,7 @@ interface AvailabilityState {
   isAvailable: boolean;
 }
 
-const Hero = (carsList: any ) => {
+const Hero = (props: any ) => {
 
   const router = useRouter();
   //const [openTab, setOpenTab] = useState<string>("berline");
@@ -53,9 +53,9 @@ const Hero = (carsList: any ) => {
 
   useEffect(() => {
     const fetchAvailability = async () => {
-      console.log(carsList)
+      console.log(props)
       const bookings = await GetAllBookings();
-      const availableCars = await filterAvailableCars(bookings.data?.bookings, formValue.pickUpDate, formValue.dropOffDate, carsList);
+      const availableCars = await filterAvailableCars(bookings.data?.bookings, formValue.pickUpDate, formValue.dropOffDate, props?.carsList);
 
       console.log(availableCars);
       setCars(availableCars);
