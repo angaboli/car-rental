@@ -16,12 +16,6 @@ interface FormValues {
   dropOffTime?: string;
 }
 
-interface AvailabilityState {
-  loading: boolean;
-  error: Error | null;
-  isAvailable: boolean;
-}
-
 const Hero = (props: any ) => {
 
   const router = useRouter();
@@ -29,8 +23,8 @@ const Hero = (props: any ) => {
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
-  const [addDropoff, setAddDropoff] = useState<Boolean>(false)
-  const [error, setError] = useState('');
+  const [addDropoff, setAddDropoff] = useState<boolean>(false)
+  //const [error, setError] = useState('');
   const { setCars } = useCars();
   const [formValue, setFormValue] = useState<FormValues>({
     pickUpLocation: 'Riviéra M&apos;badon, Abidjan',
@@ -40,12 +34,6 @@ const Hero = (props: any ) => {
     pickUpTime: formattedTime,
     dropOffTime: "20:00",
   });
-  const [availability, setAvailability] = useState<AvailabilityState>({
-    loading: true,
-    error: null,
-    isAvailable: false,
-  });
-
 
   const updateDropoffLocation = (e: React.ChangeEvent<HTMLInputElement>)  => {
      e.target.name == "returnAgency" && setAddDropoff(e.target.checked)
@@ -53,7 +41,6 @@ const Hero = (props: any ) => {
 
   useEffect(() => {
     const fetchAvailability = async () => {
-      console.log(props)
       const bookings = await GetAllBookings();
       const availableCars = await filterAvailableCars(bookings.data?.bookings, formValue.pickUpDate, formValue.dropOffDate, props?.carsList);
 
@@ -66,7 +53,7 @@ const Hero = (props: any ) => {
 
 
   // Gérer les changements de champ et valider en temps réel
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> , fieldName?: string) => {
+  const handleChange = (event: string | React.ChangeEvent<HTMLInputElement | HTMLSelectElement> , fieldName?: string) => {
     let name: string;
     let value: string;
 
@@ -89,7 +76,6 @@ const Hero = (props: any ) => {
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(formValue)
   };
 
 
@@ -111,7 +97,7 @@ const Hero = (props: any ) => {
                 placeholder="Lieu de récuperation ?"
                 label="Lieu de récuperation ?"
                 name="pickUpLocation"
-                onChange={ (e) => handleChange(e , 'pickUpLocation') }
+                onChange={ (e) => handleChange( e, 'pickUpLocation') }
                 defaultValue={formValue.pickUpLocation}
                 color="orange"
               >
@@ -178,14 +164,13 @@ const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: 
     bookings.filter(booking => {
       const bookingStart = new Date(booking.pickUpDate);
       const bookingEnd = new Date(booking.dropOffDate);
-
       // Vérifiez si la période de réservation se chevauche avec les dates sélectionnées
       return (start <= bookingEnd && end >= bookingStart);
     }).map(booking => booking.carId)
   );
 
   // Ici, supposez que vous avez une liste `allCars` contenant toutes les voitures
-  return allCars.filter(car => !unavailableCarIds.has(car.id));
+  return allCars?.filter(car => !unavailableCarIds.has(car.id));
 };
 
 export default Hero;
