@@ -24,7 +24,7 @@ const config: Config = {
         "orange": "#DE5E0A",
         "light-orange": "#ECC19D",
         "light-gray": "#f1f1f1",
-        "dark-gray": "#e5e7eb",
+        "dark-gray": "#707070",
         "gray-100": "#f3f4f6",
         "gray-200": "#e5e7eb",
         "gray-500": "#6b7280",
