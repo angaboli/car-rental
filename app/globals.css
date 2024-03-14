@@ -19,7 +19,7 @@ body {
 }
 
 .head_text {
-  @apply text-blue-green font-ubuntu text-3xl;
+  @apply text-orange font-ubuntu text-3xl;
 }
 
 .link {

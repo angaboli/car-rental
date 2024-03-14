@@ -61,7 +61,17 @@ export const getCarsList = async () : Promise<CarsListResponse> => {
   return result
 }
 
-export const createBooking = async (formValue: any) => {
+type Booking = {
+  id: string;
+  carId: string;
+  pickUpDate: string;
+  pickUpTime: string;
+  dropOffTime: string;
+  dropOffDate: string;
+  contactNumber: string;
+};
+
+export const createBooking = async (formValue: Booking) => {
   const mutationQuery = gql `
   mutation MyMutation {
     createBooking(
@@ -82,54 +92,16 @@ export const createBooking = async (formValue: any) => {
   return res;
 }
 
-/* const GET_RESERVATIONS = gql`
-  query GetReservations($carId: ID!, $startDate: DateTime!, $endDate: DateTime!) {
-    bookings(
-      where: {
-        car: { id: $carId }
-        AND: [
-          { startDate_lte: $dropOffDate }
-          { endDate_gte: $pickUpDate }
-        ]
-      }
-    ) {
-      id
-      startDate
-      endDate
-    }
-  }
-`;
-
-export async function checkCarAvailability(carId: string, startDate: string, endDate: string) {
-  try {
-      const variables = { carId, startDate, endDate };
-      const data = await request<any>(MASTER_URL, GET_RESERVATIONS, variables);
-      return {
-          loading: false,
-          error: null,
-          isAvailable: data.reservations.length === 0,
-      };
-  } catch (error) {
-      return {
-          loading: false,
-          error,
-          isAvailable: false,
-      };
-  }
-} */
-
-export async function checkCarAvailability(carId: string, startDate: string, endDate: string) {
+export async function checkCarAvailability($pickUpDate: string, $dropOffDate: string) {
   try {
     const variables = {
       where: {
-        carId: { equals: carId },
-        AND: [
-          { startDate: { lte: endDate } },
-          { endDate: { gte: startDate } },
+        OR: [
+          { AND: [{ pickUpDate_lte: $pickUpDate }, { dropOffDate_gte: $pickUpDate }] },
+          { AND: [{ pickUpDate_lte: $dropOffDate }, { dropOffDate_gte: $dropOffDate }] },
+          { AND: [{ pickUpDate_gte: $pickUpDate }, { dropOffDate_lte: $dropOffDate }] }
         ],
       },
-      stage: 'PUBLISHED', // Assurez-vous que cette variable correspond à ce que votre API attend
-      first: 10, // Ajustez selon le besoin
       skip: 0,
     };
 
