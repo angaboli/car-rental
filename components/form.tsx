@@ -1,8 +1,9 @@
 import { createBooking, checkCarAvailability } from "@/services";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState } from "react";
 import InputDateTime from "./inputDateTime";
-import { Input, Select, Option, Switch, Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
+import { Input, Select, Option, Switch } from "@material-tailwind/react";
 import ButtonMain from'@/components/buttonMain';
+import { useRouter } from 'next/router';
 
 interface FormErrors {
   pickUpLocation?: string;
@@ -24,12 +25,19 @@ interface AvailabilityState {
   isAvailable: boolean;
 }
 
+
+interface ReservationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 const Form = ({ car }: any) => {
+  const router = useRouter();
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
   const [ finalPrice, setFinalPrice ] = useState(car?.price)
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [formValue, setFormValue] = useState({
     pickUpLocation: '',
     dropoffLocation: '',
@@ -58,6 +66,11 @@ const Form = ({ car }: any) => {
     isAvailable: false,
   });
   const carId = car?.id
+
+   const handleCloseModal = () => {
+    setIsModalOpen(false); // Ferme la modal
+    router.push('/'); // Redirige vers la page d'accueil
+  };
 
   const prevStep = () => {
     setStep(step - 1);
@@ -116,6 +129,7 @@ const Form = ({ car }: any) => {
     console.log(formValue)
     const resp = await createBooking(formValue);
     console.log(resp);
+    setIsModalOpen(true);
   };
 
   useEffect(() => {
@@ -205,6 +219,7 @@ const Form = ({ car }: any) => {
   }, [formValue.pickUpDate, formValue.pickUpTime, formValue.dropOffDate, formValue.dropOffTime, addDropoff]);
 
   return (
+    <>
     <form method="" onSubmit={handleSubmit} className="w-11/12 max-w-7xl bg-light-gray mb-3">
       <div>
         <div className="shadow-md rounded-3xl p-5 my-3">
@@ -271,8 +286,30 @@ const Form = ({ car }: any) => {
       </div>
       </div>
     </form>
+    <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
+    </>
   )
 }
+
+const ReservationModal : React.FC<ReservationModalProps> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="relative m-4 w-1/4 min-w-[25%] max-w-[25%] rounded-lg bg-white leading-relaxed text-primary-black antialiased shadow-2xl">
+        <div
+          className="flex items-center p-4 text-2xl leading-snug shrink-0 font-light text-gold">Votre réservation
+        </div>
+        <p className="relative p-4 leading-relaxed border-t border-b border-t-tacha-100 border-b-tacha-100 ">
+          Votre réservation a été pris en compte, nous reviendrons vers vous dans les plus brefs delais.
+        </p>
+        <div className="flex justify-end text-center">
+          <button className="btn_base primary_btn m-2 rounded-lg" onClick={onClose}>Fermer</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const FinalPrice = ({ price }: { price: number }) => (
   <div className="">
