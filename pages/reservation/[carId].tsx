@@ -5,6 +5,8 @@ import Form from '@/components/form';
 import { useRouter } from 'next/router';
 import { getCarsList } from '@/services';
 import CryptoJS from 'crypto-js';
+import SkeletonPage from '@/components/SkeletonPage';
+import CarDetails from '@/components/carDetails';
 
 interface Car {
   carAvg?: number;
@@ -64,7 +66,7 @@ export default function CarReservation() {
   };
 
   //if (loading) return ;
-  if (error) return <p>Error: {error}</p>;
+  //if (error) return <p>Error: {error}</p>;
 
   return (
     <>
@@ -81,11 +83,12 @@ export default function CarReservation() {
         <div>
           {
             loading && !car ?
-              <p>Loading...</p> :
-              <div className='md:max-w-[1366px] md:px-8 mx-auto'>
-                <div className="flex">
+              <SkeletonPage /> :
+              <div className='md:max-w-[1366px] md:px-8 mx-auto pb-10'>
+                <div className="flex gap-10">
                   <Form className="w-3/5" car={car} />
-                  <div className="w-2/5">
+                  <div className="w-2/5 shadow-md rounded-3xl p-5 my-3">
+                    <CarDetails car={car} />
                   </div>
                 </div>
               </div>

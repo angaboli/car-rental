@@ -23,7 +23,7 @@ export default function CarDetails(props:any) {
 
   const gallery = props.car?.gallery || [];
   const frontImage = props.car?.image?.url;
-  const description = { __html: props.car.description?.html };
+  const description = { __html: props.car?.description?.html };
 
  return (
   <div className="w-full">
@@ -110,7 +110,7 @@ export default function CarDetails(props:any) {
     :
     <img
       src={frontImage}
-      alt={props.car.name}
+      alt={props.car?.name}
       className="h-full w-full object-cover"
     />
   }
@@ -119,39 +119,42 @@ export default function CarDetails(props:any) {
         <div className="flex gap-5 border-y border-light-gray py-2 my-3">
           <div className="flex items-center gap-1">
             <span className="text-dark-gray">
-              { getCategoryIcon(props.car.carCategory) }
+              { getCategoryIcon(props.car?.carCategory) }
             </span>
-            {props.car.carCategory}
+            {props.car?.carCategory}
           </div>
           <div className="flex items-center gap-1">
             <TbManualGearbox className="text-dark-gray" />
-            {props.car.carType?.substr(0,1)}
+            {props.car?.carType?.substr(0,1)}
           </div>
           <div className="flex items-center gap-1">
             <MdAirlineSeatReclineNormal className="text-dark-gray" />
-            {props.car.places}
+            {props.car?.places}
           </div>
         </div>
-        <p className="text-lg font-semibold text-gray-900 mb-0">{ props.car.name}</p>
+        <p className="text-lg font-semibold text-gray-900 mb-0">{ props.car?.name}</p>
         <div className="flex flex-col">
           <p className="text-md text-gray-800 mt-0">
             <span className="font-semibold text-md">{
-              new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( props.car.price) }&nbsp;
+              new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( props.car?.price) }&nbsp;
             </span>
             <span className="font-12px">/jr</span>
           </p>
-          <p className="mt-1 mb-1">{props.car.shortDescription}</p>
+          <p className="mt-1 mb-1">{props.car?.shortDescription}</p>
         </div>
       </div>
-      </div>
-      <div tabIndex={0} className="collapse collapse-plus border border-blue-green bg-base-200">
+    </div>
+    {
+      ( typeof(props.car?.description?.html) !== 'undefined' && props.car?.description?.html !== null ) &&
+      <div tabIndex={0} className="collapse collapse-plus border border-gold bg-base-200">
         <div className="collapse-title text-md font-medium ">
           Description
         </div>
         <div className="collapse-content">
           <div dangerouslySetInnerHTML={description} />
         </div>
-    </div>
+      </div>
+    }
   </div>
  )
 }

@@ -272,7 +272,7 @@ const Form = ({ car }: any) => {
           </div>
           <div className='flex justify-between my-3'>
             <FinalPrice price={ finalPrice } />
-            <ButtonMain type="submit" label='Je reserve'  className='' />
+            <ButtonMain type="submit" label='Valider ma réservation'  className='' />
           </div>
         </div>
       </div>

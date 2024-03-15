@@ -131,7 +131,7 @@ const Hero = (props: any ) => {
             </div>
           </div>
           <div className="flex justify-end text-center">
-            <button type="submit" className="btn_base sm:w-full md:w-1/2 lg:w-1/4 primary_btn mb-10">Continuer</button>
+            <button type="submit" className="btn_base sm:w-full md:w-1/2 lg:w-1/4 primary_btn mb-10">Recherche</button>
           </div>
         </form>
       </div>
