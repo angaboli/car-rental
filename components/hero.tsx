@@ -20,20 +20,23 @@ const Hero = (props: any ) => {
 
   const router = useRouter();
   //const [openTab, setOpenTab] = useState<string>("berline");
-  const nextHourDate = getNextHour();
-  const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
-  const formattedTime = formatTime(nextHourDate); // HH:MM
   const [addDropoff, setAddDropoff] = useState<boolean>(false)
   //const [error, setError] = useState('');
   const { setCars } = useCars();
-  const [formValue, setFormValue] = useState<FormValues>({
-    pickUpLocation: 'Riviéra M&apos;badon, Abidjan',
-    dropoffLocation: 'Riviéra M&apos;badon, Abidjan',
-    pickUpDate: formattedDate,
-    dropOffDate: formattedDate,
-    pickUpTime: formattedTime,
-    dropOffTime: "20:00",
-  });
+  const [formValue, setFormValue] = useState<FormValues>(() => {
+    const nextHourDate = getNextHour();
+    const formattedDate = formatDate(nextHourDate);
+    const formattedTime = formatTime(nextHourDate);
+
+    return {
+        pickUpLocation: 'Riviéra M&apos;badon, Abidjan',
+        dropoffLocation: 'Riviéra M&apos;badon, Abidjan',
+        pickUpDate: formattedDate,
+        dropOffDate: formattedDate,
+        pickUpTime: formattedTime,
+        dropOffTime: "20:00",
+    };
+});
 
   const updateDropoffLocation = (e: React.ChangeEvent<HTMLInputElement>)  => {
      e.target.name == "returnAgency" && setAddDropoff(e.target.checked)
@@ -42,6 +45,7 @@ const Hero = (props: any ) => {
   useEffect(() => {
     const fetchAvailability = async () => {
       const bookings = await GetAllBookings();
+      console.log(props.carsList)
       const availableCars = await filterAvailableCars(bookings.data?.bookings, formValue.pickUpDate, formValue.dropOffDate, props?.carsList);
 
       console.log(availableCars);
@@ -124,7 +128,7 @@ const Hero = (props: any ) => {
             <div className="flex gap-5 mb-5 w-2/3">
               <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
               <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
-          </div>
+            </div>
           </div>
           <div className="flex justify-end text-center">
             <button type="submit" className="btn_base sm:w-full md:w-1/2 lg:w-1/4 primary_btn mb-10">Continuer</button>
@@ -152,8 +156,16 @@ function formatDate(date: Date) {
 
 // Fonction pour formater une date en format HH:MM
 function formatTime(date: Date) {
-  return date.toISOString().split('T')[1].slice(0, 5);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedMinutes = minutes.toString().padStart(2, '0');
+
+  // Retournez la chaîne de caractères formatée en HH:MM
+  return `${formattedHours}:${formattedMinutes}`;
 }
+
 
 const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: string, allCars: Car[] ): Car[] => {
   // Convertissez les dates en objets Date pour la comparaison

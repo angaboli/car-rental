@@ -2,7 +2,7 @@ import { createBooking, checkCarAvailability } from "@/services";
 import { useEffect, useState, useMemo, useRef } from "react";
 import InputDateTime from "./inputDateTime";
 import { Input, Select, Option, Switch, Menu, MenuHandler, MenuList, MenuItem, Button } from "@material-tailwind/react";
-import { MdOutlineCarRental } from "react-icons/md";
+import ButtonMain from'@/components/buttonMain';
 
 interface FormErrors {
   pickUpLocation?: string;
@@ -29,6 +29,7 @@ const Form = ({ car }: any) => {
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
   const [ finalPrice, setFinalPrice ] = useState(car?.price)
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [formValue, setFormValue] = useState({
     pickUpLocation: '',
     dropoffLocation: '',
@@ -207,7 +208,7 @@ const Form = ({ car }: any) => {
     <form method="" onSubmit={handleSubmit} className="w-11/12 max-w-7xl bg-light-gray mb-3">
       <div>
         <div className="shadow-md rounded-3xl p-5 my-3">
-          <h3 className="font-bold text-blue-green text-xl mb-3">Votre réservation</h3>
+          <h3 className="font-bold text-gold text-xl mb-3">Votre réservation</h3>
           <div>
             <Select className="" placeholder="Lieu de récuperation ?" label="Lieu de récuperation ?" name="pickUpLocation" onChange={(value) => handleChange(value, 'pickUpLocation')} defaultValue={formValue.pickUpLocation} color="teal" >
               <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
@@ -227,8 +228,8 @@ const Form = ({ car }: any) => {
             <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
           </div>
           <div className="flex flex-row w-full mb-5 gap-5">
-            <Switch label="Avec chauffeur&nbsp;?" name="withDriver" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }} crossOrigin=""  />
-            <Switch label="Hors Abidjan&nbsp;?" name="outCapital" onChange={updatePrice} color="teal" containerProps={{ className: "my-5", }} crossOrigin="" />
+            <Switch label="Avec chauffeur&nbsp;?" name="withDriver" onChange={updatePrice} color="amber" containerProps={{ className: "my-5", }} crossOrigin=""  />
+            <Switch label="Hors Abidjan&nbsp;?" name="outCapital" onChange={updatePrice} color="amber" containerProps={{ className: "my-5", }} crossOrigin="" />
             {/* <ToggleCheck label="Avec chauffeur ?" name="withDriver" type="checkbox" onChange={updatePrice} className="w-1/2" />
             <ToggleCheck label="Heure de retour" name="outCapital" type="checkbox" onChange={updatePrice} className="w-1/2" /> */}
           </div>
@@ -236,7 +237,7 @@ const Form = ({ car }: any) => {
         </div>
       </div>
       <div className="shadow-md rounded-3xl p-5 text-primary-black">
-        <h3 className="font-bold text-blue-green text-xl mb-3">Vos Coordonnées</h3>
+        <h3 className="font-bold text-gold text-xl mb-3">Vos Coordonnées</h3>
         <div>
           <div className="flex flex-row w-full mb-5 gap-5">
             <Input label="Votre Prénom" color="teal" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} crossOrigin=""  />
@@ -254,16 +255,19 @@ const Form = ({ car }: any) => {
               <Option value="30+">30+</Option>
             </Select>
           </div>
-          <FinalPrice price={ finalPrice } />
+          <div className='flex justify-between my-3'>
+            <FinalPrice price={ finalPrice } />
+            <ButtonMain type="submit" label='Je reserve'  className='' />
+          </div>
         </div>
       </div>
       <div>
-          <button className="float-right w-40 group my-5 overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
-            <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
-            <span className="z-40">Je rèserve</span>
-            <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
-	          </div>
-          </button>
+        {/* <button className="float-right w-40 group my-5 overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
+          <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
+          <span className="z-40">Je rèserve</span>
+          <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
+	        </div>
+        </button> */}
       </div>
       </div>
     </form>
@@ -271,7 +275,7 @@ const Form = ({ car }: any) => {
 }
 
 const FinalPrice = ({ price }: { price: number }) => (
-  <div className="mb-5">
+  <div className="">
     <p className="text-md text-gray-800 mt-0 kbd">
       <span className="font-semibold text-2xl">{
         new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( price) }&nbsp;
@@ -298,7 +302,14 @@ function formatDate(date: Date) {
 
 // Fonction pour formater une date en format HH:MM
 function formatTime(date: Date) {
-  return date.toISOString().split('T')[1].slice(0, 5);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedMinutes = minutes.toString().padStart(2, '0');
+
+  // Retournez la chaîne de caractères formatée en HH:MM
+  return `${formattedHours}:${formattedMinutes}`;
 }
 
 

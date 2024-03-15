@@ -10,10 +10,12 @@ import { TbManualGearbox } from "react-icons/tb";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { MdOutlineCarRental } from "react-icons/md";
 import Link from "next/link";
+import ButtonMain from '@/components/buttonMain';
+import CryptoJS from 'crypto-js';
 
 const BookingModal = ({car} :any) => {
-
-    const getCategoryIcon = (categoryName:any) => {
+  const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
+  const getCategoryIcon = (categoryName:any) => {
     switch (categoryName) {
       case 'SUV':
         return <TbCarSuv />;
@@ -26,12 +28,9 @@ const BookingModal = ({car} :any) => {
     }
   };
 
-  function createCarSlug(name: string) {
-    if (!name) return ''; // Retourne une chaîne vide si name est undefined ou vide
-    return name.split(" ").join("-").toLowerCase();
+  function encryptID(id: string) {
+    return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
   }
-
-
 
   const gallery = car?.gallery || [];
   const frontImage = car?.image?.url;
@@ -40,7 +39,7 @@ const BookingModal = ({car} :any) => {
     <form method="dialog"  className="modal-box w-11/12 max-w-7xl bg-light-gray ">
       <div className="relative">
         <div className='border-b-[1px] pb-2 '>
-          <h3 className=" text-[30px] font-light text-blue-green">
+          <h3 className=" text-[30px] font-light text-gold">
             Réservez maintenant
           </h3>
         </div>
@@ -184,13 +183,12 @@ const BookingModal = ({car} :any) => {
         </div>
         </div>
         <div className="modal-action">
-          <button className="btn_base py-2 px-3 rounded bg-orange hover:bg-light-orange text-light-gray hover:text-dark-gray">Fermer</button>
-          <Link href={`/reservation/${createCarSlug(car.name)}`} className="float-right w-40 group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
-            <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
-            <span className="z-40">Je rèserve</span>
-            <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
-	          </div>
-          </Link>
+          <button className="btn_base py-2 px-3 rounded bg-gold hover:bg-tacha text-light-gray hover:text-dark-gray">Fermer</button>
+          {
+            typeof(car.id) !== 'undefined' && car.id !== null ?
+            <ButtonMain label='Je reserve' link={`/reservation/${encodeURIComponent(encryptID(car?.id))}`} className='py-2 ' /> :
+            ''
+          }
         </div>
       </div>
     </form>

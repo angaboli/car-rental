@@ -23,6 +23,8 @@ const config: Config = {
         "blue-green": "#05A3AB",
         "orange": "#FC9404",
         "choco": "#4C2C2C",
+        "gold": "#B38425",
+        "tacha": "#D6B456",
         "light-orange": "#ECC19D",
         "light-gray": "#f1f1f1",
         "dark-gray": "#707070",
