@@ -19,10 +19,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body className="bg-white">
         <Header />
-        {children}
+          {children}
         <Footer />
       </body>
     </html>

@@ -1,31 +1,9 @@
 import { request, gql } from "graphql-request";
+import {CarsListResponse } from "@/types/";
 //import { gql, useQuery } from '@apollo/client';
 
 const MASTER_URL="https://api-eu-west-2.hygraph.com/v2/clrtbrrae0lgu01uurnnsod74/master"
 
-
-interface CarImage {
-  url: string;
-}
-
-interface Car {
-  id: string;
-  carAvg: number;
-  carBrand: string;
-  carType: string;
-  createdAt: string;
-  image: CarImage;
-  name: string;
-  price: number;
-  places: number;
-  carCategory: string;
-  publishedAt: string;
-  updatedAt: string;
-}
-
-interface CarsListResponse {
-  carLists: Car[];
-}
 
 export const getCarsList = async () : Promise<CarsListResponse> => {
   const query = gql`
@@ -61,6 +39,7 @@ export const getCarsList = async () : Promise<CarsListResponse> => {
   return result
 }
 
+
 export const createBooking = async (formValue: any) => {
   const mutationQuery = gql `
   mutation MyMutation {
@@ -82,38 +61,69 @@ export const createBooking = async (formValue: any) => {
   return res;
 }
 
-const GET_RESERVATIONS = gql`
-  query GetReservations($carId: ID!, $startDate: DateTime!, $endDate: DateTime!) {
-    bookings(
-      where: {
-        car: { id: $carId }
-        AND: [
-          { startDate_lte: $dropOffDate }
-          { endDate_gte: $pickUpDate }
-        ]
-      }
-    ) {
-      id
-      startDate
-      endDate
-    }
-  }
-`;
 
-export async function checkCarAvailability(carId: string, startDate: string, endDate: string) {
-    try {
-        const variables = { carId, startDate, endDate };
-        const data = await request<any>(MASTER_URL, GET_RESERVATIONS, variables);
-        return {
-            loading: false,
-            error: null,
-            isAvailable: data.reservations.length === 0,
-        };
-    } catch (error) {
-        return {
-            loading: false,
-            error,
-            isAvailable: false,
-        };
-    }
+export async function GetAllBookings() {
+  try {
+    const query = gql`
+      query MyBookings {
+        bookings {
+          id
+          pickUpDate
+          pickUpTime
+          dropOffTime
+          dropOffDate
+        }
+      }`;
+      const data = await request<any>(MASTER_URL, query);
+    return {
+      loading: false,
+      error: null,
+      data: data,
+    };
+  } catch(error){
+    return {
+      loading: false,
+      error: error instanceof Error ? error : new Error("Une erreur inconnue est survenue"),
+      data: {},
+    };
+  }
+}
+
+export async function checkCarAvailability($pickUpDate: string, $dropOffDate: string) {
+  try {
+    const variables = {
+      where: {
+        OR: [
+          { AND: [{ pickUpDate_lte: $pickUpDate }, { dropOffDate_gte: $pickUpDate }] },
+          { AND: [{ pickUpDate_lte: $dropOffDate }, { dropOffDate_gte: $dropOffDate }] },
+          { AND: [{ pickUpDate_gte: $pickUpDate }, { dropOffDate_lte: $dropOffDate }] }
+        ],
+      },
+      skip: 0,
+    };
+
+    const query = gql`
+      query MyBookings {
+        bookings(where: {carId: {}}) {
+          id
+          pickUpDate
+          pickUpTime
+          dropOffTime
+          dropOffDate
+        }
+      }`;
+
+    const data = await request<any>(MASTER_URL, query, variables);
+    return {
+      loading: false,
+      error: null,
+      isAvailable: true, //data.page.aggregate.count === 0, // Supposons que `data.page.aggregate.count` donne le nombre de réservations trouvées
+    };
+  } catch (error) {
+    return {
+      loading: false,
+      error: error instanceof Error ? error : new Error("Une erreur inconnue est survenue"),
+      isAvailable: false,
+    };
+  }
 }

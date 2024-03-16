@@ -1,9 +1,9 @@
 
 const InputDateTime = ({ label, nameDate, nameTime, valueDate, valueTime, onChange, className, errors }:any) => {
   return (
-    <div>
-      <label className="text-gray-400 mb-2">{label}</label>
-      <div className={`main-search rounded-lg shadow-md focus:shadow-lg px-6 py-3 w-full flex items-center space-x-6 border border-gray-200 border-opacity-75 ${className}`}>
+    <div className="w-1/2">
+      <label className="text-gray-700 font-light mt-5">{label}</label>
+      <div className={`main-search rounded-lg shadow-md focus:shadow-lg mt-5 px-5 py-2 w-full flex items-center space-x-6 border border-gray-200 border-opacity-75 ${className}`}>
         <input
           type="date"
           name={nameDate}

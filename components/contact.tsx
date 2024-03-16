@@ -36,7 +36,7 @@ const Contact = () => {
             <InputField name="email" placeholder="Votre email" type="email" value={formData.email} handleChange={handleChange} />
             <TextAreaField name="message" placeholder="Votre message" value={formData.message} handleChange={handleChange} />
           </div>
-          <button type="submit" className="group overflow-hidden btn_base mt-5 mr-2 py-1 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
+          <button type="submit" className="group overflow-hidden btn_base mt-5 mr-2 py-2 px-6 rounded  items-center flex gap-2 bg-gradient-to-r from-gold to-tacha  text-light-gray hover:text-primary-black hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
             <BsSend className="z-40 transition-all duration-300 group-hover:translate-x-1" />
             <span className="z-40">Envoyer</span>
               <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
@@ -51,15 +51,15 @@ const Contact = () => {
 
 const InputField = ({ name, placeholder, type = "text", value, handleChange }: any) => (
   <div className="relative z-0">
-    <input type={type} name={name} value={value} onChange={handleChange} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:blue-green focus:outline-none focus:ring-0" placeholder=" " />
-    <label className="absolute top-3 px-2 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-blue-green peer-focus:dark:text-blue-green">{placeholder}</label>
+    <input type={type} name={name} value={value} onChange={handleChange} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:gold focus:outline-none focus:ring-0" placeholder=" " />
+    <label className="absolute top-3 px-2 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-gold peer-focus:dark:text-gold">{placeholder}</label>
   </div>
 );
 
 const TextAreaField = ({ name, placeholder, value, handleChange }: any) => (
   <div className="relative z-0 col-span-2">
-    <textarea name={name} rows={5} value={value} onChange={handleChange} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:blue-green focus:outline-none focus:ring-0" placeholder=" "></textarea>
-    <label className="absolute top-3 px-2 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-blue-green peer-focus:dark:text-blue-green">{placeholder}</label>
+    <textarea name={name} rows={5} value={value} onChange={handleChange} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:gold focus:outline-none focus:ring-0" placeholder=" "></textarea>
+    <label className="absolute top-3 px-2 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-gold peer-focus:dark:text-gold">{placeholder}</label>
   </div>
 );
 

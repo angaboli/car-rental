@@ -16,7 +16,7 @@ const SelectField = ({ label, name, options, onChange, className, defaultValue, 
         </select>
       {Icon && <Icon />}
     </div>
-    {errors[defaultValue] && <span className="error_message">{errors[defaultValue]}</span>}
+    {/* {errors[defaultValue] && <span className="error_message">{errors[defaultValue]}</span>} */}
     </div>
   );
 };

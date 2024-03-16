@@ -25,12 +25,13 @@ export default function CarCard(props:any) {
   };
 
   return (
-    <div className="relative max-w-80 md:max-w-sm min-w-11/12 md:min-w-[540px] bg-white shadow-md rounded-3xl p-2 mx-1 my-3 cursor-pointer">
+        <div>
           <div className="overflow-x-hidden rounded-2xl relative">
             { props.car?.image ?
               <Image
                 src={props.car?.image?.url}
-                className="h-64 rounded-2xl w-full object-cover"
+                priority={false}
+                className=" rounded-2xl w-full object-cover"
                 alt={props.car.name}
                 width={520}
                 height={320}
@@ -70,12 +71,7 @@ export default function CarCard(props:any) {
                     <span className="font-12px">/jr</span>
                   </p>
                 </div>
-                <button className="place-self-end w-40 group overflow-hidden btn_base mr-2 py-2 px-3 rounded  items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
-                  <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
-                  <span className="z-40">Je rèserve</span>
-                  <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
-	                </div>
-                </button>
+
               </div>
             </div>
           </div>
