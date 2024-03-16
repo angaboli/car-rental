@@ -6,8 +6,10 @@ import { MdOutlineCarRental } from "react-icons/md";
 import Link  from "next/link";
 import CryptoJS from 'crypto-js';
 import ButtonMain from '@/components/buttonMain';
+import { useCars } from '@/contexts/carsContext';
 
 export default function CarsList (props:any) {
+  const { carsList } = useCars();
   const [selectedCar, setSelectedCar ] = useState<any>([]);
   const createNameLink = (name: string) => name.split(" ").join("-").toLowerCase();
   const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
@@ -17,10 +19,12 @@ export default function CarsList (props:any) {
     return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
   }
 
+  console.log(carsList)
+
   return (
     <div className="flex">
       <div className="relative md:max-w-[1366px] m-3 flex flex-wrap gap-1 mx-auto justify-center">
-        { props.carsList.map((car:any, index:number) => (
+        { carsList.map((car:any, index:number) => (
           <div key={car.id} className="relative max-w-80 md:max-w-sm min-w-11/12 md:min-w-[540px] bg-white shadow-md rounded-3xl p-2 mx-1 my-3 cursor-pointer">
             <div key={index} onClick={() => {(window as any ).my_modal_4.showModal(); setSelectedCar(car)}}>
               <CarCard car={car} />

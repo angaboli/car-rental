@@ -22,8 +22,9 @@ const Hero = (props: any ) => {
   //const [openTab, setOpenTab] = useState<string>("berline");
   const [addDropoff, setAddDropoff] = useState<boolean>(false)
   //const [error, setError] = useState('');
-  const { setCars } = useCars();
-  const [formValue, setFormValue] = useState<FormValues>(() => {
+  const { carsList, setCars, loading } = useCars();
+  //const [ loading, setLoading ] = useState<boolean>(true)
+  const [ formValue, setFormValue ] = useState<FormValues>(() => {
     const nextHourDate = getNextHour();
     const formattedDate = formatDate(nextHourDate);
     const formattedTime = formatTime(nextHourDate);
@@ -36,28 +37,40 @@ const Hero = (props: any ) => {
         pickUpTime: formattedTime,
         dropOffTime: "20:00",
     };
-});
+  });
+
 
   const updateDropoffLocation = (e: React.ChangeEvent<HTMLInputElement>)  => {
      e.target.name == "returnAgency" && setAddDropoff(e.target.checked)
   }
 
-  useEffect(() => {
+  //useEffect(() => {
     const fetchAvailability = async () => {
       const bookings = await GetAllBookings();
-      console.log(props.carsList)
-      const availableCars = await filterAvailableCars(bookings.data?.bookings, formValue.pickUpDate, formValue.dropOffDate, props?.carsList);
+      console.log(carsList)
+      if (formValue.pickUpDate && formValue.dropOffDate && bookings.data?.bookings && carsList) {
 
-      console.log(availableCars);
-      setCars(availableCars);
+        const availableCars = await filterAvailableCars(
+          bookings.data.bookings,
+          formValue.pickUpDate,
+          formValue.dropOffDate,
+          carsList
+        );
+
+        console.log(availableCars);
+        setCars(availableCars);
+      } else {
+        console.log("Les informations nécessaires pour filtrer les voitures ne sont pas toutes disponibles.");
+      }
     };
 
-    fetchAvailability();
-  }, []);
+    //fetchAvailability();
+  //}, []);
+
 
 
   // Gérer les changements de champ et valider en temps réel
-  const handleChange = (event: string | React.ChangeEvent<HTMLInputElement | HTMLSelectElement> , fieldName?: string) => {
+  const handleChange = (event: any , fieldName?: string) => {
     let name: string;
     let value: string;
 
@@ -80,6 +93,7 @@ const Hero = (props: any ) => {
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    fetchAvailability();
   };
 
 
@@ -92,7 +106,7 @@ const Hero = (props: any ) => {
           Roues.
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col">
-          <div className={`relative flex xs:text-xs sm:text-xs md:text-sm gap-4 pt-5`}>
+          <div className={`relative flex flex-col lg:flex-row xs:text-xs sm:text-xs md:text-sm gap-4 pt-5`}>
             <div className="w-1/3 ">
               <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" className="text-[#07074D]" onChange={updateDropoffLocation} color="teal" containerProps={{ className: "", }} crossOrigin="" />
               <Select
@@ -101,7 +115,7 @@ const Hero = (props: any ) => {
                 placeholder="Lieu de récuperation ?"
                 label="Lieu de récuperation ?"
                 name="pickUpLocation"
-                onChange={ (e) => handleChange( e, 'pickUpLocation') }
+                onChange={ (e) => handleChange( e, 'pickUpLocation' || '') }
                 defaultValue={formValue.pickUpLocation}
                 color="orange"
               >
@@ -115,7 +129,7 @@ const Hero = (props: any ) => {
                     className="shadow-md"
                     label="Lieu de retour ?"
                     name="dropoffLocation"
-                    onChange={ (e) => handleChange( e , 'dropoffLocation') }
+                    onChange={ (e) => handleChange( e , 'dropoffLocation' || '') }
                     defaultValue={formValue.dropoffLocation}
                     color="orange"
                     placeholder="Lieu de retour ?"
@@ -125,13 +139,15 @@ const Hero = (props: any ) => {
                   </Select>
               )}
             </div>
-            <div className="flex gap-5 mb-5 w-2/3">
+            <div className="flex  gap-5 mb-5 w-2/3">
               <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
               <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
             </div>
           </div>
           <div className="flex justify-end text-center">
-            <button type="submit" className="btn_base sm:w-full md:w-1/2 lg:w-1/4 primary_btn mb-10">Recherche</button>
+
+              <button type="submit" disabled={loading || !carsList.length} className="btn_base sm:w-full md:w-1/2 lg:w-1/4 primary_btn mb-10">Recherche</button>
+
           </div>
         </form>
       </div>
