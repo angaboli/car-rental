@@ -251,7 +251,7 @@ const Form = ({ car }: any) => {
                   <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                 </Select>
             )}
-          <div className="flex flex-wrap gap-5 mb-5">
+          <div className="flex flex-col md:flex-row gap-5 mb-5">
             <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
             <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
           </div>
