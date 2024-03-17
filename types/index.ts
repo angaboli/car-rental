@@ -14,6 +14,7 @@ export interface Car {
   price: number;
   places: number;
   carCategory: string;
+  withDriver: boolean;
   publishedAt: string;
   updatedAt: string;
 }

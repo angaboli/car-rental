@@ -13,7 +13,7 @@ const ButtonMain: React.FC<ButtonReserveProps> = ({ label, link, className, type
     <>
       <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1 hover:text-light-gray" />
       <span className="z-40 hover:text-primary-black">{label}</span>
-      <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000"></div>
+      <div className="hidden md:block absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000"></div>
     </>
   );
 

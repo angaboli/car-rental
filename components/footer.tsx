@@ -17,7 +17,7 @@ const Footer = () => {
               Retrouvez-nous sur nos resaux sociaux.
             </h5>
             <div className="mt-6 lg:mb-0 mb-6">
-              <div className="flex shadow-lg  h-10 w-1/3 items-center justify-between rounded-full outline-none focus:outline-none mr-2" >
+              <div className="flex  h-10 w-1/3 items-center justify-between rounded-full outline-none focus:outline-none mr-2" >
                 <a href="#" target="_blank" className="cursor-pointer">
                   <FaXTwitter className="bg-white p-2 text-neutral-800 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2" />
                 </a>
