@@ -1,7 +1,7 @@
 export default function SkeletonPage() {
   return (
     <div className="md:max-w-[1366px] md:px-8 mx-auto">
-      <div className=" flex  py-16 px-5">
+      <div className=" flex flex-wrap py-16 px-5">
         <div className="w-3/5">
           <div className="skeleton h-10 w-4/5 mb-5"></div>
           <div className="skeleton h-10 w-4/5 mb-5"></div>

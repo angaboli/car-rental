@@ -29,8 +29,7 @@ export const getCarsList = async () : Promise<CarsListResponse> => {
         gallery {
           url
         }
-        publishedAt
-        updatedAt
+        withDriver
       }
     }
   `
@@ -45,12 +44,21 @@ export const createBooking = async (formValue: any) => {
   mutation MyMutation {
     createBooking(
       data: {
+        pickUpLocation: "`+ formValue.pickUpLocation + `",
         pickUpDate: "`+ formValue.pickUpDate + `",
         pickUpTime: "`+ formValue.pickUpTime + `",
+        dropOffLocation: "`+ formValue.dropOffLocation + `",
         dropOffDate: "`+ formValue.dropOffDate + `",
         dropOffTime: "`+ formValue.dropOffTime + `",
-        contactNumber: "`+ formValue.contactNumber + `",
+        finalPrice: "`+ formValue.finalPrice + `",
         carId: {connect: {id: "`+ formValue.carId + `"}}
+        emailAdress: "`+ formValue.emailAdress + `",
+        firstName: "`+ formValue.firstName + `",
+        lastName: "`+ formValue.lastName + `",
+        phoneNumber: "`+ formValue.phoneNumber + `",
+        withDriver: "`+ formValue.withDriver + `",
+        outCapital: "`+ formValue.outCapital + `",
+        whatsAppNumber: "`+ formValue.whatsAppNumber + `",
       }
     ) {
       id

@@ -1,13 +1,13 @@
 import { createBooking, checkCarAvailability } from "@/services";
 import { useEffect, useState } from "react";
 import InputDateTime from "./inputDateTime";
-import { Input, Select, Option, Switch } from "@material-tailwind/react";
+import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind/react";
 import ButtonMain from'@/components/buttonMain';
 import { useRouter } from 'next/router';
 
 interface FormErrors {
   pickUpLocation?: string;
-  dropoffLocation?: string;
+  dropOffLocation?: string;
   pickUpDate?: string;
   pickUpTime?: string;
   dropOffDate?: string;
@@ -17,6 +17,9 @@ interface FormErrors {
   emailAdress?: string;
   phoneNumber?: string;
   whatsAppNumber?: string;
+  finalPrice?: string;
+  withDriver?: boolean;
+  outCapital?: boolean;
 }
 
 interface AvailabilityState {
@@ -40,7 +43,7 @@ const Form = ({ car }: any) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [formValue, setFormValue] = useState({
     pickUpLocation: '',
-    dropoffLocation: '',
+    dropOffLocation: '',
     pickUpDate: formattedDate,
     dropOffDate: formattedDate,
     pickUpTime: formattedTime,
@@ -52,7 +55,9 @@ const Form = ({ car }: any) => {
     phoneNumber: '',
     whatsAppNumber: '',
     carId: car?.id,
-    bookingPrice: finalPrice
+    finalPrice: finalPrice,
+    withDriver: false,
+    outCapital: false,
   })
   const [withDriver, setWithDriver] = useState(false);
   const [outCapital, setOutCapital] = useState(false);
@@ -65,7 +70,8 @@ const Form = ({ car }: any) => {
     error: null,
     isAvailable: false,
   });
-  const carId = car?.id
+  const carId = car?.id;
+  const [ rentWithDriver, setRentWithDriver ] = useState(false);
 
    const handleCloseModal = () => {
     setIsModalOpen(false); // Ferme la modal
@@ -84,21 +90,31 @@ const Form = ({ car }: any) => {
     }
   }
 
-  const updateDropoffLocation = (e:any)  => {
+  const updatedropOffLocation = (e:any)  => {
      if(e.target.name == "returnAgency") {
       setAddDropoff(e.target.checked)
     }
   }
 
   useEffect(() => {
-    let price = car?.price;
-    if(withDriver) { price += 5000}
-    if(outCapital) { price += 10000}
+    const startDate = new Date(formValue.pickUpDate);
+    const endDate = new Date(formValue.dropOffDate);
+    const timeDiff = endDate.getTime() - startDate.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    let price = car?.price * daysDiff;
+
+    if (withDriver || car?.withDriver) {
+      price += 5000 * daysDiff;
+      formValue.withDriver = true;
+    }
+    if (outCapital) {
+      price += 10000 * daysDiff;
+      formValue.outCapital = true;
+    }
     setFinalPrice(price);
-  }, [withDriver, outCapital, car?.price])
-  useEffect(() => {
-    if (car) setFormValue({ ...formValue, carId: car.id, bookingPrice: finalPrice });
-  }, [car])
+    setFormValue({ ...formValue, finalPrice: price });
+  }, [withDriver, outCapital, car?.price, formValue.pickUpDate, formValue.dropOffDate]);
 
   // Fonction de validation pour l'étape 1
   const validateStep1 = () => {
@@ -106,7 +122,7 @@ const Form = ({ car }: any) => {
     // Validation du lieu de récupération
     if (!formValue.pickUpLocation) errors.pickUpLocation = 'Le lieu de récupération est requis';
     // Validation conditionnelle du lieu de retour
-    else if (addDropoff && !formValue.dropoffLocation) errors.dropoffLocation = 'Le lieu de retour est requis lorsque cette option est sélectionnée';
+    else if (addDropoff && !formValue.dropOffLocation) errors.dropOffLocation = 'Le lieu de retour est requis lorsque cette option est sélectionnée';
     // Ajouter d'autres validations pour l'étape 1 si nécessaire
     else setNextIsValid(true);
     return errors;
@@ -115,11 +131,8 @@ const Form = ({ car }: any) => {
   // Fonction de validation pour l'étape 2
   const validateStep2 = () => {
     const errors: any = {};
-    // Validation du prénom
     if (!formValue.firstName) errors.firstName = 'Le prénom est requis';
-    // Validation du nom
     if (!formValue.lastName) errors.lastName = 'Le nom est requis';
-    // Ajouter d'autres validations pour l'étape 2 si nécessaire
     return errors;
   };
 
@@ -229,11 +242,11 @@ const Form = ({ car }: any) => {
               <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
               <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
             </Select>
-            <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updateDropoffLocation} containerProps={{ className: "my-5", }} crossOrigin="" />
-            {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" /> */}
+            <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updatedropOffLocation} containerProps={{ className: "my-5", }} crossOrigin="" />
+            {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updatedropOffLocation} className="w-1/2 mb-2" /> */}
             {
               addDropoff == true && (
-                <Select className="" label="Lieu de retour ?" name="dropoffLocation" onChange={(value) => handleChange(value, 'dropoffLocation')} defaultValue={formValue.dropoffLocation} placeholder="Lieu de retour ?">
+                <Select className="" label="Lieu de retour ?" name="dropOffLocation" onChange={(value) => handleChange(value, 'dropOffLocation')} defaultValue={formValue.dropOffLocation} placeholder="Lieu de retour ?">
                   <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
                   <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                 </Select>
@@ -242,13 +255,28 @@ const Form = ({ car }: any) => {
             <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
             <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
           </div>
-          <div className="flex flex-row w-full mb-5 gap-5">
-            <Switch label="Avec chauffeur&nbsp;?" name="withDriver" onChange={updatePrice}  containerProps={{ className: "my-5", }} crossOrigin=""  />
+          <div className="flex flex-row w-full mb-5 gap-10">
+            <div>
+            <Switch label='Avec chauffeur&nbsp;?' name="withDriver" onChange={updatePrice} checked={rentWithDriver} disabled={car?.withDriver}  containerProps={{ className: "my-5", }} crossOrigin=""  />
+              {
+                car?.withDriver &&
+                <sup>
+                  <Tooltip content='Location avec chauffeur obligatoire.'>
+                    <button className="italic text-primary-black ml-3">i</button>
+                  </Tooltip>
+                </sup>
+              }
+              </div>
             <Switch label="Hors Abidjan&nbsp;?" name="outCapital" onChange={updatePrice} containerProps={{ className: "my-5", }} crossOrigin="" />
             {/* <ToggleCheck label="Avec chauffeur ?" name="withDriver" type="checkbox" onChange={updatePrice} className="w-1/2" />
             <ToggleCheck label="Heure de retour" name="outCapital" type="checkbox" onChange={updatePrice} className="w-1/2" /> */}
           </div>
-          <FinalPrice price={finalPrice} />
+          <div className="flex">
+            {
+              (finalPrice !== 0 && !isNaN(finalPrice)) &&
+              <FinalPrice price={finalPrice} />
+            }
+          </div>
         </div>
       </div>
       <div className="shadow-md rounded-3xl p-5 text-primary-black">
@@ -270,19 +298,16 @@ const Form = ({ car }: any) => {
               <Option value="30+">30+</Option>
             </Select>
           </div>
-          <div className='flex justify-between my-3'>
-            <FinalPrice price={ finalPrice } />
-            <ButtonMain type="submit" label='Je valide'  className='px-5' />
+          <div className='flex flex-wrap justify-between my-3'>
+            {
+              (finalPrice !== 0 && !isNaN(finalPrice)) &&
+              <FinalPrice price={finalPrice} />
+            }
+            <ButtonMain type="submit" label='Je valide'  className='px-8' />
           </div>
         </div>
       </div>
       <div>
-        {/* <button className="float-right w-40 group my-5 overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2 bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-orange hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
-          <MdOutlineCarRental className="z-40 transition-all duration-300 group-hover:translate-x-1" />
-          <span className="z-40">Je rèserve</span>
-          <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
-	        </div>
-        </button> */}
       </div>
       </div>
     </form>
@@ -313,12 +338,17 @@ const ReservationModal : React.FC<ReservationModalProps> = ({ isOpen, onClose })
 
 const FinalPrice = ({ price }: { price: number }) => (
   <div className="">
-    <p className="text-md text-gray-800 mt-0 kbd">
-      <span className="font-semibold text-2xl">{
-        new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( price) }&nbsp;
-      </span>
-      <span className="font-12px">/jr</span>
-    </p>
+    <Chip
+      variant="ghost"
+      value={
+        <div>
+          <span className="font-semibold text-2xl">{
+            new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( price) }&nbsp;
+          </span>
+          <span className="font-12px lowercase">/jr</span>
+        </div>
+      }
+    />
   </div>
 )
 
