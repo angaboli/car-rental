@@ -84,10 +84,10 @@ export default function CarReservation() {
           {
             loading && !car ?
               <SkeletonPage /> :
-              <div className='md:max-w-[1366px] md:px-8 mx-auto pb-10'>
-                <div className="flex gap-10">
-                  <Form className="w-3/5" car={car} />
-                  <div className="w-2/5 shadow-md rounded-3xl p-5 my-3">
+              <div className='md:max-w-[1366px] px-8 mx-auto pb-10'>
+                <div className="flex flex-col lg:flex-row gap-10 mx-auto">
+                  <Form className="w-full md:w-3/5" car={car} />
+                  <div className="w-full md:w-2/5 shadow-md rounded-3xl p-5 my-3">
                     <CarDetails car={car} />
                   </div>
                 </div>

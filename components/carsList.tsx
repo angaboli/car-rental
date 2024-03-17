@@ -19,8 +19,6 @@ export default function CarsList (props:any) {
     return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
   }
 
-  console.log(carsList)
-
   return (
     <div className="flex">
       <div className="relative md:max-w-[1366px] m-3 flex flex-wrap gap-1 mx-auto justify-center">
@@ -31,7 +29,7 @@ export default function CarsList (props:any) {
             </div>
             {
               typeof(car.id) !== 'undefined' && car.id !== null &&
-              <ButtonMain label='Je reserve' link={`/reservation/${encodeURIComponent(encryptID(car?.id))}`} className='m-2 ' />
+              <ButtonMain label='Je reserve' link={`/reservation/${encodeURIComponent(encryptID(car?.id))}`} className='m-2 px-5' />
             }
           </div>
         ))}

@@ -183,7 +183,7 @@ const BookingModal = ({car} :any) => {
           <button className="btn_base btn_base primary_btn">Fermer</button>
           {
             typeof(car.id) !== 'undefined' && car.id !== null ?
-            <ButtonMain label='Je reserve' link={`/reservation/${encodeURIComponent(encryptID(car?.id))}`} className='py-3 uppercase ' /> :
+            <ButtonMain label='Je reserve' link={`/reservation/${encodeURIComponent(encryptID(car?.id))}`} className='py-3 px-6 uppercase ' /> :
             ''
           }
         </div>
