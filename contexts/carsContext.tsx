@@ -39,7 +39,7 @@ export const CarsProvider: React.FC<{children: ReactNode}> = ({ children }) => {
     fetchCars();
   }, []);
 
-  console.log(loading)
+  
   const value = { carsList, setCars, loading, setLoading };
 
   return (

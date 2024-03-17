@@ -30,7 +30,6 @@ export default function Home() {
 
     fetchCars();
   }, []); */
-  console.log(loading)
 
   return (
     <CarsProvider>

@@ -1,7 +1,7 @@
 
 const InputDateTime = ({ label, nameDate, nameTime, valueDate, valueTime, onChange, className, errors }:any) => {
   return (
-    <div className="w-1/2">
+    <div className="w-full md:w-1/2">
       <label className="text-gray-700 font-light mt-5">{label}</label>
       <div className={`main-search rounded-lg shadow-md focus:shadow-lg mt-5 px-5 py-2 w-full flex items-center space-x-6 border border-gray-200 border-opacity-75 ${className}`}>
         <input

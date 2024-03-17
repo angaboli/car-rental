@@ -36,30 +36,30 @@ const Footer = () => {
           <div className="w-full lg:w-6/12 xl:w-6/12 2xl:w-6/12">
             <div className="flex flex-wrap items-top mb-6">
               <div className="w-full lg:w-4/12 2xl:w-4/12 px-4 ml-auto mb-4">
-                <span className="block uppercase text-orange text-sm font-semibold mb-2">Liens utile</span>
+                <span className="block uppercase text-tacha text-sm font-semibold mb-2">Liens utile</span>
                 <ul className="list-unstyled">
                   <li>
-                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="https://www.creative-tim.com/presentation?ref=njs-profile">Decouvrez</a>
+                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="#">Decouvrez</a>
                   </li>
                   <li>
-                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="https://blog.creative-tim.com?ref=njs-profile">Les dernières nouvelles</a>
+                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="#">Les dernières nouvelles</a>
                   </li>
                   <li>
-                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="https://www.github.com/creativetimofficial?ref=njs-profile">Mon compte</a>
+                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="#">Mon compte</a>
                   </li>
                 </ul>
               </div>
               <div className="w-full lg:w-4/12 2xl:w-4/12 px-4">
-                <span className="block uppercase text-orange text-sm font-semibold mb-2">Ressources</span>
+                <span className="block uppercase text-tacha text-sm font-semibold mb-2">Ressources</span>
                 <ul className="list-unstyled">
                   <li>
-                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="https://creative-tim.com/terms?ref=njs-profile">Terms &amp; Conditions</a>
+                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="#">Terms &amp; Conditions</a>
                   </li>
                   <li>
-                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="https://creative-tim.com/privacy?ref=njs-profile">Privacy Policy</a>
+                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="#">Privacy Policy</a>
                   </li>
                   <li>
-                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="https://creative-tim.com/contact-us?ref=njs-profile">Contact Us</a>
+                    <a className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm" href="#">Contact Us</a>
                   </li>
                 </ul>
               </div>
@@ -69,9 +69,9 @@ const Footer = () => {
         <hr className="my-6 border-blueGray-300" />
         <div className="flex flex-wrap items-center md:justify-between justify-center">
           <div className="w-full md:w-4/12 px-4 mx-auto text-center">
-            <div className="text-sm text-orange font-semibold py-1">
+            <div className="text-sm text-tacha font-semibold py-1">
               Copyright © <span id="get-current-year">{currentYear}</span>
-              <a href="https://d3cod.com" className="text-orange hover:text-gray-800" target="_blank"> D3cod</a>
+              <a href="https://d3cod.com" className="text-tacha hover:text-gray-800" target="_blank"> D3cod</a>
             </div>
           </div>
         </div>

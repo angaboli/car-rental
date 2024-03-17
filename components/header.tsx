@@ -32,14 +32,8 @@ const Header = () => {
                 <li><a className="hover:bg-gradient-to-r from-gold to-tacha hover:text-light-gray" href="/#processus">Processus</a></li>
                 <li><a className="hover:bg-gradient-to-r from-gold to-tacha hover:text-light-gray" href="#contact">Contact</a></li>
               </ul>
-              {/* <button className="btn_base py-1 px-3 rounded bg-gradient-to-r from-cyan-700 to-cyan-500  text-light-gray hover:text-light-dark-gray hover:bg-primary-black">
-                <Link href="/reservation" className="xs:hidden  flex items-center gap-2 ">
-                  <MdOutlineCarRental />
-                  <span>Je réserve</span>
-                </Link>
-              </button> */}
             <div className="md:hidden">
-              <Hamburger color="#05A3AB" size={24} toggled={isOpen} toggle={setOpen} />
+              <Hamburger color="#B38425" size={24} toggled={isOpen} toggle={setOpen} />
                 {isOpen && (
                   <div className="absolute top-full right-2">
                     <ul className="menu my-2 menu-vertical bg-light-gray rounded-box ">

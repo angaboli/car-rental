@@ -47,7 +47,7 @@ const Hero = (props: any ) => {
   //useEffect(() => {
     const fetchAvailability = async () => {
       const bookings = await GetAllBookings();
-      console.log(carsList)
+      //console.log(carsList)
       if (formValue.pickUpDate && formValue.dropOffDate && bookings.data?.bookings && carsList) {
 
         const availableCars = await filterAvailableCars(
@@ -107,39 +107,42 @@ const Hero = (props: any ) => {
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col">
           <div className={`relative flex flex-col lg:flex-row xs:text-xs sm:text-xs md:text-sm gap-4 pt-5`}>
-            <div className="w-1/3 ">
-              <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" className="text-[#07074D]" onChange={updateDropoffLocation} color="teal" containerProps={{ className: "", }} crossOrigin="" />
-              <Select
-                className="shadow-md rounded-lg"
-                containerProps={{ className: "mt-5 mb-3 rounded-lg", }}
-                placeholder="Lieu de récuperation ?"
-                label="Lieu de récuperation ?"
-                name="pickUpLocation"
-                onChange={ (e) => handleChange( e, 'pickUpLocation' || '') }
-                defaultValue={formValue.pickUpLocation}
-                color="orange"
-              >
-                <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
-                <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
-              </Select>
-              {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" /> */}
-              {
-                addDropoff == true && (
-                  <Select
-                    className="shadow-md"
-                    label="Lieu de retour ?"
-                    name="dropoffLocation"
-                    onChange={ (e) => handleChange( e , 'dropoffLocation' || '') }
-                    defaultValue={formValue.dropoffLocation}
-                    color="orange"
-                    placeholder="Lieu de retour ?"
-                  >
-                    <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
-                    <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
-                  </Select>
-              )}
+            <div className="w-full md:w-1/3 ">
+              <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" className="text-[#07074D]" onChange={updateDropoffLocation} containerProps={{ className: "", }} crossOrigin="" />
+              <div className="flex flex-wrap gap-5">
+                <Select
+                  className="shadow-md rounded-lg"
+                  containerProps={{ className: "mt-5 md:mb-3 rounded-lg", }}
+                  placeholder="Lieu de récuperation ?"
+                  label="Lieu de récuperation ?"
+                  name="pickUpLocation"
+                  onChange={ (e) => handleChange( e, 'pickUpLocation' || '') }
+                  defaultValue={formValue.pickUpLocation}
+                  color="orange"
+                >
+                  <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                  <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
+                </Select>
+                {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" /> */}
+                {
+                  addDropoff == true && (
+                    <Select
+                      className="shadow-md"
+                      containerProps={{ className: "", }}
+                      label="Lieu de retour ?"
+                      name="dropoffLocation"
+                      onChange={ (e) => handleChange( e , 'dropoffLocation' || '') }
+                      defaultValue={formValue.dropoffLocation}
+                      color="orange"
+                      placeholder="Lieu de retour ?"
+                    >
+                      <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                      <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
+                    </Select>
+                )}
+              </div>
             </div>
-            <div className="flex  gap-5 mb-5 w-2/3">
+            <div className="flex flex-col md:flex-row gap-5 mb-5 w-full md:w-2/3">
               <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
               <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
             </div>
@@ -192,7 +195,7 @@ const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: 
     bookings.filter(booking => {
       const bookingStart = new Date(booking.pickUpDate);
       const bookingEnd = new Date(booking.dropOffDate);
-      // Vérifiez si la période de réservation se chevauche avec les dates sélectionnées
+
       return (start <= bookingEnd && end >= bookingStart);
     }).map(booking => booking.carId)
   );
