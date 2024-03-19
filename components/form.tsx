@@ -4,7 +4,7 @@ import InputDateTime from "./inputDateTime";
 import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind/react";
 import ButtonMain from'@/components/buttonMain';
 import EmailReservation from'@/components/emailReservation';
-import SkeletonPage from'@/components/skeletonPage';
+import SkeletonPage from'@/components/SkeletonPage';
 import { useRouter } from 'next/router';
 import { BsInfoCircleFill } from "react-icons/bs";
 import { Spinner } from "@material-tailwind/react";
@@ -272,7 +272,7 @@ const Form = ({ car }: any) => {
     {
       (loading) ?
         <div className="w-11/12 max-w-7xl bg-light-gray">
-          <SkeletonPage className="h-16 w-16 text-gray-900/50" />
+          <SkeletonPage />
         </div> :
       <>
         <form method="" onSubmit={handleSubmit} className="w-11/12 max-w-7xl bg-light-gray mb-3">
