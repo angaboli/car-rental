@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
+import { Audiowide } from 'next/font/google'
 import Form from '@/components/form';
 import { useRouter } from 'next/router';
 import { getCarsList } from '@/services';
@@ -26,7 +27,11 @@ interface Car {
   updatedAt?: string;
 }
 
-
+const audiowide = Audiowide({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export default function CarReservation() {
   const router = useRouter();
@@ -74,9 +79,9 @@ export default function CarReservation() {
       <main className="scroll-smooth bg-light-gray">
         <div id="reservez" className=" bg-gradient-to-r from-gray-200 to-slate-300">
           <div className="wrapper  min-h-[200px]">
-            <h1 className="head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center uppercase">
+            <h1 className={`${audiowide.className } head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center uppercase`}>
               Réservation de la&nbsp;
-              <span className="text-primary-black font-light">{car?.name}&nbsp;</span>
+              <span className="text-primary-black">{car?.name}&nbsp;</span>
             </h1>
           </div>
         </div>

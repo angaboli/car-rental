@@ -19,7 +19,7 @@ body {
 }
 
 .head_text {
-  @apply text-tacha font-ubuntu text-3xl;
+  @apply text-gold text-3xl;
 }
 
 .link {
