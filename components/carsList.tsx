@@ -29,7 +29,7 @@ export default function CarsList (props:any) {
             </div>
             {
               typeof(car.id) !== 'undefined' && car.id !== null &&
-              <ButtonMain label='Je reserve' link={`/reservation/${encodeURIComponent(encryptID(car?.id))}`} className='m-2 px-5' />
+              <ButtonMain label='Je reserve' link={`/reservation/${((car?.id))}`} className='m-2 px-5' />
             }
           </div>
         ))}
