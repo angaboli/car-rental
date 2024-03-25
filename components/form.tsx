@@ -51,7 +51,7 @@ interface ReservationModalProps {
   onClose: () => void;
 }
 
-const Form = ({ car }: any) => {
+const Form = ({ car, className }: any) => {
   const router = useRouter();
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
@@ -108,6 +108,23 @@ const Form = ({ car }: any) => {
     }
   }
 
+  useEffect(() => {
+    const savedFormData = sessionStorage.getItem("formData");
+    console.log(savedFormData)
+    if (savedFormData) {
+      setFormValue(JSON.parse(savedFormData));
+    }else{
+      setFormValue({
+        ...formValue,
+        carId: car?.id,
+        finalPrice: finalPrice,
+      });
+    }
+  }, [car]);
+
+  useEffect(() => {
+    sessionStorage.setItem("formData", JSON.stringify(formValue));
+  }, [formValue]);
 
   useEffect(() => {
     const fetchCarDetails = async () => {
@@ -133,12 +150,9 @@ const Form = ({ car }: any) => {
     const startDate = new Date(formValue.pickUpDate);
     const endDate = new Date(formValue.dropOffDate);
     const timeDiff = endDate.getTime() - startDate.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    const daysDiff = (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1;
 
-    let price = car?.price * daysDiff;
-
-    console.log('useEffect', car)
-    console.log('useEffect', formValue)
+    let price = car?.price * daysDiff  ;
 
     if (withDriver || car?.withDriver) {
       price += 5000 * daysDiff;
@@ -188,6 +202,7 @@ const Form = ({ car }: any) => {
     } else {
       console.error("Il y'a une erreur de traitement")
     }
+    sessionStorage.removeItem("formData");
   };
 
 
@@ -271,11 +286,11 @@ const Form = ({ car }: any) => {
     <>
     {
       (loading) ?
-        <div className="w-11/12 max-w-7xl bg-light-gray">
+        <div className="max-w-7xl bg-light-gray">
           <SkeletonPage />
         </div> :
       <>
-        <form method="" onSubmit={handleSubmit} className="w-11/12 max-w-7xl bg-light-gray mb-3">
+        <form method="" onSubmit={handleSubmit} className={`${className} max-w-7xl bg-light-gray mb-3`}>
           <div>
             <div className="shadow-md rounded-3xl p-5 my-3">
               <h3 className="font-bold text-gold text-xl mb-3">Votre réservation</h3>
@@ -314,10 +329,7 @@ const Form = ({ car }: any) => {
                 <Switch label="Hors Abidjan&nbsp;?" color="brown" name="outCapital" onChange={updatePrice} containerProps={{ className: "my-5", }} crossOrigin="" />
               </div>
               <div className="flex">
-                {
-                  (finalPrice !== 0 && !isNaN(finalPrice)) &&
-                  <FinalPrice price={finalPrice} />
-                }
+                <FinalPrice price={finalPrice} />
               </div>
             </div>
           </div>
@@ -341,10 +353,7 @@ const Form = ({ car }: any) => {
                 </Select>
               </div>
               <div className='flex flex-wrap justify-between my-3'>
-                {
-                  (finalPrice !== 0 && !isNaN(finalPrice)) &&
-                  <FinalPrice price={finalPrice} />
-                }
+                <FinalPrice price={finalPrice} />
                 <ButtonMain type="submit" label='Je valide'  className='px-8' />
               </div>
             </div>

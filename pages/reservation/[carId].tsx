@@ -60,6 +60,9 @@ export default function CarReservation() {
     fetchCarsList();
   }, [carId]);
 
+  console.log(carId);
+  console.log(car);
+
   const decryptID = (encryptedId: string) => {
     try {
       const bytes = CryptoJS.AES.decrypt(encryptedId, secretKey);
@@ -89,10 +92,10 @@ export default function CarReservation() {
           {
             loading && !car ?
               <SkeletonPage /> :
-              <div className='md:max-w-[1366px] px-8 mx-auto pb-10'>
+              <div className='w-11/12 px-8 mx-auto pb-10'>
                 <div className="flex flex-col lg:flex-row gap-10 mx-auto">
-                  <Form className="w-full lg:w-3/5" car={car} />
-                  <div className="w-full lg:w-2/5 shadow-md rounded-3xl p-5 my-3">
+                  <Form className="w-full lg:w-7/12" car={car} />
+                  <div className="w-full lg:w-5/12 shadow-md rounded-3xl p-5 my-3">
                     <CarDetails car={car} />
                   </div>
                 </div>
