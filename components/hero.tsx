@@ -1,4 +1,5 @@
 "use client";
+import { Audiowide } from 'next/font/google'
 import InputDateTime from "@/components/inputDateTime";
 import { useState, useEffect } from "react";
 import { useRouter  } from "next/navigation"
@@ -15,6 +16,12 @@ interface FormValues {
   dropOffDate?: string;
   dropOffTime?: string;
 }
+
+const audiowide = Audiowide({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 const Hero = (props: any ) => {
 
@@ -96,13 +103,12 @@ const Hero = (props: any ) => {
     fetchAvailability();
   };
 
-
   return (
     <div id="reservez" className="bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">
-      <div className="wrapper  min-h-[200px]">
-        <h1 className="head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center uppercase">
+      <div className={` wrapper  min-h-[200px]`}>
+        <h1 className={`${audiowide.className} head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center font-bold uppercase`}>
           L'Élégance sur&nbsp;
-          <span className="text-primary-black font-light">quatre&nbsp;</span>
+          <span className={`${audiowide.className} text-primary-black`}>quatre&nbsp;</span>
           Roues.
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col">

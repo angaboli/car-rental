@@ -1,5 +1,5 @@
 "use client";
-import logo from '../public/logo_gold.svg'
+import logo from '../public/logo.svg'
 import { TbMenuDeep } from "react-icons/tb"
 import Link from 'next/link'
 import { IoClose } from "react-icons/io5"
