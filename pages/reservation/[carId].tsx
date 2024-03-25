@@ -45,7 +45,8 @@ export default function CarReservation() {
     const fetchCarsList = async () => {
       try {
         const result = await getCarsList();
-        const decryptedId = carId ? decryptID(Array.isArray(carId) ? carId[0] : carId) : null;
+        const decryptedId = carId;
+        //? decryptID(Array.isArray(carId) ? carId[0] : carId) : null;
         const foundCar = result.carLists.find((car: any) => car.id === decryptedId);
         (foundCar) && setCar(foundCar);
         //else setError('La voiture n\'apas été trouvé');
