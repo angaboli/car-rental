@@ -8,48 +8,9 @@ import SkeletonPage from'@/components/SkeletonPage';
 import { useRouter } from 'next/router';
 import { BsInfoCircleFill } from "react-icons/bs";
 import { Spinner } from "@material-tailwind/react";
+import { EmailParams, FormErrors, AvailabilityState, DateParams, TimeParams, ReservationModalProps, ValidationParams} from '@/types';
+import { validatePickUpDate, validateDropOffDate, validatePickUpTime, validateDropOffTime, validateName, validateEmail } from '@services/validation';
 
-interface EmailParams {
-  firstName: string;
-  contactEmail: string;
-  contactPhone: string;
-  pickUpLocation: string;
-  dropOffLocation: string;
-  pickUpDate: string;
-  pickUpTime: string;
-  dropOffDate: string;
-  dropOffTime: string;
-  finalPrice: string;
-}
-
-interface FormErrors {
-  pickUpLocation?: string;
-  dropOffLocation?: string;
-  pickUpDate?: string;
-  pickUpTime?: string;
-  dropOffDate?: string;
-  dropOffTime?: string;
-  firstName?: string;
-  lastName?: string;
-  emailAdress?: string;
-  phoneNumber?: string;
-  whatsAppNumber?: string;
-  finalPrice?: string;
-  withDriver?: boolean;
-  outCapital?: boolean;
-}
-
-interface AvailabilityState {
-  loading: boolean;
-  error: Error | null;
-  isAvailable: boolean;
-}
-
-
-interface ReservationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 const Form = ({ car, className }: any) => {
   const router = useRouter();
@@ -110,7 +71,7 @@ const Form = ({ car, className }: any) => {
 
   useEffect(() => {
     const savedFormData = sessionStorage.getItem("formData");
-    console.log(savedFormData)
+    //console.log(savedFormData)
     if (savedFormData) {
       setFormValue(JSON.parse(savedFormData));
     }else{
@@ -167,13 +128,6 @@ const Form = ({ car, className }: any) => {
     setFormValue({ ...formValue, finalPrice: price });
   }, [withDriver, rentWithDriver, outCapital, car?.price, formValue.pickUpDate, formValue.dropOffDate]);
 
-  /* // Fonction de validation pour l'étape 2
-  const validateStep2 = () => {
-    const errors: any = {};
-    if (!formValue.firstName) errors.firstName = 'Le prénom est requis';
-    if (!formValue.lastName) errors.lastName = 'Le nom est requis';
-    return errors;
-  }; */
 
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: any) => {
@@ -182,6 +136,18 @@ const Form = ({ car, className }: any) => {
     console.log(car.id)
     formValue.carId = car.id;
     console.log('handleSubmit 2', formValue);
+    const errors: FormErrors = {
+      pickUpDate: validatePickUpDate(formValues.pickUpDate),
+      dropOffDate: validateDropOffDate(formValues.pickUpDate, formValues.dropOffDate),
+      pickUpTime: validatePickUpTime(formValues.pickUpDate, formValues.pickUpTime),
+      dropOffTime: validateDropOffTime(formValues.pickUpDate, formValues.dropOffDate, formValues.pickUpTime, formValues.dropOffTime),
+      firstName: validateName(formValues.firstName),
+      lastName: validateName(formValues.lastName),
+      email: validateEmail(formValues.email),
+    };
+
+    setErrors(errors);
+    
     if(typeof(formValue.carId) !== 'undefined' && formValue.carId !== null){
 
       const resp = await createBooking(formValue);
@@ -227,60 +193,70 @@ const Form = ({ car, className }: any) => {
     }else{
       value = event;
     }
+    console.log(fieldName);
+    if (fieldName === "pickUpDate" && !isValidPickUpDate(value)) {
+      setErrors({ ...errors, pickUpDate: "La date de récupération doit être aujourd'hui ou dans le futur." });
+    } else if (fieldName === "dropOffDate" && !isValidDropOffDate(formValue.pickUpDate, value)) {
+      setErrors({ ...errors, dropOffDate: "La date de retour ne peut pas être avant la date de récupération." });
+    } else if (fieldName === "dropOffTime" && !isValidDropOffTime(formValue.pickUpDate, formValue.dropOffDate, formValue.pickUpTime, value)) {
+      setErrors({ ...errors, dropOffTime: "L'heure de retour ne peut pas être avant l'heure de récupération." });
+    }
     //const { name, value } = event.target;
     setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
   };
 
-  const validateDates = () => {
+  // Vérification si la date est aujourd'hui ou dans le futur
+  const validPickUpDate = (date:string):FormErrors => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Ignore time part
+    today.setHours(0, 0, 0, 0);
+    const pickUpDate = new Date(date);
+    pickUpDate >= today ?
+    setErrors({ ...errors, pickUpDate: "La date de récupération doit être aujourd'hui ou dans le futur." }) :
+    setErrors({ ...errors, pickUpDate: "" }) ;
+    return
+  };
 
-    const pickUpDate = new Date(formValue.pickUpDate);
-    const dropOffDate = new Date(formValue.dropOffDate);
+  // Vérification si la date de retour est après la date de récupération
+  const isValidDropOffDate = ({ pickUpDate, dropOffDate }: DateParams): boolean => {
+    const startDate = new Date(pickUpDate);
+    const endDate = new Date(dropOffDate);
+    console.log(endDate >= startDate)
+    return endDate >= startDate;
+  };
 
-    if (pickUpDate < today) {
-      return "La date de récupération ne peut pas être dans le passé.";
+  // Vérifie si l'heure de retour est valide par rapport à l'heure de récupération
+  const isValidDropOffTime = ({ pickUpDate, dropOffDate, pickUpTime, dropOffTime }: TimeParams): boolean => {
+    if (pickUpDate === dropOffDate) {
+      const startTime = pickUpTime.split(":").map(Number);
+      const endTime = dropOffTime.split(":").map(Number);
+      const startDateTime = new Date(pickUpDate);
+      startDateTime.setHours(startTime[0], startTime[1], 0);
+      const endDateTime = new Date(dropOffDate);
+      endDateTime.setHours(endTime[0], endTime[1], 0);
+      return endDateTime > startDateTime;
     }
+    return true;
+  };
 
-    if (dropOffDate < today) {
-      return "La date de retour ne peut pas être dans le passé.";
-    }
+  const validateTextField = ({ value, fieldName }: ValidationParams): string | null => {
+    if (!value.trim()) return `Le champ ${fieldName} est requis.`;
+    if (value.length < 2 || value.length > 50) { return `Le champ ${fieldName} doit contenir entre 2 et 50 caractères.`; }
+    return null;
+  };
 
-    if (dropOffDate < pickUpDate) {
-      return "La date de retour ne peut pas être avant la date de récupération.";
-    }
-    return null; // Pas d'erreur
-  }
+  const validateEmailField = ({ value, fieldName }: ValidationParams): string | null => {
+    if (!value.trim()) return `Le champ ${fieldName} est requis.`;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) return `Le champ ${fieldName} doit être une adresse email valide.`;
+    return null;
+  };
 
-  const validateTimes = () => {
-    const now = new Date();
-    const pickUpDate = new Date(formValue.pickUpDate + "T" + formValue.pickUpTime);
-    const dropOffDate = new Date(formValue.dropOffDate + "T" + formValue.dropOffTime);
+  const validateAgeField = ({ value, fieldName }: ValidationParams): string | null => {
+    const age = parseInt(value, 10);
+    if (isNaN(age) || age < 18) return `Le champ ${fieldName} doit être un nombre valide supérieur ou égal à 18.`;
+    return null;
+  };
 
-    // Si la date de récupération est aujourd'hui, vérifiez l'heure
-    if (pickUpDate.toDateString() === now.toDateString() && pickUpDate <= now) {
-      return "L'heure de récupération doit être au moins l'heure suivante.";
-    }
-
-    // Si les dates de récupération et de retour sont les mêmes, l'heure de retour doit être supérieure à l'heure de récupération
-    if (formValue.pickUpDate === formValue.dropOffDate && dropOffDate <= pickUpDate) {
-      return "L'heure de retour doit être après l'heure de récupération.";
-    }
-    return null; // Pas d'erreur
-  }
-
-  /* useEffect(() => {
-    const dateError = validateDates();
-    const timeError = validateTimes();
-
-    if (dateError) newErrors.pickUpDate = dateError;
-    if (timeError) newErrors.pickUpTime = timeError;
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-    }
-    // Ajoutez ici toutes les variables / états dont dépend cette logique
-  }, [formValue.pickUpDate, formValue.pickUpTime, formValue.dropOffDate, formValue.dropOffTime, addDropoff]); */
 
   return (
     <>
@@ -309,8 +285,8 @@ const Form = ({ car, className }: any) => {
                     </Select>
                 )}
               <div className="flex flex-col md:flex-row gap-5 mb-5">
-                <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
-                <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
+                  <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" errors={errors.pickUpDate} />
+                  <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" errors={errors.dropOffDate} />
               </div>
               <div className="flex flex-row w-full mb-5 gap-10">
                 <div className="flex">
