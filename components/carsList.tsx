@@ -13,6 +13,7 @@ export default function CarsList (props:any) {
   const [selectedCar, setSelectedCar ] = useState<any>([]);
   const createNameLink = (name: string) => name.split(" ").join("-").toLowerCase();
   const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
+  //const encrypted = encodeURIComponent(encryptID(car?.id))
 
   // Fonction pour crypter l'ID
   function encryptID(id: string) {
@@ -28,8 +29,8 @@ export default function CarsList (props:any) {
               <CarCard car={car} />
             </div>
             {
-              typeof(car.id) !== 'undefined' && car.id !== null &&
-              <ButtonMain label='Je reserve' link={`/reservation/${((car?.id))}`} className='m-2 px-5' />
+              (typeof(car.id) !== 'undefined' && car.id !== null) &&
+              <ButtonMain label='Je reserve' link={`/reservation/${car?.id}`} className='m-2 px-5' />
             }
           </div>
         ))}

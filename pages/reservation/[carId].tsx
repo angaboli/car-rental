@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Head from 'next/head';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { Audiowide } from 'next/font/google'
@@ -8,6 +9,12 @@ import { getCarsList } from '@/services';
 import CryptoJS from 'crypto-js';
 import SkeletonPage from '@/components/SkeletonPage';
 import CarDetails from '@/components/carDetails';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'COCOGO - Réservation',
+  description: 'Car rental App developped by D3',
+}
 
 interface Car {
   carAvg?: number;
@@ -45,8 +52,7 @@ export default function CarReservation() {
     const fetchCarsList = async () => {
       try {
         const result = await getCarsList();
-        const decryptedId = carId;
-        //? decryptID(Array.isArray(carId) ? carId[0] : carId) : null;
+        const decryptedId = carId //? decryptID(Array.isArray(carId) ? carId[0] : carId) : null;
         const foundCar = result.carLists.find((car: any) => car.id === decryptedId);
         (foundCar) && setCar(foundCar);
         //else setError('La voiture n\'apas été trouvé');
@@ -61,8 +67,8 @@ export default function CarReservation() {
     fetchCarsList();
   }, [carId]);
 
-  console.log(carId);
-  console.log(car);
+  //console.log(carId);
+  //console.log(car);
 
   const decryptID = (encryptedId: string) => {
     try {
@@ -79,6 +85,10 @@ export default function CarReservation() {
 
   return (
     <>
+      <Head>
+        <title>COCOGO - Réservation de la voiture {car?.name}</title>
+        <meta name="description" content={car?.shortDerscription} />
+      </Head>
       <Header />
       <main className="scroll-smooth bg-light-gray">
         <div id="reservez" className=" bg-gradient-to-r from-gray-200 to-slate-300">
