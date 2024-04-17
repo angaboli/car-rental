@@ -7,49 +7,9 @@ import EmailReservation from'@/components/emailReservation';
 import SkeletonPage from'@/components/SkeletonPage';
 import { useRouter } from 'next/router';
 import { BsInfoCircleFill } from "react-icons/bs";
-import { Spinner } from "@material-tailwind/react";
+import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, ValidationParams} from '@/types';
+import { validators } from '@/services/validation';
 
-interface EmailParams {
-  firstName: string;
-  contactEmail: string;
-  contactPhone: string;
-  pickUpLocation: string;
-  dropOffLocation: string;
-  pickUpDate: string;
-  pickUpTime: string;
-  dropOffDate: string;
-  dropOffTime: string;
-  finalPrice: string;
-}
-
-interface FormErrors {
-  pickUpLocation?: string;
-  dropOffLocation?: string;
-  pickUpDate?: string;
-  pickUpTime?: string;
-  dropOffDate?: string;
-  dropOffTime?: string;
-  firstName?: string;
-  lastName?: string;
-  emailAdress?: string;
-  phoneNumber?: string;
-  whatsAppNumber?: string;
-  finalPrice?: string;
-  withDriver?: boolean;
-  outCapital?: boolean;
-}
-
-interface AvailabilityState {
-  loading: boolean;
-  error: Error | null;
-  isAvailable: boolean;
-}
-
-
-interface ReservationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 const Form = ({ car, className }: any) => {
   const router = useRouter();
@@ -110,7 +70,7 @@ const Form = ({ car, className }: any) => {
 
   useEffect(() => {
     const savedFormData = sessionStorage.getItem("formData");
-    console.log(savedFormData)
+    //console.log(savedFormData)
     if (savedFormData) {
       setFormValue(JSON.parse(savedFormData));
     }else{
@@ -167,13 +127,6 @@ const Form = ({ car, className }: any) => {
     setFormValue({ ...formValue, finalPrice: price });
   }, [withDriver, rentWithDriver, outCapital, car?.price, formValue.pickUpDate, formValue.dropOffDate]);
 
-  /* // Fonction de validation pour l'étape 2
-  const validateStep2 = () => {
-    const errors: any = {};
-    if (!formValue.firstName) errors.firstName = 'Le prénom est requis';
-    if (!formValue.lastName) errors.lastName = 'Le nom est requis';
-    return errors;
-  }; */
 
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: any) => {
@@ -182,8 +135,31 @@ const Form = ({ car, className }: any) => {
     console.log(car.id)
     formValue.carId = car.id;
     console.log('handleSubmit 2', formValue);
-    if(typeof(formValue.carId) !== 'undefined' && formValue.carId !== null){
+    let newErrors: FormErrors = {};
+    let isValidForm = true;
 
+    // Application des validations
+    Object.keys(formValue).forEach((key: string) => {
+      //console.log(typeof pickUpTime, pickUpTime);
+        const value = formValue[key as keyof FormValues];
+        const validator = validators[key as keyof typeof validators]; // Accès sécurisé au validateur
+        if (validator) {
+            const error = validator(value, formValue);
+            if (error) {
+                newErrors[key as keyof FormErrors] = error;
+                isValidForm = false;
+            }
+        }
+    });
+
+
+    // Si le formulaire n'est pas valide, mettez à jour l'état des erreurs et arrêtez la soumission
+    if (!isValidForm) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
       const resp = await createBooking(formValue);
       console.log(resp);
       setIsModalOpen(true);
@@ -199,10 +175,10 @@ const Form = ({ car, className }: any) => {
         dropOffTime: formValue.dropOffTime,
         finalPrice: formValue.finalPrice.toString(),
       }); */
-    } else {
-      console.error("Il y'a une erreur de traitement")
+      sessionStorage.removeItem("formData");
+    }  catch (error) {
+      console.error("Erreur lors de la soumission du formulaire :", error);
     }
-    sessionStorage.removeItem("formData");
   };
 
 
@@ -227,60 +203,18 @@ const Form = ({ car, className }: any) => {
     }else{
       value = event;
     }
+
+    //const validator = validators[fieldName];
+    //const error = validator ? validator(value) : '';
+
+    // Assurez-vous que name est une clé valide dans FormValidators
+    if (validators[fieldName as keyof FormValidators]) {
+      const error = validators[fieldName as keyof FormValidators](value);
+      setErrors(prev => ({ ...prev, [fieldName]: error }));
+    }
     //const { name, value } = event.target;
     setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
   };
-
-  const validateDates = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Ignore time part
-
-    const pickUpDate = new Date(formValue.pickUpDate);
-    const dropOffDate = new Date(formValue.dropOffDate);
-
-    if (pickUpDate < today) {
-      return "La date de récupération ne peut pas être dans le passé.";
-    }
-
-    if (dropOffDate < today) {
-      return "La date de retour ne peut pas être dans le passé.";
-    }
-
-    if (dropOffDate < pickUpDate) {
-      return "La date de retour ne peut pas être avant la date de récupération.";
-    }
-    return null; // Pas d'erreur
-  }
-
-  const validateTimes = () => {
-    const now = new Date();
-    const pickUpDate = new Date(formValue.pickUpDate + "T" + formValue.pickUpTime);
-    const dropOffDate = new Date(formValue.dropOffDate + "T" + formValue.dropOffTime);
-
-    // Si la date de récupération est aujourd'hui, vérifiez l'heure
-    if (pickUpDate.toDateString() === now.toDateString() && pickUpDate <= now) {
-      return "L'heure de récupération doit être au moins l'heure suivante.";
-    }
-
-    // Si les dates de récupération et de retour sont les mêmes, l'heure de retour doit être supérieure à l'heure de récupération
-    if (formValue.pickUpDate === formValue.dropOffDate && dropOffDate <= pickUpDate) {
-      return "L'heure de retour doit être après l'heure de récupération.";
-    }
-    return null; // Pas d'erreur
-  }
-
-  /* useEffect(() => {
-    const dateError = validateDates();
-    const timeError = validateTimes();
-
-    if (dateError) newErrors.pickUpDate = dateError;
-    if (timeError) newErrors.pickUpTime = timeError;
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-    }
-    // Ajoutez ici toutes les variables / états dont dépend cette logique
-  }, [formValue.pickUpDate, formValue.pickUpTime, formValue.dropOffDate, formValue.dropOffTime, addDropoff]); */
 
   return (
     <>
@@ -309,10 +243,10 @@ const Form = ({ car, className }: any) => {
                     </Select>
                 )}
               <div className="flex flex-col md:flex-row gap-5 mb-5">
-                <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
-                <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
+                  <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" errors={errors.pickUpDate} />
+                  <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" errors={errors.dropOffDate} />
               </div>
-              <div className="flex flex-row w-full mb-5 gap-10">
+              <div className="flex flex-col sm:flex-row w-full mb-5 sm:gap-10">
                 <div className="flex">
                   <Switch label='Avec chauffeur&nbsp;?' color="brown" name="withDriver" onChange={updatePrice} checked={ rentWithDriver } disabled={car?.withDriver}  containerProps={{ className: "my-5", }} crossOrigin="" />
                   {
@@ -337,12 +271,23 @@ const Form = ({ car, className }: any) => {
             <h3 className="font-bold text-gold text-xl mb-3">Vos Coordonnées</h3>
             <div>
               <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
-                <Input className="" label="Votre Prénom"  type='text' name="firstName" value={formValue.firstName} onChange={handleChange} crossOrigin=""  />
-                <Input className="" label="Votre Nom"  type='text' name="lastName" value={formValue.lastName} onChange={handleChange} crossOrigin=""  />
+                <div className='flex flex-col w-full sm:w-1/2'>
+                  <Input className="" label="Votre Prénom"  type='text' name="firstName" value={formValue.firstName} onChange={handleChange} crossOrigin=""  />
+                  {errors.firstName && <div className="error">{errors.firstName}</div>}
+                </div>
+                <div className='flex flex-col w-full sm:w-1/2'>
+                  <Input className="" label="Votre Nom"  type='text' name="lastName" value={formValue.lastName} onChange={handleChange} crossOrigin=""  />
+                  {errors.lastName && <div className="error">{errors.lastName}</div>}
+                </div>
               </div>
               <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
-                <Input label="Numéro de tél"  type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange} crossOrigin=""  />
-                <Input label="Numéro de WhatsApp"  type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} crossOrigin=""  />
+                <div className='flex flex-col w-full sm:w-1/2'>
+                  <Input label="Numéro de tél"  type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange} crossOrigin=""  />
+                  {errors.phoneNumber && <div className="error">{errors.phoneNumber}</div>}
+                </div>
+                <div className='flex flex-col w-full sm:w-1/2'>
+                  <Input label="Numéro de WhatsApp"  type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} crossOrigin=""  />
+                </div>
               </div>
               <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
                 <Input label="Votre email"  type='email' name="emailAdress" value={formValue.emailAdress} onChange={handleChange} crossOrigin=""  />
@@ -352,8 +297,8 @@ const Form = ({ car, className }: any) => {
                   <Option value="30+">30+</Option>
                 </Select>
               </div>
-              <div className='flex flex-wrap justify-between my-3'>
-                <FinalPrice price={finalPrice} />
+              <div className='flex flex-wrap justify-between my-3 gap-5'>
+                <FinalPrice  price={finalPrice} />
                 <ButtonMain type="submit" label='Je valide'  className='px-8' />
               </div>
             </div>
@@ -390,7 +335,7 @@ const ReservationModal : React.FC<ReservationModalProps> = ({ isOpen, onClose })
 };
 
 const FinalPrice = ({ price }: { price: number }) => (
-  <div className="">
+  <div className=''>
     <Chip
       variant="ghost"
       value={

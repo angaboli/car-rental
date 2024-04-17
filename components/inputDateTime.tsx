@@ -1,5 +1,6 @@
 
 const InputDateTime = ({ label, nameDate, nameTime, valueDate, valueTime, onChange, className, errors }:any) => {
+  const today = new Date().toISOString().split('T')[0];
   return (
     <div className="w-full md:w-1/2">
       <label className="text-gray-700 font-light mt-5">{label}</label>
@@ -12,6 +13,7 @@ const InputDateTime = ({ label, nameDate, nameTime, valueDate, valueTime, onChan
           className="w-3/5 rounded-md border-none bg-transparent  text-base font-sm text-primary-black outline-none focus:outline-none "
           onChange={onChange}
           required
+          min={today}
         />
         <input
           type="time"
@@ -23,6 +25,7 @@ const InputDateTime = ({ label, nameDate, nameTime, valueDate, valueTime, onChan
           required
         />
       </div>
+      {errors && <p className="mt-1 text-xs text-red-500">{errors}</p>}
     </div>
   );
 };
