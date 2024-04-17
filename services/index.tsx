@@ -76,10 +76,13 @@ export async function GetAllBookings() {
       query MyBookings {
         bookings {
           id
-          pickUpDate
+          pickUpDate      
           pickUpTime
           dropOffTime
           dropOffDate
+          carId {
+            id
+          }
         }
       }`;
       const data = await request<any>(MASTER_URL, query);

@@ -86,8 +86,8 @@ export default function CarReservation() {
   return (
     <>
       <Head>
-        <title>COCOGO - Réservation de la voiture {car?.name}</title>
-        <meta name="description" content={car?.shortDerscription} />
+        <title>{car ? `COCOGO - Réservation de la voiture ${car?.name}` : "COCOGO - Réservation"}</title>
+        <meta name="description" content={car?.shortDescription} />
       </Head>
       <Header />
       <main className="scroll-smooth bg-light-gray">

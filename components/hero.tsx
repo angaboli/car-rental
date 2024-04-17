@@ -11,10 +11,18 @@ import { Car } from '@/types/';
 interface FormValues {
   pickUpLocation?: string;
   dropoffLocation?: string;
-  pickUpDate?: string;
-  pickUpTime?: string;
-  dropOffDate?: string;
-  dropOffTime?: string;
+  pickUpDate: string;
+  pickUpTime: string;
+  dropOffDate: string;
+  dropOffTime: string;
+}
+
+interface FormErrors {
+  pickUpLocation?: string | null;
+  pickUpDate?: string | null;
+  pickUpTime?: string | null;
+  dropOffDate?: string | null;
+  dropOffTime?: string | null;
 }
 
 const audiowide = Audiowide({
@@ -23,7 +31,7 @@ const audiowide = Audiowide({
   display: 'swap',
 })
 
-const Hero = (props: any ) => {
+const Hero = () => {
 
   const router = useRouter();
   //const [openTab, setOpenTab] = useState<string>("berline");
@@ -31,11 +39,11 @@ const Hero = (props: any ) => {
   //const [error, setError] = useState('');
   const { carsList, setCars, loading } = useCars();
   //const [ loading, setLoading ] = useState<boolean>(true)
+  const [ errors, setErrors ] = useState<FormErrors>({});
   const [ formValue, setFormValue ] = useState<FormValues>(() => {
     const nextHourDate = getNextHour();
     const formattedDate = formatDate(nextHourDate);
     const formattedTime = formatTime(nextHourDate);
-
     return {
         pickUpLocation: 'Riviéra M&apos;badon, Abidjan',
         dropoffLocation: 'Riviéra M&apos;badon, Abidjan',
@@ -54,7 +62,7 @@ const Hero = (props: any ) => {
   //useEffect(() => {
     const fetchAvailability = async () => {
       const bookings = await GetAllBookings();
-      //console.log(carsList)
+      //console.log(bookings)
       if (formValue.pickUpDate && formValue.dropOffDate && bookings.data?.bookings && carsList) {
 
         const availableCars = await filterAvailableCars(
@@ -64,7 +72,7 @@ const Hero = (props: any ) => {
           carsList
         );
 
-        console.log(availableCars);
+        //console.log(availableCars);
         setCars(availableCars);
       } else {
         console.log("Les informations nécessaires pour filtrer les voitures ne sont pas toutes disponibles.");
@@ -100,8 +108,31 @@ const Hero = (props: any ) => {
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    fetchAvailability();
+
+    // Validations
+    const pickUpDateError = validateDate(formValue.pickUpDate);
+    const pickUpTimeError = validateTime(formValue.pickUpTime);
+    const dropOffDateError = validateDate(formValue.dropOffDate);
+    const dropOffTimeError = validateTime(formValue.dropOffTime);
+
+    // Mis à jour des erreurs
+    setErrors(prevErrors => ({
+      ...prevErrors,
+      pickUpDate: pickUpDateError || undefined,
+      pickUpTime: pickUpTimeError || undefined,
+      dropOffDate: dropOffDateError || undefined,
+      dropOffTime: dropOffTimeError || undefined,
+    }));
+
+    // Verification des erreurs
+    if (pickUpDateError || pickUpTimeError || dropOffDateError || dropOffTimeError) {
+      console.error("Validation errors", {pickUpDateError, pickUpTimeError, dropOffDateError, dropOffTimeError});
+      return;
+    }
+
+    await fetchAvailability();
   };
+
 
   return (
     <div id="reservez" className="bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">
@@ -149,14 +180,12 @@ const Hero = (props: any ) => {
               </div>
             </div>
             <div className="flex flex-col md:flex-row gap-5 mb-5 w-full md:w-2/3">
-              <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" />
-              <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" />
+              <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} errors={errors?.pickUpDate} onChange={handleChange} className="" />
+              <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} errors={errors?.dropOffDate} onChange={handleChange} className="" />
             </div>
           </div>
           <div className="flex justify-end text-center">
-
-              <button type="submit" disabled={loading || !carsList.length} className="btn_base sm:w-full md:w-1/2 lg:w-1/4 primary_btn mb-10">Recherche</button>
-
+            <button type="submit" disabled={loading || !carsList.length} className="btn_base sm:w-full md:w-1/2 lg:w-1/4 primary_btn mb-10">Recherche</button>
           </div>
         </form>
       </div>
@@ -201,13 +230,27 @@ const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: 
     bookings.filter(booking => {
       const bookingStart = new Date(booking.pickUpDate);
       const bookingEnd = new Date(booking.dropOffDate);
-
       return (start <= bookingEnd && end >= bookingStart);
-    }).map(booking => booking.carId)
+    }).map(booking => booking.carId.id)
   );
 
   // Ici, supposez que vous avez une liste `allCars` contenant toutes les voitures
   return allCars?.filter(car => !unavailableCarIds.has(car.id));
 };
+
+function validateDate(date: string): string | undefined {
+  if (!date) return "La date est obligatoire";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inputDate = new Date(date);
+  if (inputDate < today) return "La date ne peut pas etre dans le passer";
+  return undefined;
+}
+
+function validateTime(time: string): string | undefined {
+  if (!time) return "L'heure est obligatoire";
+  return undefined;
+}
+
 
 export default Hero;
