@@ -1,16 +1,6 @@
-interface FormValidators {
-  pickUpDate: (date: string) => string | null;
-  pickUpTime: (pickUpTime: string, pickUpDate?: string) => string | null;
-  dropOffDate: (dropOffDate: string, pickUpDate: string) => string | null;
-  dropOffTime: (dropOffTime: string, pickUpTime: string, pickUpDate: string, dropOffDate: string) => string | null;
-  firstName: (name: string) => string | null;
-  lastName: (name: string) => string | null;
-  emailAdress: (email: string) => string | null;
-  phoneNumber: (phone: string, whatsAppNumber?: string) => string | null;
-  whatsAppNumber: (phone: string, phoneNumber?: string) => string | null;
-}
+import {FormValidators} from '@/types';
 
-// Exemple d'implémentation de quelques validateurs
+// Validateur
 export const validators: FormValidators = {
   pickUpDate: (date) => {
     const today = new Date();
@@ -19,16 +9,22 @@ export const validators: FormValidators = {
     return pickUpDate >= today ? null : "La date de récupération doit être aujourd'hui ou dans le futur.";
   },
   pickUpTime: (pickUpTime, pickUpDate) => {
+    if (!pickUpDate) return null;
     const now = new Date();
     const pickUpDateTime = new Date(`${pickUpDate}T${pickUpTime}`);
-    return pickUpDateTime < now ? "L'heure de récupération doit être dans le futur." : "";
+    return pickUpDateTime < now ? "L'heure de récupération doit être dans le futur." : null;
   },
   dropOffDate: (dropOffDate, pickUpDate) => {
+    !pickUpDate && null;
     const start = new Date(pickUpDate);
     const end = new Date(dropOffDate);
-    return end >= start ? null : "La date de retour doit être après la date de récupération.";
+    if (end < start) {
+      return "La date de retour doit être après la date de récupération.";
+    }
+    return null; // Aucune erreur si la condition est respectée
   },
   dropOffTime: (dropOffTime, pickUpTime, pickUpDate, dropOffDate) => {
+    if (!pickUpDate || !pickUpTime || !dropOffDate) return null;
     if (pickUpDate === dropOffDate) {
       const startTime = pickUpTime.split(":").map(Number);
       const endTime = dropOffTime.split(":").map(Number);
@@ -36,47 +32,53 @@ export const validators: FormValidators = {
       startDateTime.setHours(startTime[0], startTime[1], 0);
       const endDateTime = new Date(dropOffDate);
       endDateTime.setHours(endTime[0], endTime[1], 0);
-      return endDateTime <= startDateTime ? "L'heure de retour doit être après l'heure de récupération pour le même jour." : "";
+      return endDateTime <= startDateTime ? "L'heure de retour doit être après l'heure de récupération pour le même jour." : null;
     }
     return null;
   },
-  firstName: (name) => {
-    return name.trim() ? null : "Le prénom est requis.";
-  },
-  lastName: (name) => {
-    return name.trim() ? null : "Le nom est requis.";
-  },
+  firstName: (name) => name.trim() ? null : "Le prénom est requis.",
+  lastName: (name) => name.trim() ? null : "Le nom est requis.",
   emailAdress: (email) => {
     const regex = /^\S+@\S+\.\S+$/;
     return regex.test(email) ? null : "L'email est invalide.";
   },
   phoneNumber: (phone, whatsAppNumber) => {
-    // Assurez-vous qu'au moins un des deux numéros est fourni
-    if (!phone.trim() && (!whatsAppNumber || !whatsAppNumber.trim())) {
+    const trimmedPhone = typeof phone === 'string' ? phone.trim() : "";
+    const trimmedWhatsAppNumber = typeof whatsAppNumber === 'string' ? whatsAppNumber.trim() : "";
+
+    if (!trimmedPhone && !trimmedWhatsAppNumber) {
       return "Au moins un numéro de téléphone est requis.";
     }
-    // Validation du format du numéro de téléphone
+
     const phoneRegex = /^\+?\d{10,15}$/;
-    return phoneRegex.test(phone) ? null : "Le format du numéro de téléphone est invalide.";
+
+    // Vérifier que chaque numéro fourni est valide
+    if (trimmedPhone && !phoneRegex.test(trimmedPhone)) {
+      return "Numéro de téléphone non valide";
+    }
+    if (trimmedWhatsAppNumber && !phoneRegex.test(trimmedWhatsAppNumber)) {
+      return "Numéro WhatsApp non valide";
+    }
+
+    return null; // Aucune erreur
   },
-  whatsAppNumber: (whatsAppNumber, phoneNumber) => {
-    // Cette validation peut être similaire à celle de phoneNumber
-    const phoneRegex = /^\+?\d{10,15}$/;
-    return phoneRegex.test(whatsAppNumber) ? null : "Le format du numéro WhatsApp est invalide.";
-  }
 };
 
 /*
 // Fonction de validation pour la date de récupération
-export const validatePickUpDate = (date: string): string => {
+export const validateDate= (date: string,  referenceDate : string): string => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const pickUpDate = new Date(date);
-  return pickUpDate < today ? "La date de récupération doit être aujourd'hui ou dans le futur." : "";
+  const start = new Date(date);
+  const end = new Date(referenceDate);
+  return start >= today ? null : "La date de récupération doit être aujourd'hui ou dans le futur.";
+  if (end < start) {
+    return "La date de retour doit être après la date de récupération.";
+  }
 };
 
 // Fonction de validation pour la date de retour
-export const validateDropOffDate = (pickUpDate: string, dropOffDate: string): string => {
+export const validateDropOffDate = (date: string, referenceDate : string): string => {
   const start = new Date(pickUpDate);
   const end = new Date(dropOffDate);
   return end < start ? "La date de retour doit être après la date de récupération." : "";
