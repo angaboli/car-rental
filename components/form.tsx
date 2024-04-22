@@ -7,7 +7,7 @@ import EmailReservation from'@/components/emailReservation';
 import SkeletonPage from'@/components/SkeletonPage';
 import { useRouter } from 'next/router';
 import { BsInfoCircleFill } from "react-icons/bs";
-import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, ValidationParams} from '@/types';
+import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, FormValidators, ValidationParams} from '@/types';
 import { validators } from '@/services/validation';
 
 
@@ -70,7 +70,6 @@ const Form = ({ car, className }: any) => {
 
   useEffect(() => {
     const savedFormData = sessionStorage.getItem("formData");
-    //console.log(savedFormData)
     if (savedFormData) {
       setFormValue(JSON.parse(savedFormData));
     }else{
@@ -131,56 +130,41 @@ const Form = ({ car, className }: any) => {
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    console.log('handleSubmit 1', formValue);
-    console.log(car.id)
-    formValue.carId = car.id;
-    console.log('handleSubmit 2', formValue);
-    let newErrors: FormErrors = {};
-    let isValidForm = true;
 
-    // Application des validations
+    // Réinitialisation des erreurs
+    let newErrors: FormErrors = {};
+
+    // Vérification des validations des champs
     Object.keys(formValue).forEach((key: string) => {
-      //console.log(typeof pickUpTime, pickUpTime);
-        const value = formValue[key as keyof FormValues];
-        const validator = validators[key as keyof typeof validators]; // Accès sécurisé au validateur
-        if (validator) {
-            const error = validator(value, formValue);
-            if (error) {
-                newErrors[key as keyof FormErrors] = error;
-                isValidForm = false;
-            }
+      const value = formValue[key as keyof FormValues];
+      const validator = validators[key as keyof typeof validators];
+      if (validator) {
+        const error = validator(value, formValue);
+        if (error) {
+          newErrors[key as keyof FormErrors] = error;
         }
+      }
     });
 
+    // Mise à jour de l'état des erreurs
+    setErrors(newErrors);
 
-    // Si le formulaire n'est pas valide, mettez à jour l'état des erreurs et arrêtez la soumission
-    if (!isValidForm) {
-      setErrors(newErrors);
+    // Vérifiez s'il y a des erreurs avant de continuer
+    if (Object.values(newErrors).some(error => error !== null)) {
+      console.error("Erreurs de validation, soumission annulée.");
       return;
     }
 
+    // Aucune erreur, procéder à la création de la réservation
     try {
-      const resp = await createBooking(formValue);
-      console.log(resp);
-      setIsModalOpen(true);
-      /* sendEmail({
-        firstName: formValue.firstName,
-        contactEmail: formValue.emailAdress,
-        contactPhone: formValue.phoneNumber,
-        pickUpLocation: formValue.pickUpLocation,
-        dropOffLocation: formValue.dropOffLocation || '',
-        pickUpDate: formValue.pickUpDate,
-        pickUpTime: formValue.pickUpTime,
-        dropOffDate: formValue.dropOffDate,
-        dropOffTime: formValue.dropOffTime,
-        finalPrice: formValue.finalPrice.toString(),
-      }); */
-      sessionStorage.removeItem("formData");
-    }  catch (error) {
-      console.error("Erreur lors de la soumission du formulaire :", error);
+      const response = await createBooking(formValue);
+      console.log("Réservation créée avec succès", response);
+      setIsModalOpen(true); // Afficher le modal de confirmation
+      sessionStorage.removeItem("formData"); // Nettoyer le formulaire sauvegardé
+    } catch (error) {
+      console.error("Erreur lors de la création de la réservation :", error);
     }
   };
-
 
   useEffect(() => {
     const fetchAvailability = async () => {
@@ -206,12 +190,11 @@ const Form = ({ car, className }: any) => {
 
     //const validator = validators[fieldName];
     //const error = validator ? validator(value) : '';
-
-    // Assurez-vous que name est une clé valide dans FormValidators
     if (validators[fieldName as keyof FormValidators]) {
       const error = validators[fieldName as keyof FormValidators](value);
       setErrors(prev => ({ ...prev, [fieldName]: error }));
     }
+    console.log(errors);
     //const { name, value } = event.target;
     setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
   };
@@ -408,52 +391,24 @@ const sendEmail = async ({firstName, contactEmail, contactPhone, pickUpLocation,
     console.error('Erreur lors de l\'envoi de l\'email', data.error);
   }
 };
-/*
-const validatepickUpDate = (date) => {
-  const now = new Date();
-  const today = now.toISOString().split('T')[0];
-  if (date < today) {
-    setError("La date de récupération doit être aujourd'hui ou dans le futur.");
-    return false;
-  }
-  setError("");
-  return true;
-};
 
-const validatepickUpTime = (time) => {
-  if (pickUpDate === new Date().toISOString().split('T')[0]) {
-    const now = new Date();
-    const oneHourLater = getOneHourLater(now);
-    const pickUpDateTime = new Date(pickUpDate + "T" + time);
-    if (pickUpDateTime < oneHourLater) {
-      setError("L'heure de récupération doit être au moins une heure après l'heure actuelle.");
-      return false;
-    }
-  }
-  setError("");
-  return true;
-};
+function validateDate(date: string, referenceDate?: string): string | undefined {
+  if (!date) return "La date est obligatoire";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inputDate = new Date(date);
+  if (inputDate < today) return "La date ne peut pas etre dans le passer";
 
-const validatedropOffDate = (date) => {
-  if (date < pickUpDate) {
-    setError("La date de retour doit être après la date de récupération.");
-    return false;
+  if (referenceDate) {
+    const reference = new Date(referenceDate);
+    if (inputDate < reference) return "La date de retour ne doit pas être avant la date de récuperation";
   }
-  setError("");
-  return true;
-};
+  return undefined;
+}
 
-const validatedropOffTime = (time) => {
-  if (dropOffDate === pickUpDate) {
-    const pickUpDateTime = new Date(pickUpDate + "T" + pickUpTime);
-    const dropOffDateTime = new Date(dropOffDate + "T" + time);
-    if (dropOffDateTime <= getOneHourLater(pickUpDateTime)) {
-      setError("L'heure de retour doit être au moins une heure après l'heure de récupération pour le même jour.");
-      return false;
-    }
-  }
-  setError("");
-  return true;
-};
-   */
+function validateTime(time: string): string | undefined {
+  if (!time) return "L'heure est obligatoire";
+  return undefined;
+}
+
 export default Form

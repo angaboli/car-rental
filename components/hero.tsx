@@ -1,7 +1,7 @@
 "use client";
 import { Audiowide } from 'next/font/google'
 import InputDateTime from "@/components/inputDateTime";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter  } from "next/navigation"
 import { GetAllBookings } from "@/services"
 import { Select, Option, Switch } from "@material-tailwind/react";
@@ -33,12 +33,9 @@ const audiowide = Audiowide({
 
 const Hero = () => {
 
-  const router = useRouter();
-  //const [openTab, setOpenTab] = useState<string>("berline");
+  //const router = useRouter();
   const [addDropoff, setAddDropoff] = useState<boolean>(false)
-  //const [error, setError] = useState('');
   const { carsList, setCars, loading } = useCars();
-  //const [ loading, setLoading ] = useState<boolean>(true)
   const [ errors, setErrors ] = useState<FormErrors>({});
   const [ formValue, setFormValue ] = useState<FormValues>(() => {
     const nextHourDate = getNextHour();
@@ -54,38 +51,28 @@ const Hero = () => {
     };
   });
 
-
   const updateDropoffLocation = (e: React.ChangeEvent<HTMLInputElement>)  => {
      e.target.name == "returnAgency" && setAddDropoff(e.target.checked)
   }
 
-  //useEffect(() => {
-    const fetchAvailability = async () => {
-      const bookings = await GetAllBookings();
-      //console.log(bookings)
-      if (formValue.pickUpDate && formValue.dropOffDate && bookings.data?.bookings && carsList) {
-
-        const availableCars = await filterAvailableCars(
-          bookings.data.bookings,
-          formValue.pickUpDate,
-          formValue.dropOffDate,
-          carsList
-        );
-
-        //console.log(availableCars);
-        setCars(availableCars);
-      } else {
-        console.log("Les informations nécessaires pour filtrer les voitures ne sont pas toutes disponibles.");
-      }
-    };
-
-    //fetchAvailability();
-  //}, []);
-
-
+  const fetchAvailability = async () => {
+    const bookings = await GetAllBookings();
+    if (formValue.pickUpDate && formValue.dropOffDate && bookings.data?.bookings && carsList) {
+      const availableCars = await filterAvailableCars(
+        bookings.data.bookings,
+        formValue.pickUpDate,
+        formValue.dropOffDate,
+        carsList
+      );
+      //console.log(availableCars);
+      setCars(availableCars);
+    } else {
+      console.log("Les informations nécessaires pour filtrer les voitures ne sont pas toutes disponibles.");
+    }
+  };
 
   // Gérer les changements de champ et valider en temps réel
-  const handleChange = (event: any , fieldName?: string) => {
+  const handleChange = useCallback((event: any , fieldName?: string) => {
     let name: string;
     let value: string;
 
@@ -103,33 +90,26 @@ const Hero = () => {
       value = event.target.value;
     }
     setFormValue((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Validations
-    const pickUpDateError = validateDate(formValue.pickUpDate);
-    const pickUpTimeError = validateTime(formValue.pickUpTime);
-    const dropOffDateError = validateDate(formValue.dropOffDate);
-    const dropOffTimeError = validateTime(formValue.dropOffTime);
+    const errors = {
+      pickUpDate: validateDate(formValue.pickUpDate),
+      pickUpTime: validateTime(formValue.pickUpTime),
+      dropOffDate: validateDate(formValue.dropOffDate, formValue.pickUpDate),
+      dropOffTime: validateTime(formValue.dropOffTime),
+    };
 
-    // Mis à jour des erreurs
-    setErrors(prevErrors => ({
-      ...prevErrors,
-      pickUpDate: pickUpDateError || undefined,
-      pickUpTime: pickUpTimeError || undefined,
-      dropOffDate: dropOffDateError || undefined,
-      dropOffTime: dropOffTimeError || undefined,
-    }));
+    setErrors(errors);
 
     // Verification des erreurs
-    if (pickUpDateError || pickUpTimeError || dropOffDateError || dropOffTimeError) {
-      console.error("Validation errors", {pickUpDateError, pickUpTimeError, dropOffDateError, dropOffTimeError});
+    if (Object.values(errors).some(error => error !== undefined)) {
+      console.error("Validation errors", errors);
       return;
     }
-
     await fetchAvailability();
   };
 
@@ -220,9 +200,9 @@ function formatTime(date: Date) {
   return `${formattedHours}:${formattedMinutes}`;
 }
 
-
+// Filtrer les voiture disponnible
 const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: string, allCars: Car[] ): Car[] => {
-  // Convertissez les dates en objets Date pour la comparaison
+
   const start = new Date(pickUpDate);
   const end = new Date(dropOffDate);
 
@@ -234,16 +214,20 @@ const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: 
     }).map(booking => booking.carId.id)
   );
 
-  // Ici, supposez que vous avez une liste `allCars` contenant toutes les voitures
   return allCars?.filter(car => !unavailableCarIds.has(car.id));
 };
 
-function validateDate(date: string): string | undefined {
+function validateDate(date: string, referenceDate?: string): string | undefined {
   if (!date) return "La date est obligatoire";
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const inputDate = new Date(date);
   if (inputDate < today) return "La date ne peut pas etre dans le passer";
+
+  if (referenceDate) {
+    const reference = new Date(referenceDate);
+    if (inputDate < reference) return "La date de retour ne doit pas être avant la date de récuperation";
+  }
   return undefined;
 }
 

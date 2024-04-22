@@ -2,7 +2,7 @@ import { request, gql } from "graphql-request";
 import {CarsListResponse } from "@/types/";
 //import { gql, useQuery } from '@apollo/client';
 
-const MASTER_URL="https://api-eu-west-2.hygraph.com/v2/clrtbrrae0lgu01uurnnsod74/master"
+const MASTER_URL= process.env.NEXT_PUBLIC_HYGRAPH_KEY || "";
 
 
 export const getCarsList = async () : Promise<CarsListResponse> => {
@@ -76,7 +76,7 @@ export async function GetAllBookings() {
       query MyBookings {
         bookings {
           id
-          pickUpDate      
+          pickUpDate
           pickUpTime
           dropOffTime
           dropOffDate

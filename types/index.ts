@@ -122,3 +122,14 @@ export interface ValidationParams {
   value: string;
   fieldName: string;
 }
+
+export interface FormValidators {
+  pickUpDate: (date: string) => string | null;
+  pickUpTime: (pickUpTime: string, pickUpDate?: string) => string | null;
+  dropOffDate: (dropOffDate: string, pickUpDate?: string) => string | null;
+  dropOffTime: (dropOffTime: string, pickUpTime?: string, pickUpDate?: string, dropOffDate?: string) => string | null;
+  firstName: (name: string) => string | null;
+  lastName: (name: string) => string | null;
+  emailAdress: (email: string) => string | null;
+  phoneNumber: (phone: string, whatsAppNumber?: string) => string | null;
+}
