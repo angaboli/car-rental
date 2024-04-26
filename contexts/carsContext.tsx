@@ -7,6 +7,8 @@ interface CarsContextState {
   setCars: React.Dispatch<React.SetStateAction<any[]>>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  isAvailable?: boolean,
+  setIsAvailable: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const defaultValue: CarsContextState = {
@@ -14,6 +16,8 @@ const defaultValue: CarsContextState = {
   setCars: () => {},
   loading: false,
   setLoading: () => {},
+  isAvailable: false,
+  setIsAvailable: () => {},
 };
 
 const CarsContext = createContext<CarsContextState>(defaultValue);
@@ -23,6 +27,7 @@ export const useCars = () => useContext(CarsContext);
 export const CarsProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   const [carsList, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -39,8 +44,8 @@ export const CarsProvider: React.FC<{children: ReactNode}> = ({ children }) => {
     fetchCars();
   }, []);
 
-  
-  const value = { carsList, setCars, loading, setLoading };
+
+  const value = { carsList, setCars, loading, setLoading, isAvailable, setIsAvailable };
 
   return (
     <CarsContext.Provider value={value}>
