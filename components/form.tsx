@@ -126,26 +126,43 @@ const Form = ({ car, className }: any) => {
   }, [withDriver, rentWithDriver, outCapital, car?.price, formValue.pickUpDate, formValue.dropOffDate]);
 
 
-  const validateForm = (values : FormValues) : FormErrors => {
-    let newErrors = {};
+  const validateForm = (values: FormValues): any => {
+    let newErrors: FormErrors = {};
     let isValid = true;
 
-    // Validation de chaque champ en utilisant les validateurs définis
     Object.keys(values).forEach(key => {
-        const validator = validators[key as keyof typeof validators]; // Accéder au validateur approprié
+        const validator = validators[key as keyof typeof validators];
         if (validator) {
-            const error = validator(values[key], values);
+            let error;
+            // Exemple d'utilisation des validateurs avec plusieurs paramètres
+            switch (key) {
+                case 'pickUpDate':
+                    error = validator(values.pickUpDate);
+                    break;
+                case 'dropOffDate':
+                    error = validator(values.dropOffDate, values.pickUpDate);
+                    break;
+                case 'pickUpTime':
+                    error = validator(values.pickUpTime, values.pickUpDate);
+                    break;
+                case 'dropOffTime':
+                    error = validator(values.dropOffTime, values.pickUpTime, values.pickUpDate, values.dropOffDate);
+                    break;
+                default:
+                    error = validator(values[key] as any);
+                    break;
+            }
             if (error) {
-                newErrors[key as keyof FormErrors] = error;
-                isValid = false;
+                newErrors[key] = error;
+                //isValid = false;
             }
         }
     });
 
-    // Mise à jour de l'état des erreurs
     setErrors(newErrors);
-    return isValid;
-};
+    //return isValid;
+  };
+
 
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: any) => {
@@ -154,15 +171,12 @@ const Form = ({ car, className }: any) => {
     // Réinitialisation des erreurs
     let newErrors: FormErrors = {};
 
-    console.log('submit');
 
     // Vérification des validations des champs
     if (!validateForm(formValue)) {
         console.log('Validation errors', errors);
         return; // Stop the submission if there are errors
     }
-    console.log('errors', errors);
-    console.log('formValue', formValue);
 
     // Mise à jour de l'état des erreurs
     setErrors(newErrors);
