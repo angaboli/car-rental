@@ -62,21 +62,7 @@ export interface FormValidators {
   lastName: (name: string) => string | null;
   emailAdress: (email: string) => string | null;
   phoneNumber: (phone: string, whatsAppNumber?: string) => string | null;
-  whatsAppNumber: (phone: string, phoneNumber?: string) => string | null;
-}
-
-export interface FormValues {
-  pickUpLocation: string;
-  dropOffLocation: string;
-  pickUpDate: string;
-  dropOffDate: string;
-  pickUpTime: string;
-  dropOffTime: string;
-  firstName: string;
-  lastName: string;
-  emailAdress: string | null;
-  phoneNumber: string | null;
-  whatsAppNumber: string | null;
+  whatsAppNumber?: (phone: string, phoneNumber?: string) => string | null;
 }
 
 
@@ -123,7 +109,7 @@ export interface ValidationParams {
   fieldName: string;
 }
 
-export interface FormValidators {
+/* export interface FormValidators {
   pickUpDate: (date: string) => string | null;
   pickUpTime: (pickUpTime: string, pickUpDate?: string) => string | null;
   dropOffDate: (dropOffDate: string, pickUpDate?: string) => string | null;
@@ -132,4 +118,4 @@ export interface FormValidators {
   lastName: (name: string) => string | null;
   emailAdress: (email: string) => string | null;
   phoneNumber: (phone: string, whatsAppNumber?: string) => string | null;
-}
+} */

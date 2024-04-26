@@ -35,7 +35,7 @@ const Hero = () => {
 
   //const router = useRouter();
   const [addDropoff, setAddDropoff] = useState<boolean>(false)
-  const { carsList, setCars, loading } = useCars();
+  const { carsList, setCars, loading, setIsAvailable } = useCars();
   const [ errors, setErrors ] = useState<FormErrors>({});
   const [ formValue, setFormValue ] = useState<FormValues>(() => {
     const nextHourDate = getNextHour();
@@ -64,9 +64,10 @@ const Hero = () => {
         formValue.dropOffDate,
         carsList
       );
-      //console.log(availableCars);
       setCars(availableCars);
+      setIsAvailable(true);
     } else {
+      setIsAvailable(false);
       console.log("Les informations nécessaires pour filtrer les voitures ne sont pas toutes disponibles.");
     }
   };

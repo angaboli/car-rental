@@ -1,20 +1,25 @@
 import { getCarsList  } from "@/services"
 import CarCard from "./carCard"
 import BookingModal from "./bookingModal"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MdOutlineCarRental } from "react-icons/md";
 import Link  from "next/link";
 import CryptoJS from 'crypto-js';
 import ButtonMain from '@/components/buttonMain';
 import { useCars } from '@/contexts/carsContext';
+import { Tooltip } from "@material-tailwind/react";
+import { BsInfoCircleFill } from "react-icons/bs";
 
 export default function CarsList (props:any) {
-  const { carsList } = useCars();
+  const { carsList, isAvailable } = useCars();
+  //const { disable, setdisable } = useState<boolean>(true);
   const [selectedCar, setSelectedCar ] = useState<any>([]);
   const createNameLink = (name: string) => name.split(" ").join("-").toLowerCase();
   const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
   //const encrypted = encodeURIComponent(encryptID(car?.id))
-
+  useEffect(() => {
+    isAvailable !== true &&  'disable';
+  }, [isAvailable])
   // Fonction pour crypter l'ID
   function encryptID(id: string) {
     return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
@@ -30,7 +35,19 @@ export default function CarsList (props:any) {
             </div>
             {
               (typeof(car.id) !== 'undefined' && car.id !== null) &&
-              <ButtonMain label='Je reserve' link={`/reservation/${car?.id}`} className='m-2 px-5' />
+              <>
+                <ButtonMain disabled={!isAvailable} label='Je reserve' link={`/reservation/${car?.id}`} className='m-2 px-5' />
+                {
+                  !isAvailable &&
+                  <Tooltip id="#reservez" className="float-right" content='Veuillez remplir le formulaire pour voir les voitures disponibles.'>
+                    <button>
+                      <sup>
+                        <BsInfoCircleFill className="text-gold text-xl ml-3 cursor-none" />
+                      </sup>
+                    </button>
+                  </Tooltip>
+                }
+              </>
             }
           </div>
         ))}

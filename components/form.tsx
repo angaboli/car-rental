@@ -112,7 +112,6 @@ const Form = ({ car, className }: any) => {
     const daysDiff = (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1;
 
     let price = car?.price * daysDiff  ;
-
     if (withDriver || car?.withDriver) {
       price += 5000 * daysDiff;
       formValue.withDriver = true;
@@ -127,6 +126,27 @@ const Form = ({ car, className }: any) => {
   }, [withDriver, rentWithDriver, outCapital, car?.price, formValue.pickUpDate, formValue.dropOffDate]);
 
 
+  const validateForm = (values : FormValues) : FormErrors => {
+    let newErrors = {};
+    let isValid = true;
+
+    // Validation de chaque champ en utilisant les validateurs définis
+    Object.keys(values).forEach(key => {
+        const validator = validators[key as keyof typeof validators]; // Accéder au validateur approprié
+        if (validator) {
+            const error = validator(values[key], values);
+            if (error) {
+                newErrors[key as keyof FormErrors] = error;
+                isValid = false;
+            }
+        }
+    });
+
+    // Mise à jour de l'état des erreurs
+    setErrors(newErrors);
+    return isValid;
+};
+
   // Fonction pour gérer la soumission du formulaire
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -134,17 +154,15 @@ const Form = ({ car, className }: any) => {
     // Réinitialisation des erreurs
     let newErrors: FormErrors = {};
 
+    console.log('submit');
+
     // Vérification des validations des champs
-    Object.keys(formValue).forEach((key: string) => {
-      const value = formValue[key as keyof FormValues];
-      const validator = validators[key as keyof typeof validators];
-      if (validator) {
-        const error = validator(value, formValue);
-        if (error) {
-          newErrors[key as keyof FormErrors] = error;
-        }
-      }
-    });
+    if (!validateForm(formValue)) {
+        console.log('Validation errors', errors);
+        return; // Stop the submission if there are errors
+    }
+    console.log('errors', errors);
+    console.log('formValue', formValue);
 
     // Mise à jour de l'état des erreurs
     setErrors(newErrors);
@@ -157,6 +175,9 @@ const Form = ({ car, className }: any) => {
 
     // Aucune erreur, procéder à la création de la réservation
     try {
+      if (typeof(formValue.carId) === 'undefined' || formValue.carId === null) {
+        formValue.carId = car.id;
+      }
       const response = await createBooking(formValue);
       console.log("Réservation créée avec succès", response);
       setIsModalOpen(true); // Afficher le modal de confirmation
@@ -176,28 +197,21 @@ const Form = ({ car, className }: any) => {
   }, [formValue.carId, formValue.pickUpDate, formValue.dropOffDate]);
 
   // Gérer les changements de champ et valider en temps réel
-  const handleChange = (event: any | string, name?: any ) => {
+  const handleChange = (event: any | string, name?: any) => {
     let fieldName: any = name;
-    //let fieldValue = event;
     let value: string;
 
     if (typeof event === 'object' && event.target) {
       fieldName = event.target.name;
       value = event.target.value;
-    }else{
+    } else {
       value = event;
     }
 
-    //const validator = validators[fieldName];
-    //const error = validator ? validator(value) : '';
-    if (validators[fieldName as keyof FormValidators]) {
-      const error = validators[fieldName as keyof FormValidators](value);
-      setErrors(prev => ({ ...prev, [fieldName]: error }));
-    }
-    console.log(errors);
-    //const { name, value } = event.target;
+    // Mise à jour de la valeur du champ
     setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
-  };
+    validateForm({...formValue, [fieldName]: value});
+  }
 
   return (
     <>
@@ -231,7 +245,7 @@ const Form = ({ car, className }: any) => {
               </div>
               <div className="flex flex-col sm:flex-row w-full mb-5 sm:gap-10">
                 <div className="flex">
-                  <Switch label='Avec chauffeur&nbsp;?' color="brown" name="withDriver" onChange={updatePrice} checked={ rentWithDriver } disabled={car?.withDriver}  containerProps={{ className: "my-5", }} crossOrigin="" />
+                  <Switch label='Avec chauffeur&nbsp;?' color="brown" name="withDriver" onChange={updatePrice} checked={ rentWithDriver } disabled={car?.withDriver} containerProps={{ className: "my-5", }} crossOrigin="" />
                   {
                     car?.withDriver &&
                     <Tooltip className="" content='Location avec chauffeur obligatoire.'>
