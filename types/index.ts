@@ -38,6 +38,7 @@ export interface FormValues {
   finalPrice?: string;
   withDriver?: boolean;
   outCapital?: boolean;
+  [key: string]: any;
 }
 
 export interface EmailParams {
@@ -56,15 +57,14 @@ export interface EmailParams {
 export interface FormValidators {
   pickUpDate: (date: string) => string | null;
   pickUpTime: (pickUpTime: string, pickUpDate?: string) => string | null;
-  dropOffDate: (dropOffDate: string, pickUpDate: string) => string | null;
-  dropOffTime: (dropOffTime: string, pickUpTime: string, pickUpDate: string, dropOffDate: string) => string | null;
+  dropOffDate: (dropOffDate: string, pickUpDate?: string) => string | null;
+  dropOffTime: (dropOffTime: string, pickUpTime?: string, pickUpDate?: string, dropOffDate?: string) => string | null;
   firstName: (name: string) => string | null;
   lastName: (name: string) => string | null;
   emailAdress: (email: string) => string | null;
   phoneNumber: (phone: string, whatsAppNumber?: string) => string | null;
-  whatsAppNumber?: (phone: string, phoneNumber?: string) => string | null;
+  //whatsAppNumber?: (phone: string, phoneNumber?: string) => string | null;
 }
-
 
 export interface FormErrors {
   pickUpLocation?: string;
@@ -81,6 +81,7 @@ export interface FormErrors {
   finalPrice?: string;
   withDriver?: boolean;
   outCapital?: boolean;
+  [key: string]: string | boolean | undefined;
 }
 
 export interface AvailabilityState {

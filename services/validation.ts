@@ -15,7 +15,9 @@ export const validators: FormValidators = {
     return pickUpDateTime < now ? "L'heure de récupération doit être dans le futur." : null;
   },
   dropOffDate: (dropOffDate, pickUpDate) => {
-    !pickUpDate && null;
+    if (pickUpDate === undefined) {
+    return "La date de recuperation n'est pas defini";
+    }
     const start = new Date(pickUpDate);
     const end = new Date(dropOffDate);
     if (end < start) {
