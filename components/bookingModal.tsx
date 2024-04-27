@@ -12,9 +12,13 @@ import { MdOutlineCarRental } from "react-icons/md";
 import Link from "next/link";
 import ButtonMain from '@/components/buttonMain';
 import CryptoJS from 'crypto-js';
+import { useCars } from '@/contexts/carsContext';
+import { Tooltip } from "@material-tailwind/react";
+import { BsInfoCircleFill } from "react-icons/bs";
 
 const BookingModal = ({car} :any) => {
   const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
+  const { isAvailable } = useCars();
   const getCategoryIcon = (categoryName:any) => {
     switch (categoryName) {
       case 'SUV':
@@ -182,9 +186,19 @@ const BookingModal = ({car} :any) => {
         <div className="modal-action">
           <button className="btn_base btn_base primary_btn">Fermer</button>
           {
-            typeof(car.id) !== 'undefined' && car.id !== null ?
-            <ButtonMain label='Je reserve' link={`/reservation/${car?.id}`} className='py-3 px-6 uppercase ' /> :
-            ''
+            isAvailable ?
+            typeof(car.id) !== 'undefined' && car.id !== null &&
+            <ButtonMain label='Je reserve' link={`/reservation/${car?.id}`} className='py-3 px-6 uppercase ' />
+            :
+            <div className="float-right z-50">
+              <Tooltip id="#reservez" className="" content='Veuillez remplir le formulaire pour voir les voitures disponibles.'>
+                <button>
+                  <sup>
+                    <BsInfoCircleFill className="text-gold text-xl ml-3 cursor-none" />
+                  </sup>
+                </button>
+              </Tooltip>
+            </div>
           }
         </div>
       </div>
