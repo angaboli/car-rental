@@ -28,9 +28,9 @@ const Processus = () => {
                   <div className="order-1 w-5/12"></div>
                   <div className="order-1 w-5/12 px-1 py-4 text-right">
                     <p className="mb-3 text-base text-tacha">Étape 1</p>
-                    <h4 className="mb-3 font-bold text-lg md:text-xl">Choisir une voiture</h4>
+                    <h4 className="mb-3 font-bold text-lg md:text-xl">Choisir la location et la date</h4>
                     <p className="text-sm md:text-base leading-snug text-gray-50 text-opacity-100">
-                      Sélectionnez le modèle de voiture qui répond à vos besoins et préférences.
+                      Déterminez le lieu de récuperation et de retour ainsi que la période de location souhaitée.
                     </p>
                   </div>
                 </div>
@@ -40,9 +40,9 @@ const Processus = () => {
                   <div className="order-1 w-5/12"></div>
                   <div className="order-1 w-5/12 px-1 py-4 text-left">
                     <p className="mb-3 text-base text-tacha">Étape 2</p>
-                    <h4 className="mb-3 font-bold text-lg md:text-xl">Choisir la location et la date</h4>
+                    <h4 className="mb-3 font-bold text-lg md:text-xl">Choisir une voiture</h4>
                     <p className="text-sm md:text-base leading-snug text-gray-50 text-opacity-100">
-                      Déterminez le lieu de récuperation et de reotour au=insi que la période de location souhaitée.
+                      Sélectionnez le modèle de voiture qui répond à vos besoins et préférences.
                     </p>
                   </div>
                 </div>
@@ -60,7 +60,7 @@ const Processus = () => {
                 </div>
 
                 {/* Timeline Step 4 */}
-                <div className="mb-8 flex justify-between items-center w-full right-timeline">
+                {/* <div className="mb-8 flex justify-between items-center w-full right-timeline">
                   <div className="order-1 w-5/12"></div>
                   <div className="order-1 w-5/12 px-1 py-4">
                     <p className="mb-3 text-base text-tacha">Étape 4</p>
@@ -69,7 +69,7 @@ const Processus = () => {
                       Terminez la réservation par le paiement et préparez-vous à prendre la route !
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

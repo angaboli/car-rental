@@ -36,16 +36,18 @@ export default function CarsList (props:any) {
             {
               (typeof(car.id) !== 'undefined' && car.id !== null) &&
               <>
-                <ButtonMain disabled={!isAvailable} label='Je reserve' link={`/reservation/${car?.id}`} className='m-2 px-5' />
                 {
-                  !isAvailable &&
-                  <Tooltip id="#reservez" className="float-right" content='Veuillez remplir le formulaire pour voir les voitures disponibles.'>
-                    <button>
-                      <sup>
-                        <BsInfoCircleFill className="text-gold text-xl ml-3 cursor-none" />
-                      </sup>
-                    </button>
-                  </Tooltip>
+                  isAvailable ?
+                  <ButtonMain label='Je reserve' link={`/reservation/${car?.id}`} className='m-2 px-5' /> :
+                  <div className="float-right">
+                    <Tooltip id="#reservez" className="" content='Veuillez remplir le formulaire pour voir les voitures disponibles.'>
+                      <button>
+                        <sup>
+                          <BsInfoCircleFill className="text-gold text-xl ml-3 cursor-none" />
+                        </sup>
+                      </button>
+                    </Tooltip>
+                  </div>
                 }
               </>
             }

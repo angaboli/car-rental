@@ -4,7 +4,6 @@ import {CarsListResponse } from "@/types/";
 
 const MASTER_URL= process.env.NEXT_PUBLIC_HYGRAPH_KEY || "";
 
-
 export const getCarsList = async () : Promise<CarsListResponse> => {
   const query = gql`
     query CarLists {
