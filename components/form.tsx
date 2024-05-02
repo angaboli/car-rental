@@ -1,4 +1,4 @@
-import { createBooking, checkCarAvailability } from "@/services";
+import { createBooking } from "@/services";
 import { useEffect, useState } from "react";
 import InputDateTime from "./inputDateTime";
 import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind/react";
@@ -201,14 +201,14 @@ const Form = ({ car, className }: any) => {
     }
   };
 
-  useEffect(() => {
+ /*  useEffect(() => {
     const fetchAvailability = async () => {
       const result = await checkCarAvailability(formValue.pickUpDate, formValue.dropOffDate);
       setAvailability(result);
     };
 
     fetchAvailability();
-  }, [formValue.carId, formValue.pickUpDate, formValue.dropOffDate]);
+  }, [formValue.carId, formValue.pickUpDate, formValue.dropOffDate]); */
 
   // Gérer les changements de champ et valider en temps réel
   const handleChange = (event: any | string, name?: any) => {
