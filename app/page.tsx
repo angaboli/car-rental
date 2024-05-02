@@ -1,12 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Hero from '@/components/hero';
 import CarsFiltersOption from '@/components/carsFiltersOption';
 import CarsList from '@/components/carsList';
 import Skeleton from '@/components/skeleton';
 import Processus from '@/components/processus';
-import { getCarsList } from '@/services';
+//import { getCarsList } from '@/services';
 import { CarsProvider, useCars } from '@/contexts/carsContext';
 import { CarsListResponse } from '@/types'
 
@@ -16,20 +16,45 @@ export default function Home() {
   const [carsList, setCarsList] = useState<any[]>([]);
   const {loading} = useCars();
 
-  /* useEffect(() => {
-    const fetchCars = async () => {
-      setLoading(true);
-      try {
-        const result = await getCarsList();
-        setCarsList(result.carLists);
-      } catch (error) {
-        console.error('Error fetching cars:', error);
-      }
-      setLoading(false);
-    };
+  /* useEffect( () => {
+    async function testFetchAPI() {
+      const MASTER_URL= process.env.WORDPRESS_API_URL || "";
+      const response = await fetch(MASTER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `query CarLists {
+            cars {
+              nodes {
+                id
+                title(format: RENDERED)
+                carACF {
+                  carBrand
+                  carCategory
+                  carType
+                  description
+                  name
+                  places
+                  price
+                  shortDescription
+                  withDriver
+                  image {
+                    node {
+                      sourceUrl
+                    }
+                  }
+                }
+              }
+            }
+          }`,
+        }),
+      });
+      const data = await response.json();
+      console.log('front reponse', data);
+    }
 
-    fetchCars();
-  }, []); */
+    testFetchAPI();
+  },[]) */
 
   return (
     <CarsProvider>

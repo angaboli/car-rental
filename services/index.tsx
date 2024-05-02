@@ -1,10 +1,101 @@
 import { request, gql } from "graphql-request";
+import axios from 'axios';
 import {CarsListResponse } from "@/types/";
 //import { gql, useQuery } from '@apollo/client';
 
-const MASTER_URL= process.env.NEXT_PUBLIC_HYGRAPH_KEY || "";
+//const MASTER_URL= process.env.NEXT_PUBLIC_HYGRAPH_KEY || "";
+const MASTER_URL= process.env.WORDPRESS_API_URL || "https://cocogo.mizi.fr/graphql";
 
-export const getCarsList = async () : Promise<CarsListResponse> => {
+/* async function fetchAPI(query = "", { variables }: Record<string, any> = {}) {
+  const headers = { "Content-Type": "application/json", "Accept": "application/json" };
+
+  if (process.env.WORDPRESS_AUTH_REFRESH_TOKEN) {
+    headers[
+      "Authorization"
+    ] = `Bearer ${process.env.WORDPRESS_AUTH_REFRESH_TOKEN}`;
+  }
+
+  const res = await fetch(MASTER_URL, {
+    headers,
+    method: "POST",
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+  });
+
+  const contentType = res.headers.get("content-type");
+  console.log(contentType)
+  console.log(res)
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error("Le serveur n'a pas renvoyé du JSON");
+  }
+  const json = await res.json();
+  if (json.errors) {
+    console.error(json.errors);
+    throw new Error("Failed to fetch API");
+  }
+  return json.data;
+} */
+
+async function fetchAPI(query = "", { variables }: Record<string, any> = {}) {
+
+  const headers = { 'Content-Type': 'application/json' };
+
+  // build out the fetch() call using the API_URL
+  // environment variable pulled in at the start
+  // Note the merging of the query and variables
+  const res = await fetch(MASTER_URL, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ query, variables })
+  });
+
+  // error handling work
+  const json = await res.json();
+  if (json.errors) {
+    console.log(json.errors);
+    console.log('error details', query, variables);
+    throw new Error('Failed to fetch API');
+  }
+  return json.data;
+}
+
+export async function getCarsList() {
+  const data = await fetchAPI(
+  `
+    query CarLists {
+      cars {
+        nodes {
+          id
+          title(format: RENDERED)
+          carACF {
+            carBrand
+            carCategory
+            carType
+            description
+            name
+            places
+            price
+            shortDescription
+            withDriver
+            image {
+              node {
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
+    }
+    `
+  )
+  //const result = await request<CarsListResponse>(MASTER_URL, query);
+  //return result;
+  return data?.cars;
+}
+
+/* export const getCarsList = async () : Promise<CarsListResponse> => {
   const query = gql`
     query CarLists {
       carLists {
@@ -35,7 +126,7 @@ export const getCarsList = async () : Promise<CarsListResponse> => {
   const result = await request<CarsListResponse>(MASTER_URL, query)
 
   return result
-}
+} */
 
 
 export const createBooking = async (formValue: any) => {
@@ -98,7 +189,7 @@ export async function GetAllBookings() {
     };
   }
 }
-
+/*
 export async function checkCarAvailability($pickUpDate: string, $dropOffDate: string) {
   try {
     const variables = {
@@ -137,3 +228,4 @@ export async function checkCarAvailability($pickUpDate: string, $dropOffDate: st
     };
   }
 }
+ */

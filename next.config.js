@@ -8,7 +8,14 @@ const nextConfig = {
         port: '',
       },
     ],
-  }
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cocogo.mizi.fr',
+        port: '',
+      },
+    ],
+  },
 }
 
 module.exports = nextConfig

@@ -23,13 +23,15 @@ export default function CarCard(props:any) {
         return <FaCar />;
     }
   };
+  console.log(props.car?.carACF?.image)
+  console.log(props.car?.carACF?.image?.node.sourceUrl)
 
   return (
         <div>
           <div className="overflow-x-hidden rounded-2xl relative">
-            { props.car?.image ?
+            { props.car?.carACF?.image ?
               <Image
-                src={props.car?.image?.url}
+                src={props.car?.carACF?.image?.node.sourceUrl}
                 priority={false}
                 className=" rounded-2xl w-full object-cover"
                 alt={props.car.name}
@@ -47,26 +49,26 @@ export default function CarCard(props:any) {
               <div className="flex gap-5 border-y border-light-gray py-1 my-3">
                 <div className="flex items-center gap-1">
                   <span className="text-dark-gray">
-                    { getCategoryIcon(props.car.carCategory) }
+                    { getCategoryIcon(props.car.carACF.carCategory) }
                   </span>
-                  {props.car.carCategory}
+                  {props.car.carACF.carCategory}
                 </div>
                 <div className="flex items-center gap-1">
                   <TbManualGearbox className="text-dark-gray" />
-                  {props.car.carType?.substr(0,1)}
+                  {props.car.carACF.carType?.[0].substr(0,1)}
                 </div>
                 <div className="flex items-center gap-1">
                   <MdAirlineSeatReclineNormal className="text-dark-gray" />
                   {props.car.places}
                 </div>
               </div>
-              <p className="text-lg font-semibold text-gray-900 mb-0">{ props.car.name}</p>
+              <p className="text-lg font-semibold text-gray-900 mb-0">{ props.car.carACF.name}</p>
               <div className="flex flex-col">
                 <div className="flex-col">
-                  <p className="mr-2 truncate mb-1">{props.car.shortDescription}</p>
+                  <p className="mr-2 truncate mb-1">{props.car.carACF.shortDescription}</p>
                   <p className="text-md text-gray-800 mt-0">
                     <span className="font-bold text-md">{
-                      new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( props.car.price) }&nbsp;
+                      new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( props.car.carACF.price) }&nbsp;
                       </span>
                     <span className="font-12px">/jr</span>
                   </p>

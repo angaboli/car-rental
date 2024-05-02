@@ -34,7 +34,7 @@ export const CarsProvider: React.FC<{children: ReactNode}> = ({ children }) => {
       setLoading(true);
       try {
         const result = await getCarsList();
-        setCars(result.carLists);
+        setCars(result.nodes);
       } catch (error) {
         console.error('Error fetching cars:', error);
       }
