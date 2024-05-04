@@ -57,9 +57,10 @@ const Hero = () => {
 
   const fetchAvailability = async () => {
     const bookings = await GetAllBookings();
-    if (formValue.pickUpDate && formValue.dropOffDate && bookings.data?.bookings && carsList) {
+    const allBookings = bookings.bookings.nodes;
+    if (formValue.pickUpDate && formValue.dropOffDate && allBookings.length > 0 && carsList) {
       const availableCars = await filterAvailableCars(
-        bookings.data.bookings,
+        allBookings,
         formValue.pickUpDate,
         formValue.dropOffDate,
         carsList
@@ -209,12 +210,11 @@ const filterAvailableCars = (bookings: any[], pickUpDate : string, dropOffDate: 
 
   const unavailableCarIds = new Set(
     bookings.filter(booking => {
-      const bookingStart = new Date(booking.pickUpDate);
-      const bookingEnd = new Date(booking.dropOffDate);
+      const bookingStart = new Date(booking.bookings?.pickUpDate);
+      const bookingEnd = new Date(booking.bookings?.dropOffDate);
       return (start <= bookingEnd && end >= bookingStart);
-    }).map(booking => booking.carId.id)
+    }).map(booking => booking.bookings.carId.edges[0].node.id)
   );
-
   return allCars?.filter(car => !unavailableCarIds.has(car.id));
 };
 

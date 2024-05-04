@@ -1,6 +1,6 @@
 import { request, gql } from "graphql-request";
 import axios from 'axios';
-import {CarsListResponse } from "@/types/";
+import {CarsListResponse, FormValues } from "@/types/";
 //import { gql, useQuery } from '@apollo/client';
 
 //const MASTER_URL= process.env.NEXT_PUBLIC_HYGRAPH_KEY || "";
@@ -84,52 +84,100 @@ export async function getCarsList() {
                 sourceUrl
               }
             }
+            gallery {
+              img1 {
+                node {
+                  sourceUrl
+                }
+              }
+              img2 {
+                node {
+                  sourceUrl
+                }
+              }
+              img3 {
+                node {
+                  sourceUrl
+                }
+              }
+              img4 {
+                node {
+                  sourceUrl
+                }
+              }
+              img5 {
+                node {
+                  sourceUrl
+                }
+              }
+            }
           }
         }
       }
     }
     `
   )
-  //const result = await request<CarsListResponse>(MASTER_URL, query);
-  //return result;
   return data?.cars;
 }
 
-/* export const getCarsList = async () : Promise<CarsListResponse> => {
-  const query = gql`
-    query CarLists {
-      carLists {
-        id
-        carAvg
-        carBrand
-        carType
-        createdAt
-        image {
-          url
+export const createBooking = async (formValue: FormValues) => {
+  const mutation = `
+    mutation CreateBooking($input: CreateBookingInput!) {
+      createBooking(input: $input) {
+        booking {
+          bookings {
+            carId {
+              edges {
+                node {
+                  id
+                }
+              }
+            }
+            pickUpLocation
+            pickUpDate
+            pickUpTime
+            dropOffLocation
+            dropOffDate
+            dropOffTime
+            finalPrice
+            emailAdress
+            firstName
+            lastName
+            phoneNumber
+            withDriver
+            outCapital
+            whatsAppNumber
+          }
         }
-        name
-        shortDescription
-        description{
-          html
-          text
-        }
-        price
-        places
-        carCategory
-        gallery {
-          url
-        }
-        withDriver
       }
     }
-  `
-  const result = await request<CarsListResponse>(MASTER_URL, query)
+  `;
 
-  return result
-} */
+  const variables = {
+    input: {
+      carId: formValue.carId,
+      pickUpLocation: formValue.pickUpLocation,
+      pickUpDate: formValue.pickUpDate,
+      pickUpTime: formValue.pickUpTime,
+      dropOffLocation: formValue.dropOffLocation,
+      dropOffDate: formValue.dropOffDate,
+      dropOffTime: formValue.dropOffTime,
+      finalPrice: formValue.finalPrice,
+      emailAdress: formValue.emailAdress,
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      phoneNumber: formValue.phoneNumber,
+      withDriver: formValue.withDriver,
+      outCapital: formValue.outCapital,
+      whatsAppNumber: formValue.whatsAppNumber
+    }
+  };
+
+  return await fetchAPI(mutation, { variables });
+};
 
 
-export const createBooking = async (formValue: any) => {
+/* export const createBooking = async (formValue: any) => {
   const mutationQuery = gql `
   mutation MyMutation {
     createBooking(
@@ -158,9 +206,34 @@ export const createBooking = async (formValue: any) => {
   const res = await request(MASTER_URL, mutationQuery);
   return res;
 }
-
+ */
 
 export async function GetAllBookings() {
+  const queryBookings = await fetchAPI(
+    `
+    query Bookings {
+        bookings {
+          nodes {
+            bookings {
+              carId {
+                edges {
+                  node {
+                    id
+                  }
+                }
+              }
+              pickUpDate
+              pickUpTime
+              dropOffDate
+              dropOffTime
+            }
+          }
+        }
+    }
+    `);
+  return queryBookings;
+}
+/* export async function GetAllBookings() {
   try {
     const query = gql`
       query MyBookings {
@@ -188,7 +261,7 @@ export async function GetAllBookings() {
       data: {},
     };
   }
-}
+} */
 /*
 export async function checkCarAvailability($pickUpDate: string, $dropOffDate: string) {
   try {
