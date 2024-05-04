@@ -17,7 +17,7 @@ import { Tooltip } from "@material-tailwind/react";
 import { BsInfoCircleFill } from "react-icons/bs";
 
 const BookingModal = ({car} :any) => {
-  const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
+  //const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
   const { isAvailable } = useCars();
   const getCategoryIcon = (categoryName:any) => {
     switch (categoryName) {
@@ -32,13 +32,15 @@ const BookingModal = ({car} :any) => {
     }
   };
 
-  function encryptID(id: string) {
+  /* function encryptID(id: string) {
     return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
-  }
+  } */
+  //console.log(car)
+  //console.log(car?.carACF)
 
   const gallery = car?.gallery || [];
-  const frontImage = car?.image?.url;
-  const description = { __html: car.description?.html };
+  const frontImage = car?.carACF?.image?.node.sourceUrl || "";
+  const description = { __html: car.carACF?.description } || "";
   return (
     <form method="dialog"  className="modal-box w-4/5 max-w-7xl bg-light-gray ">
       <div className="relative">
@@ -122,19 +124,22 @@ const BookingModal = ({car} :any) => {
                 >
                   {
                     gallery.map((image:any, index:any) => (
+                      <>
+                      {console.log("img : ", image)}
                       <img
                         key={index}
                         src={image.url}
                         alt={`Slide ${index}`}
                         className="h-full w-full object-cover"
-                      />
+                        />
+                        </>
                     ))
                   }
                 </Carousel>
             :
             <img
               src={frontImage}
-              alt={car.name}
+              alt={car.title}
               className="h-full w-full object-cover"
             />
           }
@@ -145,33 +150,33 @@ const BookingModal = ({car} :any) => {
               <div className="flex gap-5 border-y border-light-gray py-2 my-3">
                 <div className="flex items-center gap-1">
                   <span className="text-dark-gray">
-                    { getCategoryIcon(car.carCategory) }
+                    { getCategoryIcon(car.carACF?.carCategory) }
                   </span>
                   {car.carCategory}
                 </div>
                 <div className="flex items-center gap-1">
                   <TbManualGearbox className="text-dark-gray" />
-                  {car.carType?.substr(0,1)}
+                  {car.carACF?.carType?.[0].substr(0,1)}
                 </div>
                 <div className="flex items-center gap-1">
                   <MdAirlineSeatReclineNormal className="text-dark-gray" />
-                  {car.places}
+                  {car?.carACF?.places}
                 </div>
               </div>
-              <p className="text-lg font-semibold text-gray-900 mb-0">{ car.name}</p>
+              <p className="text-lg font-semibold text-gray-900 mb-0">{ car.title}</p>
               <div className="flex flex-col">
                 <p className="text-md text-gray-800 mt-0">
                   <span className="font-semibold text-md">{
-                    new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( car.price) }&nbsp;
+                    new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( car.carACF?.price) }&nbsp;
                   </span>
                   <span className="font-12px">/jr</span>
                 </p>
-                <p className="mt-1 mb-1">{car.shortDescription}</p>
+                <p className="mt-1 mb-1">{car.carACF?.shortDescription}</p>
               </div>
             </div>
           </div>
           {
-            ( typeof(car.description?.html) !== 'undefined' && car.description?.html !== null ) &&
+            ( typeof(car.carACF?.description) !== 'undefined' && car.carACF?.description !== null ) &&
             <div tabIndex={0} className="collapse collapse-plus border border-gold bg-base-200">
               <div className="collapse-title text-md font-medium ">
                 Description

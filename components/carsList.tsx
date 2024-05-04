@@ -25,7 +25,6 @@ export default function CarsList (props:any) {
     return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
   }
 
-  console.log(carsList)
   return (
     <div className="flex">
       <div className="relative md:max-w-[1366px] m-3 flex flex-wrap gap-1 mx-auto justify-center">

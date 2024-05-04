@@ -23,8 +23,6 @@ export default function CarCard(props:any) {
         return <FaCar />;
     }
   };
-  console.log(props.car?.carACF?.image)
-  console.log(props.car?.carACF?.image?.node.sourceUrl)
 
   return (
         <div>
@@ -34,7 +32,7 @@ export default function CarCard(props:any) {
                 src={props.car?.carACF?.image?.node.sourceUrl}
                 priority={false}
                 className=" rounded-2xl w-full object-cover"
-                alt={props.car.name}
+                alt={props.car.title}
                 width={520}
                 height={320}
               /> :
