@@ -5,33 +5,16 @@ import Footer from '@/components/footer';
 import { Audiowide } from 'next/font/google'
 import Form from '@/components/form';
 import { useRouter } from 'next/router';
-import { getCarsList } from '@/services';
+import { getCarsList, getCar } from '@/services';
 import CryptoJS from 'crypto-js';
 import SkeletonPage from '@/components/SkeletonPage';
 import CarDetails from '@/components/carDetails';
 import type { Metadata } from 'next';
+import { Car } from '@/types';
 
 export const metadata: Metadata = {
   title: 'COCOGO - Réservation',
   description: 'Car rental App developped by D3',
-}
-
-interface Car {
-  carAvg?: number;
-  carBrand: string;
-  carCategory: string;
-  carType: string;
-  createdAt?: string;
-  description?: string | null;
-  gallery?: Array<{[key: string]: any}>;
-  id: string;
-  image: { url: string };
-  name: string;
-  places?: number;
-  price: number;
-  publishedAt?: string;
-  shortDescription?: string;
-  updatedAt?: string;
 }
 
 const audiowide = Audiowide({
@@ -51,14 +34,12 @@ export default function CarReservation() {
   useEffect(() => {
     const fetchCarsList = async () => {
       try {
-        const result = await getCarsList();
-        const decryptedId = carId //? decryptID(Array.isArray(carId) ? carId[0] : carId) : null;
-        const foundCar = result.carLists.find((car: any) => car.id === decryptedId);
-        (foundCar) && setCar(foundCar);
-        //else setError('La voiture n\'apas été trouvé');
+        const result = await getCar(carId);
+        const foundCar = result;
+        if (foundCar)  setCar(foundCar);
       } catch (error) {
-        console.error('Error fetching cars:', error);
-        setError('Failed to fetch cars');
+        //console.error('Error fetching car:', error);
+        setError('Failed to fetch car');
       } finally {
         setLoading(false);
       }
@@ -67,8 +48,6 @@ export default function CarReservation() {
     fetchCarsList();
   }, [carId]);
 
-  //console.log(carId);
-  //console.log(car);
 
   const decryptID = (encryptedId: string) => {
     try {
@@ -86,8 +65,8 @@ export default function CarReservation() {
   return (
     <>
       <Head>
-        <title>{car ? `COCOGO - Réservation de la voiture ${car?.name}` : "COCOGO - Réservation"}</title>
-        <meta name="description" content={car?.shortDescription} />
+        <title>{car ? `COCOGO - Réservation de la voiture ${car?.title}` : "COCOGO - Réservation"}</title>
+        <meta name="description" content={car?.carACF?.shortDescription} />
       </Head>
       <Header />
       <main className="scroll-smooth bg-light-gray">
@@ -95,7 +74,7 @@ export default function CarReservation() {
           <div className="wrapper  min-h-[200px]">
             <h1 className={`${audiowide.className } head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center uppercase`}>
               Réservation de la&nbsp;
-              <span className="text-primary-black">{car?.name}&nbsp;</span>
+              <span className="text-primary-black">{car?.title}&nbsp;</span>
             </h1>
           </div>
         </div>
@@ -105,7 +84,7 @@ export default function CarReservation() {
               <SkeletonPage /> :
               <div className='w-11/12 px-8 mx-auto pb-10'>
                 <div className="flex flex-col lg:flex-row gap-10 mx-auto">
-                  <Form className="w-full lg:w-7/12" car={car} />
+                  <Form className="w-full lg:w-7/12" car={car} loading={loading} />
                   <div className="w-full lg:w-5/12 shadow-md rounded-3xl p-5 my-3">
                     <CarDetails car={car} />
                   </div>

@@ -57,7 +57,7 @@ const Hero = () => {
 
   const fetchAvailability = async () => {
     const bookings = await GetAllBookings();
-    const allBookings = bookings.bookings.nodes;
+    const allBookings = bookings.nodes;
     if (formValue.pickUpDate && formValue.dropOffDate && allBookings.length > 0 && carsList) {
       const availableCars = await filterAvailableCars(
         allBookings,

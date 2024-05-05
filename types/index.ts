@@ -3,7 +3,7 @@ export interface CarImage {
   url: string;
 }
 
-export interface Car {
+/* export interface Car {
   id: string;
   carAvg: number;
   carBrand: string;
@@ -17,7 +17,7 @@ export interface Car {
   withDriver: boolean;
   publishedAt: string;
   updatedAt: string;
-}
+} */
 
 export interface CarsListResponse {
   carLists: Car[];
@@ -35,7 +35,7 @@ export interface FormValues {
   emailAdress?: string;
   phoneNumber?: string;
   whatsAppNumber?: string;
-  finalPrice?: string;
+  finalPrice?: number;
   withDriver?: boolean;
   outCapital?: boolean;
   [key: string]: any;
@@ -109,6 +109,52 @@ export interface ValidationParams {
   value: string;
   fieldName: string;
 }
+
+export interface ImageNode {
+  node: {
+    id: number;
+    sourceUrl: string;
+  } | null;
+}
+
+export interface Gallery {
+  img1: ImageNode | null;
+  img2: ImageNode | null;
+  img3: ImageNode | null;
+  img4: ImageNode | null;
+  img5: ImageNode | null;
+  [key: string]: ImageNode | null;
+}
+
+export interface Car {
+  id: string;
+  title: string;
+  slug: string;
+  carACF: {
+    carBrand: string;
+    carCategory: string;
+    carType: string;
+    description: string;
+    places: number;
+    price: number;
+    shortDescription: string;
+    withDriver: boolean;
+    gallery: {
+      img1: { node: { sourceUrl: string } } | null;
+      img2: { node: { sourceUrl: string } } | null;
+      img3: { node: { sourceUrl: string } } | null;
+      img4: { node: { sourceUrl: string } } | null;
+      img5: { node: { sourceUrl: string } } | null;
+    };
+    image: { node: { sourceUrl: string } };
+  };
+}
+
+interface CarQueryData {
+  car: Car;
+}
+
+export type CarType = CarQueryData;
 
 /* export interface FormValidators {
   pickUpDate: (date: string) => string | null;

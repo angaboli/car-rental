@@ -2,25 +2,25 @@ import { createBooking } from "@/services";
 import { useEffect, useState } from "react";
 import InputDateTime from "./inputDateTime";
 import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind/react";
-import ButtonMain from'@/components/buttonMain';
-import EmailReservation from'@/components/emailReservation';
-import SkeletonPage from'@/components/SkeletonPage';
+import ButtonMain from '@/components/buttonMain';
+import EmailReservation from '@/components/emailReservation';
+import SkeletonPage from '@/components/SkeletonPage';
 import { useRouter } from 'next/router';
 import { BsInfoCircleFill } from "react-icons/bs";
-import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, FormValidators, ValidationParams} from '@/types';
+import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, FormValidators, ValidationParams } from '@/types';
 import { validators } from '@/services/validation';
 
 
-const Form = ({ car, className }: any) => {
+const Form = ({ car, loading, className }: any) => {
   const router = useRouter();
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
-  const [ carId, setCarId ] = useState(car?.id);
-  const [ finalPrice, setFinalPrice ] = useState(car?.price)
-  const [ isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [ loading, setLoading ] = useState<boolean>(true);
-  const [ formValue, setFormValue] = useState({
+  const [carId, setCarId] = useState("");
+  const [finalPrice, setFinalPrice] = useState(0)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(loading);
+  const [formValue, setFormValue] = useState({
     pickUpLocation: '',
     dropOffLocation: '',
     pickUpDate: formattedDate,
@@ -42,37 +42,44 @@ const Form = ({ car, className }: any) => {
   const [outCapital, setOutCapital] = useState(false);
   const [addDropoff, setAddDropoff] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [availability, setAvailability] = useState<AvailabilityState>({
-    loading: true,
-    error: null,
-    isAvailable: false,
-  });
-  const [ rentWithDriver, setRentWithDriver ] = useState(false);
+  const [rentWithDriver, setRentWithDriver] = useState(false);
 
-   const handleCloseModal = () => {
+  const handleCloseModal = () => {
     setIsModalOpen(false); // Ferme la modal
     router.push('/'); // Redirige vers la page d'accueil
   };
 
   const updatePrice = (e: any) => {
-    if(e.target.name == "withDriver") {
+    if (e.target.name == "withDriver") {
       setWithDriver(e.target.checked)
-    } else if(e.target.name == "outCapital") {
+    } else if (e.target.name == "outCapital") {
       setOutCapital(e.target.checked)
     }
   }
 
-  const updatedropOffLocation = (e:any)  => {
-     if(e.target.name == "returnAgency") {
+  const updatedropOffLocation = (e: any) => {
+    if (e.target.name == "returnAgency") {
       setAddDropoff(e.target.checked)
     }
   }
 
   useEffect(() => {
+    if (car) {
+      setCarId(car.id || "");
+      setFinalPrice(car.carACF?.price || 0);
+      setFormValue(prev => ({
+        ...prev,
+        carId: car.id || "",
+        finalPrice: car.carACF?.price || 0
+      }));
+    }
+  }, [car]);
+
+  useEffect(() => {
     const savedFormData = sessionStorage.getItem("formData");
     if (savedFormData) {
       setFormValue(JSON.parse(savedFormData));
-    }else{
+    } else {
       setFormValue({
         ...formValue,
         carId: car?.id,
@@ -86,33 +93,13 @@ const Form = ({ car, className }: any) => {
   }, [formValue]);
 
   useEffect(() => {
-    const fetchCarDetails = async () => {
-      if (!carId) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        setCarId(car.id);
-        setFormValue({ ...formValue, carId: car.id});
-      } catch (error) {
-        console.error('Erreur lors de la récupération des détails de la voiture:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCarDetails();
-  }, [carId]);
-
-  useEffect(() => {
     const startDate = new Date(formValue.pickUpDate);
     const endDate = new Date(formValue.dropOffDate);
     const timeDiff = endDate.getTime() - startDate.getTime();
     const daysDiff = (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1;
 
-    let price = car?.price * daysDiff  ;
-    if (withDriver || car?.withDriver) {
+    let price = car?.carACF?.price * daysDiff;
+    if (withDriver || car?.carACF?.withDriver) {
       price += 5000 * daysDiff;
       formValue.withDriver = true;
       setRentWithDriver(true);
@@ -131,36 +118,38 @@ const Form = ({ car, className }: any) => {
     let isValid = true;
 
     Object.keys(values).forEach(key => {
-        const validator = validators[key as keyof typeof validators];
-        if (validator) {
-            let error;
-            // Exemple d'utilisation des validateurs avec plusieurs paramètres
-            switch (key) {
-                case 'pickUpDate':
-                    error = validator(values.pickUpDate);
-                    break;
-                case 'dropOffDate':
-                    error = validator(values.dropOffDate, values.pickUpDate);
-                    break;
-                case 'pickUpTime':
-                    error = validator(values.pickUpTime, values.pickUpDate);
-                    break;
-                case 'dropOffTime':
-                    error = validator(values.dropOffTime, values.pickUpTime, values.pickUpDate, values.dropOffDate);
-                    break;
-                default:
-                    error = validator(values[key] as any);
-                    break;
-            }
-            if (error) {
-                newErrors[key] = error;
-                //isValid = false;
-            }
+      const validator = validators[key as keyof typeof validators];
+      if (validator) {
+        let error;
+        // Exemple d'utilisation des validateurs avec plusieurs paramètres
+        switch (key) {
+          case 'pickUpDate':
+            error = validator(values.pickUpDate);
+            break;
+          case 'dropOffDate':
+            error = validator(values.dropOffDate, values.pickUpDate);
+            break;
+          case 'pickUpTime':
+            error = validator(values.pickUpTime, values.pickUpDate);
+            break;
+          case 'dropOffTime':
+            error = validator(values.dropOffTime, values.pickUpTime, values.pickUpDate, values.dropOffDate);
+            break;
+          default:
+            error = validator(values[key] as any);
+            break;
         }
+        if (error) {
+          newErrors[key] = error;
+          //isValid = false;
+        }
+      }
     });
 
     setErrors(newErrors);
-    //return isValid;
+    console.log("errors : ", errors);
+
+    return newErrors;
   };
 
 
@@ -171,11 +160,13 @@ const Form = ({ car, className }: any) => {
     // Réinitialisation des erreurs
     let newErrors: FormErrors = {};
 
-
+    let validateFormValues = validateForm(formValue);
+    console.log(validateFormValues)
     // Vérification des validations des champs
-    if (!validateForm(formValue)) {
-        console.log('Validation errors', errors);
-        return; // Stop the submission if there are errors
+    if (Object.keys(validateFormValues).length !== 0) {
+      console.error('Validation errors', errors);
+      setErrors(newErrors);
+      return; // Stop the submission if there are errors
     }
 
     // Mise à jour de l'état des erreurs
@@ -186,31 +177,28 @@ const Form = ({ car, className }: any) => {
       console.error("Erreurs de validation, soumission annulée.");
       return;
     }
+    const currentCarId = carId || car?.id;
 
-    // Aucune erreur, procéder à la création de la réservation
+    // Création de la reservation !
     try {
-      if (typeof(formValue.carId) === 'undefined' || formValue.carId === null) {
-        formValue.carId = car.id;
-      }
-      const response = await createBooking(formValue);
+      const formSubmission = {
+        ...formValue,
+        carId: currentCarId,
+      };
+
+      console.log("Submitting with car ID: ", currentCarId);
+      const response = await createBooking(formSubmission);
       console.log("Réservation créée avec succès", response);
-      setIsModalOpen(true); // Afficher le modal de confirmation
-      sessionStorage.removeItem("formData"); // Nettoyer le formulaire sauvegardé
+      setIsModalOpen(true);
+      sessionStorage.removeItem("formData");
     } catch (error) {
       console.error("Erreur lors de la création de la réservation :", error);
     }
   };
 
- /*  useEffect(() => {
-    const fetchAvailability = async () => {
-      const result = await checkCarAvailability(formValue.pickUpDate, formValue.dropOffDate);
-      setAvailability(result);
-    };
 
-    fetchAvailability();
-  }, [formValue.carId, formValue.pickUpDate, formValue.dropOffDate]); */
 
-  // Gérer les changements de champ et valider en temps réel
+  // Gestion des changements de champ et validation en temps réel
   const handleChange = (event: any | string, name?: any) => {
     let fieldName: any = name;
     let value: string;
@@ -224,108 +212,112 @@ const Form = ({ car, className }: any) => {
 
     // Mise à jour de la valeur du champ
     setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
-    validateForm({...formValue, [fieldName]: value});
+    validateForm({ ...formValue, [fieldName]: value });
   }
 
   return (
     <>
-    {
-      (loading) ?
-        <div className="max-w-7xl bg-light-gray">
-          <SkeletonPage />
-        </div> :
-      <>
-        <form method="" onSubmit={handleSubmit} className={`${className} max-w-7xl bg-light-gray mb-3`}>
-          <div>
-            <div className="shadow-md rounded-3xl p-5 my-3">
-              <h3 className="font-bold text-gold text-xl mb-3">Votre réservation</h3>
+      {
+        (isLoading) ?
+          <div className="max-w-7xl bg-light-gray">
+            <SkeletonPage />
+          </div> :
+          <>
+            <form method="" onSubmit={handleSubmit} className={`${className} max-w-7xl bg-light-gray mb-3`}>
               <div>
-                <Select className="" placeholder="Lieu de récuperation ?" label="Lieu de récuperation ?" name="pickUpLocation" onChange={(value) => handleChange(value, 'pickUpLocation')} defaultValue={formValue.pickUpLocation} >
-                  <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
-                  <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
-                </Select>
-                <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updatedropOffLocation} containerProps={{ className: "my-5", }} crossOrigin="" />
-                {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updatedropOffLocation} className="w-1/2 mb-2" /> */}
-                {
-                  addDropoff == true && (
-                    <Select className="" label="Lieu de retour ?" name="dropOffLocation" onChange={(value) => handleChange(value, 'dropOffLocation')} defaultValue={formValue.dropOffLocation} placeholder="Lieu de retour ?">
+                <div className="shadow-md rounded-3xl p-5 my-3">
+                  <h3 className="font-bold text-gold text-xl mb-3">Votre réservation</h3>
+                  <div>
+                    <Select className="" placeholder="Lieu de récuperation ?" label="Lieu de récuperation ?" name="pickUpLocation" onChange={(value) => handleChange(value, 'pickUpLocation')} defaultValue={formValue.pickUpLocation} >
                       <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
                       <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                     </Select>
-                )}
-              <div className="flex flex-col md:flex-row gap-5 mb-5">
-                  <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" errors={errors.pickUpDate} />
-                  <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" errors={errors.dropOffDate} />
-              </div>
-              <div className="flex flex-col sm:flex-row w-full mb-5 sm:gap-10">
-                <div className="flex">
-                  <Switch label='Avec chauffeur&nbsp;?' color="brown" name="withDriver" onChange={updatePrice} checked={ rentWithDriver } disabled={car?.withDriver} containerProps={{ className: "my-5", }} crossOrigin="" />
-                  {
-                    car?.withDriver &&
-                    <Tooltip className="" content='Location avec chauffeur obligatoire.'>
-                      <button>
-                        <sup>
-                          <BsInfoCircleFill className="text-gold text-xl ml-3 cursor-none" />
-                        </sup>
-                      </button>
-                    </Tooltip>
-                  }
+                    <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updatedropOffLocation} containerProps={{ className: "my-5", }} crossOrigin="" />
+                    {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updatedropOffLocation} className="w-1/2 mb-2" /> */}
+                    {
+                      addDropoff == true && (
+                        <Select className="" label="Lieu de retour ?" name="dropOffLocation" onChange={(value) => handleChange(value, 'dropOffLocation')} defaultValue={formValue.dropOffLocation} placeholder="Lieu de retour ?">
+                          <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                          <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
+                        </Select>
+                      )}
+                    <div className="flex flex-col md:flex-row gap-5 mb-5">
+                      <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} onChange={handleChange} className="" errors={errors.pickUpDate} />
+                      <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} onChange={handleChange} className="" errors={errors.dropOffDate} />
+                    </div>
+                    <div className="flex flex-col sm:flex-row w-full mb-5 sm:gap-10">
+                      <div className="flex">
+                        <Switch label='Avec chauffeur&nbsp;?' color="brown" name="withDriver" onChange={updatePrice} checked={rentWithDriver} disabled={car?.carACF?.withDriver} containerProps={{ className: "my-5", }} crossOrigin="" />
+                        {
+                          car?.carACF?.withDriver &&
+                          <Tooltip className="" content='Location avec chauffeur obligatoire.'>
+                            <button>
+                              <sup>
+                                <BsInfoCircleFill className="text-gold text-xl ml-3 cursor-none" />
+                              </sup>
+                            </button>
+                          </Tooltip>
+                        }
+                      </div>
+                      <Switch label="Hors Abidjan&nbsp;?" color="brown" name="outCapital" onChange={updatePrice} containerProps={{ className: "my-5", }} crossOrigin="" />
+                    </div>
+                    <div className="flex">
+                      {
+                        !isNaN(finalPrice) && <FinalPrice price={finalPrice} />
+                      }
+                    </div>
+                  </div>
                 </div>
-                <Switch label="Hors Abidjan&nbsp;?" color="brown" name="outCapital" onChange={updatePrice} containerProps={{ className: "my-5", }} crossOrigin="" />
-              </div>
-              <div className="flex">
-                <FinalPrice price={finalPrice} />
-              </div>
-            </div>
-          </div>
-          <div className="shadow-md rounded-3xl p-5 text-primary-black">
-            <h3 className="font-bold text-gold text-xl mb-3">Vos Coordonnées</h3>
-            <div>
-              <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
-                <div className='flex flex-col w-full sm:w-1/2'>
-                  <Input className="" label="Votre Prénom"  type='text' name="firstName" value={formValue.firstName} onChange={handleChange} crossOrigin=""  />
-                  {errors.firstName && <div className="error">{errors.firstName}</div>}
+                <div className="shadow-md rounded-3xl p-5 text-primary-black">
+                  <h3 className="font-bold text-gold text-xl mb-3">Vos Coordonnées</h3>
+                  <div>
+                    <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
+                      <div className='flex flex-col w-full sm:w-1/2'>
+                        <Input className="" label="Votre Prénom" type='text' name="firstName" value={formValue.firstName} onChange={handleChange} crossOrigin="" />
+                        {errors.firstName && <div className=" text-red-500">{errors.firstName}</div>}
+                      </div>
+                      <div className='flex flex-col w-full sm:w-1/2'>
+                        <Input className="" label="Votre Nom" type='text' name="lastName" value={formValue.lastName} onChange={handleChange} crossOrigin="" />
+                        {errors.lastName && <div className="error text-red-500">{errors.lastName}</div>}
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
+                      <div className='flex flex-col w-full sm:w-1/2'>
+                        <Input label="Numéro de tél" type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange} crossOrigin="" />
+                        {errors.phoneNumber && <div className="error text-red-500">{errors.phoneNumber}</div>}
+                      </div>
+                      <div className='flex flex-col w-full sm:w-1/2'>
+                        <Input label="Numéro de WhatsApp" type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} crossOrigin="" />
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
+                      <Input label="Votre email" type='email' name="emailAdress" value={formValue.emailAdress} onChange={handleChange} crossOrigin="" />
+                      <Select label="Votre age" name="age" onChange={(value) => handleChange(value, 'age')} defaultValue={formValue.age} placeholder="Votre age"  >
+                        <Option value="21-24">21-24</Option>
+                        <Option value="25-29">25-29</Option>
+                        <Option value="30+">30+</Option>
+                      </Select>
+                    </div>
+                    <div className='flex flex-wrap justify-between my-3 gap-5'>
+                      {
+                        !isNaN(finalPrice) && <FinalPrice price={finalPrice} />
+                      }
+                      <ButtonMain type="submit" label='Je valide' className='px-8' />
+                    </div>
+                  </div>
                 </div>
-                <div className='flex flex-col w-full sm:w-1/2'>
-                  <Input className="" label="Votre Nom"  type='text' name="lastName" value={formValue.lastName} onChange={handleChange} crossOrigin=""  />
-                  {errors.lastName && <div className="error">{errors.lastName}</div>}
+                <div>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
-                <div className='flex flex-col w-full sm:w-1/2'>
-                  <Input label="Numéro de tél"  type='tel' name="phoneNumber" value={formValue.phoneNumber} onChange={handleChange} crossOrigin=""  />
-                  {errors.phoneNumber && <div className="error">{errors.phoneNumber}</div>}
-                </div>
-                <div className='flex flex-col w-full sm:w-1/2'>
-                  <Input label="Numéro de WhatsApp"  type='tel' name="whatsAppNumber" value={formValue.whatsAppNumber} onChange={handleChange} crossOrigin=""  />
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
-                <Input label="Votre email"  type='email' name="emailAdress" value={formValue.emailAdress} onChange={handleChange} crossOrigin=""  />
-                <Select label="Votre age" name="age" onChange={(value) => handleChange(value, 'age')} defaultValue={formValue.age}  placeholder="Votre age"  >
-                  <Option value="21-24">21-24</Option>
-                  <Option value="25-29">25-29</Option>
-                  <Option value="30+">30+</Option>
-                </Select>
-              </div>
-              <div className='flex flex-wrap justify-between my-3 gap-5'>
-                <FinalPrice  price={finalPrice} />
-                <ButtonMain type="submit" label='Je valide'  className='px-8' />
-              </div>
-            </div>
-          </div>
-          <div>
-          </div>
-          </div>
-        </form>
-        <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
-      </>
-    }
+            </form>
+            <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
+          </>
+      }
     </>
   )
 }
 
-const ReservationModal : React.FC<ReservationModalProps> = ({ isOpen, onClose }) => {
+const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
@@ -351,10 +343,10 @@ const FinalPrice = ({ price }: { price: number }) => (
       variant="ghost"
       value={
         <div>
+          <span className="font-12px capitalize text-gold">Total&nbsp;:&nbsp;</span>
           <span className="font-semibold text-2xl">{
-            new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format( price) }&nbsp;
+            new Intl.NumberFormat('fr-CI', { style: 'currency', currency: 'CFA' }).format(price)}&nbsp;
           </span>
-          <span className="font-12px lowercase">/jr</span>
         </div>
       }
     />
@@ -388,7 +380,7 @@ function formatTime(date: Date) {
   return `${formattedHours}:${formattedMinutes}`;
 }
 
-const sendEmail = async ({firstName, contactEmail, contactPhone, pickUpLocation, dropOffLocation, pickUpDate, pickUpTime, dropOffDate, dropOffTime, finalPrice}: EmailParams) => {
+const sendEmail = async ({ firstName, contactEmail, contactPhone, pickUpLocation, dropOffLocation, pickUpDate, pickUpTime, dropOffDate, dropOffTime, finalPrice }: EmailParams) => {
   const html = <EmailReservation
     firstName={firstName}
     contactEmail={contactEmail}
@@ -400,7 +392,7 @@ const sendEmail = async ({firstName, contactEmail, contactPhone, pickUpLocation,
     dropOffDate={dropOffDate}
     dropOffTime={dropOffTime}
     finalPrice={finalPrice}
-    />
+  />
   const response = await fetch('/services/sendEmail', {
     method: 'POST',
     headers: {
