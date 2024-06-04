@@ -11,6 +11,7 @@ import SkeletonPage from '@/components/SkeletonPage';
 import CarDetails from '@/components/carDetails';
 import type { Metadata } from 'next';
 import { Car } from '@/types';
+import { FormProvider } from '@/contexts/formContext';
 
 export const metadata: Metadata = {
   title: 'COCOGO - Réservation',
@@ -36,7 +37,7 @@ export default function CarReservation() {
       try {
         const result = await getCar(carId);
         const foundCar = result;
-        if (foundCar)  setCar(foundCar);
+        if (foundCar) setCar(foundCar);
       } catch (error) {
         //console.error('Error fetching car:', error);
         setError('Failed to fetch car');
@@ -72,7 +73,7 @@ export default function CarReservation() {
       <main className="scroll-smooth bg-light-gray">
         <div id="reservez" className=" bg-gradient-to-r from-gray-200 to-slate-300">
           <div className="wrapper  min-h-[200px]">
-            <h1 className={`${audiowide.className } head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center uppercase`}>
+            <h1 className={`${audiowide.className} head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center uppercase`}>
               Réservation de la&nbsp;
               <span className="text-primary-black">{car?.title}&nbsp;</span>
             </h1>
@@ -80,18 +81,22 @@ export default function CarReservation() {
         </div>
         <div>
           {
-            loading && !car ?
-              <SkeletonPage /> :
-              <div className='w-11/12 px-8 mx-auto pb-10'>
-                <div className="flex flex-col lg:flex-row gap-10 mx-auto">
-                  <Form className="w-full lg:w-7/12" car={car} loading={loading} />
-                  <div className="w-full lg:w-5/12 shadow-md rounded-3xl p-5 my-3">
-                    <CarDetails car={car} />
+            loading && !car ? (
+              <SkeletonPage />
+            ) :
+              car && (
+                <div className='w-11/12 px-8 mx-auto pb-10'>
+                  <div className="flex flex-col lg:flex-row gap-10 mx-auto">
+                    <FormProvider>
+                      <Form className="w-full lg:w-7/12" car={car} loading={loading} />
+                    </FormProvider>
+                    <div className="w-full lg:w-5/12 shadow-md rounded-3xl p-5 my-3">
+                      <CarDetails car={car} />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )
           }
-          {/* Affichez ici les détails de la réservation ou un formulaire */}
         </div>
       </main>
       <Footer />

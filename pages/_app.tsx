@@ -1,6 +1,13 @@
 import { AppProps } from "next/app";
+import { FormProvider } from "@/contexts/formContext";
 import  "@/app/globals.css";
 
-export default function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
-}
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  return (
+    <FormProvider>
+      <Component {...pageProps} />
+    </FormProvider>
+  );
+};
+
+export default MyApp;

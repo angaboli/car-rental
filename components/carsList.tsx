@@ -1,4 +1,5 @@
 import { getCarsList  } from "@/services"
+import { useRouter } from 'next/navigation';
 import CarCard from "./carCard"
 import BookingModal from "./bookingModal"
 import { useEffect, useState } from "react"
@@ -9,9 +10,12 @@ import ButtonMain from '@/components/buttonMain';
 import { useCars } from '@/contexts/carsContext';
 import { Tooltip } from "@material-tailwind/react";
 import { BsInfoCircleFill } from "react-icons/bs";
+import { useFormContext } from "@/contexts/formContext";
 
 export default function CarsList (props:any) {
   const { carsList, isAvailable } = useCars();
+  const { formData, setFormData } = useFormContext();
+  const router = useRouter();
   //const { disable, setdisable } = useState<boolean>(true);
   const [selectedCar, setSelectedCar ] = useState<any>([]);
   const createNameLink = (name: string) => name.split(" ").join("-").toLowerCase();
@@ -24,6 +28,18 @@ export default function CarsList (props:any) {
   function encryptID(id: string) {
     return CryptoJS.AES.encrypt(id.toString(), secretKey).toString();
   }
+
+
+  /* const handleReserveClick = (carId: string) => {
+    router.push({
+      pathname: `/reservation/${carId}`,
+      query: { ...formData },
+    });
+  }; */
+  const handleReserveClick = (carId: string) => {
+    setFormData(prevFormData => ({ ...prevFormData, carId }));
+    router.push(`/reservation/${carId}`); // Redirect to reservation page
+  };
 
   return (
     <div className="flex">
@@ -38,7 +54,7 @@ export default function CarsList (props:any) {
               <>
                 {
                   isAvailable ?
-                  <ButtonMain label='Je reserve' link={`/reservation/${car?.id}`} className='m-2 px-5' /> :
+                    <ButtonMain label='Je reserve' onClick={() => handleReserveClick(car.id)} className='m-2 px-5' /> :
                   <div className="float-right">
                     <Tooltip id="#reservez" className="" content='Veuillez remplir le formulaire pour voir les voitures disponibles.'>
                       <button>

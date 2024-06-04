@@ -4,12 +4,13 @@ import Link  from "next/link";
 interface ButtonReserveProps {
   label: string;
   link?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
 }
 
-const ButtonMain: React.FC<ButtonReserveProps> = ({ label, link, className, disabled , type = "button" }) => {
+const ButtonMain: React.FC<ButtonReserveProps> = ({ label, link, onClick, className, disabled , type = "button" }) => {
 
   const buttonContent = (
     <>
@@ -28,7 +29,7 @@ const ButtonMain: React.FC<ButtonReserveProps> = ({ label, link, className, disa
       </button>
     </Link>
   ) : (
-    <button disabled={disabled} type={type} className={`${className} ${pointer} float-right group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2  text-light-gray hover:text-primary-black hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0`}>
+    <button disabled={disabled} type={type} onClick={onClick} className={`${className} ${pointer} float-right group overflow-hidden btn_base py-2 px-3 rounded items-center flex gap-2  text-light-gray hover:text-primary-black hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0`}>
       {buttonContent}
     </button>
   );

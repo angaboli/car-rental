@@ -3,18 +3,18 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'media.graphassets.com',
-        port: '',
+        protocol: 'http',
+        hostname: 'api.cocogo.local',
+        port: '8082',
       },
     ],
-    remotePatterns: [
+    /* remotePatterns: [
       {
         protocol: 'https',
         hostname: 'cocogo.mizi.fr',
         port: '',
       },
-    ],
+    ], */
   },
 }
 

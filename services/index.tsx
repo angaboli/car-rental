@@ -190,6 +190,7 @@ export async function getCar(id: any): Promise<Car> {
       car(id: "${id}") {
         slug
         title(format: RENDERED)
+        databaseId
         carACF {
           carBrand
           carCategory
@@ -239,6 +240,102 @@ export async function getCar(id: any): Promise<Car> {
   return queryCar.car;
 }
 
+
+async function getToken(): Promise<string | null> {
+  const WP_JWT_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_JWT || "";
+  const requestOptions: RequestInit = {
+    method: "POST",
+    redirect: "follow"
+  };
+
+  try {
+    const response = await fetch( WP_JWT_URL, {
+      ...requestOptions,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: process.env.NEXT_PUBLIC_WP_USR,
+        password: process.env.NEXT_PUBLIC_WP_PWD
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch token");
+    }
+
+    const result = await response.json();
+    return result.token;
+  } catch (error) {
+    console.error("Error fetching token:", error);
+    return null;
+  }
+}
+
+export async function sendBooking(formValue: FormValues): Promise<void> {
+  const token = await getToken();
+
+  if (!token) {
+    console.error("Token is null");
+    return;
+  }
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Authorization", `Bearer ${token}`);
+
+  console.log("Fom Value :", formValue);
+
+
+  const raw = JSON.stringify({
+    status: "publish",
+    acf: {
+      car_id: formValue.carDBId,
+      pickuplocation: formValue.pickUpLocation,
+      pickUpDate: formValue.pickUpDate,
+      pickUpTime: formValue.pickUpTime,
+      dropOffLocation: formValue.dropOffLocation,
+      dropOffDate: formValue.dropOffDate,
+      dropOffTime: formValue.dropOffTime,
+      finalprice: formValue.finalPrice,
+      emailadress: formValue.emailAdress,
+      firstname: formValue.firstName,
+      lastname: formValue.lastName,
+      phonenumber: formValue.phoneNumber,
+      withdriver: formValue.withDriver,
+      outcapital: formValue.outCapital,
+      whatsappnumber: formValue.whatsAppNumber
+    }
+  });
+
+  const requestOptions: RequestInit = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: raw,
+    redirect: "follow"
+  };
+
+  console.log("Request Options:", requestOptions);
+
+  try {
+    const response = await fetch("http://api.cocogo.local:8082/wp-json/wp/v2/bookings", requestOptions);
+
+    console.log("Response Status:", response.status);
+    console.log("Response :", response);
+    const responseBody = await response.text();
+    console.log("Response Body:", responseBody);
+
+    if (!response.ok) {
+      throw new Error("Failed to send booking");
+    }
+
+  } catch (error) {
+    console.error("Error sending booking:", error);
+  }
+}
 
 /* export async function getCar(id: string) {
   const queryCar = await fetchAPI(

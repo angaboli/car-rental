@@ -41,6 +41,24 @@ export interface FormValues {
   [key: string]: any;
 }
 
+export interface FormData {
+  pickUpLocation?: string;
+  dropOffLocation?: string;
+  pickUpDate?: string;
+  dropOffDate?: string;
+  pickUpTime?: string;
+  dropOffTime?: string;
+  firstName?: string;
+  lastName?: string;
+  emailAdress?: string;
+  phoneNumber?: string;
+  whatsAppNumber?: string;
+  finalPrice?: number;
+  withDriver?: boolean;
+  outCapital?: boolean;
+  [key: string]: any;
+}
+
 export interface EmailParams {
   firstName: string;
   contactEmail: string;
@@ -130,6 +148,7 @@ export interface Car {
   id: string;
   title: string;
   slug: string;
+  databaseId: number;
   carACF: {
     carBrand: string;
     carCategory: string;

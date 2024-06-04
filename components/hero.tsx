@@ -6,6 +6,7 @@ import { useRouter  } from "next/navigation"
 import { GetAllBookings } from "@/services"
 import { Select, Option, Switch } from "@material-tailwind/react";
 import { useCars } from '@/contexts/carsContext';
+import { useFormContext } from '@/contexts/formContext';
 import { Car } from '@/types/';
 
 interface FormValues {
@@ -37,6 +38,7 @@ const Hero = () => {
   const [addDropoff, setAddDropoff] = useState<boolean>(false)
   const { carsList, setCars, loading, setIsAvailable } = useCars();
   const [ errors, setErrors ] = useState<FormErrors>({});
+  const { formData, setFormData } = useFormContext();
   const [ formValue, setFormValue ] = useState<FormValues>(() => {
     const nextHourDate = getNextHour();
     const formattedDate = formatDate(nextHourDate);
@@ -54,6 +56,8 @@ const Hero = () => {
   const updateDropoffLocation = (e: React.ChangeEvent<HTMLInputElement>)  => {
      e.target.name == "returnAgency" && setAddDropoff(e.target.checked)
   }
+
+  console.log("FormData : ", formData);
 
   const fetchAvailability = async () => {
     const bookings = await GetAllBookings();
@@ -92,6 +96,10 @@ const Hero = () => {
       value = event.target.value;
     }
     setFormValue((prev) => ({ ...prev, [name]: value }));
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   }, []);
 
   // Fonction pour gérer la soumission du formulaire
@@ -112,6 +120,12 @@ const Hero = () => {
       console.error("Validation errors", errors);
       return;
     }
+
+    setFormData({
+      ...formData,
+      ...formValue,
+    });
+    
     await fetchAvailability();
   };
 

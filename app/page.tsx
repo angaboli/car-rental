@@ -8,20 +8,22 @@ import Skeleton from '@/components/skeleton';
 import Processus from '@/components/processus';
 //import { getCarsList } from '@/services';
 import { CarsProvider, useCars } from '@/contexts/carsContext';
+import { FormProvider } from '@/contexts/formContext';
 import { CarsListResponse } from '@/types'
 
 const DynamicContactWithNoSSR = dynamic(() => import('../components/contact'), { ssr: false });
 
 export default function Home() {
   const [carsList, setCarsList] = useState<any[]>([]);
-  const {loading} = useCars();
+  const { loading } = useCars();
 
   return (
     <CarsProvider>
       <main className="scroll-smooth bg-light-gray">
-        <Hero />
-        {/* <CarsFiltersOption /> */}
-        {loading ? <Skeleton /> : <CarsList />}
+        <FormProvider>
+          <Hero />
+          {loading ? <Skeleton /> : <CarsList />}
+        </FormProvider>
         <Processus />
         <DynamicContactWithNoSSR />
       </main>
