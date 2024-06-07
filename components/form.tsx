@@ -25,8 +25,8 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
-  const [carId, setCarId] = useState("");
-  const [finalPrice, setFinalPrice] = useState(0)
+  const [carId, setCarId] = useState(car.id || "");
+  const [finalPrice, setFinalPrice] = useState(car.carACF?.price || 0)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(loading);
   const [formValue, setFormValue] = useState({
@@ -37,16 +37,16 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
     dropOffDate: formData.dropOffDate || formattedDate,
     pickUpTime: formData.pickUpTime || formattedTime,
     dropOffTime: formData.dropOffTime || "20:00",
-    firstName: '',
-    lastName: '',
-    emailAdress: '',
-    age: '30+',
-    phoneNumber: '',
-    whatsAppNumber: '',
-    carId: carId,
-    finalPrice: finalPrice,
-    withDriver: false,
-    outCapital: false,
+    firstName: formData.firstName || '',
+    lastName: formData.lastName || '',
+    emailAdress: formData.emailAdress || '',
+    age: formData.age || '30+',
+    phoneNumber: formData.phoneNumber || '',
+    whatsAppNumber: formData.whatsAppNumber || '',
+    carId: formData.carId || carId,
+    finalPrice: formData.finalPrice || finalPrice,
+    withDriver: formData.withDriver || false,
+    outCapital: formData.outCapital || false,
   });
   const [withDriver, setWithDriver] = useState(false);
   const [outCapital, setOutCapital] = useState(false);
@@ -54,7 +54,7 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [rentWithDriver, setRentWithDriver] = useState(false);
 
- /*  useEffect(() => {
+  useEffect(() => {
     setFormData({
       pickUpLocation: formData.pickUpLocation || '',
       dropOffLocation: formData.dropOffLocation || '',
@@ -73,7 +73,7 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
       withDriver: formData.withDriver || false,
       outCapital: formData.outCapital || false,
     });
-  }, [car, formData]); */
+  }, [car, formData]);
   console.log('Form :', formData);
 
   const handleCloseModal = () => {
@@ -255,10 +255,11 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
   return (
     <>
       {
-        (isLoading) ?
+        (isLoading) ? (
           <div className="max-w-7xl bg-light-gray">
             <SkeletonPage />
-          </div> :
+          </div>
+        ) : (
           <>
             <form method="" onSubmit={handleSubmit} className={`${className} max-w-7xl bg-light-gray mb-3`}>
               <div>
@@ -348,7 +349,7 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
             </form>
             <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
           </>
-      }
+      )}
     </>
   )
 }
