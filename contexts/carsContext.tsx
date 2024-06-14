@@ -13,18 +13,18 @@ interface CarsContextState {
 
 const defaultValue: CarsContextState = {
   carsList: [],
-  setCars: () => {},
+  setCars: () => { },
   loading: false,
-  setLoading: () => {},
+  setLoading: () => { },
   isAvailable: false,
-  setIsAvailable: () => {},
+  setIsAvailable: () => { },
 };
 
 const CarsContext = createContext<CarsContextState>(defaultValue);
 
 export const useCars = () => useContext(CarsContext);
 
-export const CarsProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+export const CarsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [carsList, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isAvailable, setIsAvailable] = useState(false);
@@ -37,8 +37,9 @@ export const CarsProvider: React.FC<{children: ReactNode}> = ({ children }) => {
         setCars(result.nodes);
       } catch (error) {
         console.error('Error fetching cars:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchCars();

@@ -272,7 +272,7 @@ async function getToken(): Promise<string | null> {
   }
 }
 
-export async function sendBooking(formValue: FormValues): Promise<void> {
+export async function sendBooking(formValue: FormValues): Promise<any> {
   const token = await getToken();
 
   if (!token) {
@@ -289,6 +289,8 @@ export async function sendBooking(formValue: FormValues): Promise<void> {
 
   const raw = JSON.stringify({
     status: "publish",
+    title: {
+      rendered: formValue.title},
     acf: {
       car_id: formValue.carDBId,
       pickuplocation: formValue.pickUpLocation,
@@ -304,7 +306,7 @@ export async function sendBooking(formValue: FormValues): Promise<void> {
       phonenumber: formValue.phoneNumber,
       withdriver: formValue.withDriver,
       outcapital: formValue.outCapital,
-      whatsappnumber: formValue.whatsAppNumber
+      whatsappnumber: formValue.whatsAppNumber,
     }
   });
 
@@ -325,13 +327,14 @@ export async function sendBooking(formValue: FormValues): Promise<void> {
 
     console.log("Response Status:", response.status);
     console.log("Response :", response);
-    const responseBody = await response.text();
+    const responseBody = await response.json();
     console.log("Response Body:", responseBody);
+
 
     if (!response.ok) {
       throw new Error("Failed to send booking");
     }
-
+    return response.ok;
   } catch (error) {
     console.error("Error sending booking:", error);
   }

@@ -1,5 +1,5 @@
 import { sendBooking } from "@/services";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 import InputDateTime from "./inputDateTime";
 import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind/react";
 import ButtonMain from '@/components/buttonMain';
@@ -11,6 +11,8 @@ import { BsInfoCircleFill } from "react-icons/bs";
 import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, FormValidators, ValidationParams } from '@/types';
 import { validators } from '@/services/validation';
 import { Car } from '@/types';
+import SpinnerSearch from "./spinnerSearch";
+
 
 interface FormProps {
   car: Car;
@@ -19,9 +21,9 @@ interface FormProps {
 }
 
 
-const Form: React.FC<FormProps> = ({ car, loading, className }) => {
+const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
   const router = useRouter();
-  const { formData, setFormData } = useFormContext();
+  //const { formData, setFormData } = useFormContext();
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
@@ -29,24 +31,24 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
   const [finalPrice, setFinalPrice] = useState(car.carACF?.price || 0)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(loading);
+  const [isSearching, setIsSearching] = useState(false);
   const [formValue, setFormValue] = useState({
-    ...formData,
-    pickUpLocation: formData.pickUpLocation || '',
-    dropOffLocation: formData.dropOffLocation || '',
-    pickUpDate: formData.pickUpDate || formattedDate,
-    dropOffDate: formData.dropOffDate || formattedDate,
-    pickUpTime: formData.pickUpTime || formattedTime,
-    dropOffTime: formData.dropOffTime || "20:00",
-    firstName: formData.firstName || '',
-    lastName: formData.lastName || '',
-    emailAdress: formData.emailAdress || '',
-    age: formData.age || '30+',
-    phoneNumber: formData.phoneNumber || '',
-    whatsAppNumber: formData.whatsAppNumber || '',
-    carId: formData.carId || carId,
-    finalPrice: formData.finalPrice || finalPrice,
-    withDriver: formData.withDriver || false,
-    outCapital: formData.outCapital || false,
+    pickUpLocation:  'riviera',
+    dropOffLocation: '',
+    pickUpDate: formattedDate,
+    dropOffDate: formattedDate,
+    pickUpTime: formattedTime,
+    dropOffTime: "20:00",
+    firstName:  '',
+    lastName:  '',
+    emailAdress:  '',
+    age: '30+',
+    phoneNumber: '',
+    whatsAppNumber: '',
+    carId: carId,
+    finalPrice: finalPrice,
+    withDriver: false,
+    outCapital: false,
   });
   const [withDriver, setWithDriver] = useState(false);
   const [outCapital, setOutCapital] = useState(false);
@@ -54,31 +56,12 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [rentWithDriver, setRentWithDriver] = useState(false);
 
-  useEffect(() => {
-    setFormData({
-      pickUpLocation: formData.pickUpLocation || '',
-      dropOffLocation: formData.dropOffLocation || '',
-      pickUpDate: formData.pickUpDate || formattedDate,
-      dropOffDate: formData.dropOffDate || formattedDate,
-      pickUpTime: formData.pickUpTime || formattedTime,
-      dropOffTime: formData.dropOffTime || "20:00",
-      firstName: formData.firstName || '',
-      lastName: formData.lastName || '',
-      emailAdress: formData.emailAdress || '',
-      age: formData.age || '30+',
-      phoneNumber: formData.phoneNumber || '',
-      whatsAppNumber: formData.whatsAppNumber || '',
-      carId: formData.carId || carId,
-      finalPrice: formData.finalPrice || finalPrice,
-      withDriver: formData.withDriver || false,
-      outCapital: formData.outCapital || false,
-    });
-  }, [car, formData]);
-  console.log('Form :', formData);
+  const memoizedFormValue = useMemo(() => formValue, [formValue]);
+  const memoizedErrors = useMemo(() => errors, [errors]);
 
   const handleCloseModal = () => {
-    setIsModalOpen(false); // Ferme la modal
-    router.push('/'); // Redirige vers la page d'accueil
+    setIsModalOpen(false);
+    router.push('/');
   };
 
   const updatePrice = (e: any) => {
@@ -124,25 +107,25 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
     sessionStorage.setItem("formData", JSON.stringify(formValue));
   }, [formValue]);
 
-  useEffect(() => {
-    const startDate = new Date(formValue.pickUpDate);
-    const endDate = new Date(formValue.dropOffDate);
-    const timeDiff = endDate.getTime() - startDate.getTime();
-    const daysDiff = (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1;
+  const startDate = useMemo(() => new Date(memoizedFormValue.pickUpDate), [memoizedFormValue.pickUpDate]);
+  const endDate = useMemo(() => new Date(memoizedFormValue.dropOffDate), [memoizedFormValue.dropOffDate]);
+  const timeDiff = useMemo(() => endDate.getTime() - startDate.getTime(), [endDate, startDate]);
+  const daysDiff = useMemo(() => (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1, [timeDiff]);
 
+  useEffect(() => {
     let price = car?.carACF?.price * daysDiff;
     if (withDriver || car?.carACF?.withDriver) {
       price += 5000 * daysDiff;
-      formValue.withDriver = true;
+      memoizedFormValue.withDriver = true;
       setRentWithDriver(true);
     }
     if (outCapital) {
       price += 10000 * daysDiff;
-      formValue.outCapital = true;
+      memoizedFormValue.outCapital = true;
     }
     setFinalPrice(price);
-    setFormValue({ ...formValue, finalPrice: price });
-  }, [withDriver, rentWithDriver, outCapital, car?.carACF?.price, formValue.pickUpDate, formValue.dropOffDate]);
+    setFormValue({ ...memoizedFormValue, finalPrice: price });
+  }, [withDriver, rentWithDriver, outCapital, car?.carACF.price, memoizedFormValue.pickUpDate, memoizedFormValue.dropOffDate]);
 
 
   const validateForm = (values: FormValues): any => {
@@ -208,8 +191,10 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
       console.error("Erreurs de validation, soumission annulée.");
       return;
     }
+    setIsSearching(true);
     const currentCarId = carId || car?.id;
     const carDBID = car?.databaseId;
+    const posTitle = "#" + car.title + " [" + formValue.pickUpDate + "_" + formValue.pickUpTime + "] - [" + formValue.dropOffDate + "_" + formValue.dropOffTime + "]";
 
     // Création de la reservation !
     try {
@@ -217,19 +202,21 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
         ...formValue,
         carId: currentCarId,
         carDBId: carDBID,
+        title: posTitle,
       };
 
-      console.log("Submitting with car ID: ", currentCarId);
-      console.log("Submitting with car ID: ", carDBID);
       const response = await sendBooking(formSubmission);
 
       console.log("Réservation créée avec succès", response);
-      if(typeof(response) !== "undefined" && response !== null){
+      if( response ){
         setIsModalOpen(true);
         sessionStorage.removeItem("formData");
+        document.getElementById("submitForm")?.classList.add("disabled:opacity-75")
       }
     } catch (error) {
       console.error("Erreur lors de la création de la réservation :", error);
+    }finally {
+      setIsSearching(false);
     }
   };
 
@@ -248,7 +235,7 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
     }
     // Mise à jour de la valeur du champ
     setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
-    setFormData(prevState => ({ ...prevState, [fieldName]: value }));
+    //setFormData(prevState => ({ ...prevState, [fieldName]: value }));
     validateForm({ ...formValue, [fieldName]: value });
   }
 
@@ -261,6 +248,7 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
           </div>
         ) : (
           <>
+              {isSearching && <SpinnerSearch />}
             <form method="" onSubmit={handleSubmit} className={`${className} max-w-7xl bg-light-gray mb-3`}>
               <div>
                 <div className="shadow-md rounded-3xl p-5 my-3">
@@ -339,7 +327,7 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
                       {
                         !isNaN(finalPrice) && <FinalPrice price={finalPrice} />
                       }
-                      <ButtonMain type="submit" label='Je valide' className='px-8' />
+                      <ButtonMain id="submitForm" type="submit" label='Je valide' className='px-8' />
                     </div>
                   </div>
                 </div>
@@ -352,7 +340,7 @@ const Form: React.FC<FormProps> = ({ car, loading, className }) => {
       )}
     </>
   )
-}
+});
 
 const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;

@@ -27,7 +27,6 @@ const FormProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     dropOffTime: '',
   });
 
-  console.log('formData - context : ', formData);
   return (
     <FormContext.Provider value={{ formData, setFormData }}>
       {children}
