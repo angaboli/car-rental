@@ -24,10 +24,12 @@ export default function CarDetails(props: any) {
 
   const gallery = props.car?.carACF?.gallery || [];
   const frontImage = props.car?.carACF?.image?.node.sourceUrl || "";
+  const frontImageId = props.car?.carACF?.image?.node.id || "";
   const description = { __html: props.car?.carACF?.description } || "";
 
   function getImageUrls(gallery: Gallery): { id: number, url: string }[] {
     let urls: { id: number, url: string }[] = [];
+    //urls.push({ id: frontImageId, url: frontImage });
     for (let i = 1; i <= 5; i++) {
       const imgKey = `img${i}` as keyof Gallery;
       const imageNode = gallery[imgKey];

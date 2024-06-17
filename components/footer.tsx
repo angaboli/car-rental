@@ -71,7 +71,7 @@ const Footer = () => {
           <div className="w-full md:w-4/12 px-4 mx-auto text-center">
             <div className="text-sm text-tacha font-semibold py-1">
               Copyright © <span id="get-current-year">{currentYear}</span>
-              <a href="https://d3cod.com" className="text-tacha hover:text-gray-800" target="_blank"> D3cod</a>
+              <a href="https://d3cod.com" className="text-tacha hover:text-gray-800" target="_blank"> COCOGO</a>
             </div>
           </div>
         </div>

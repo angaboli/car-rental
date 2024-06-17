@@ -1,12 +1,14 @@
 "use client";
 import { Audiowide } from 'next/font/google'
 import InputDateTime from "@/components/inputDateTime";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useRouter  } from "next/navigation"
 import { GetAllBookings } from "@/services"
 import { Select, Option, Switch } from "@material-tailwind/react";
 import { useCars } from '@/contexts/carsContext';
+import { useFormContext } from '@/contexts/formContext';
 import { Car } from '@/types/';
+import SpinnerSearch from '@/components/spinnerSearch'
 
 interface FormValues {
   pickUpLocation?: string;
@@ -31,19 +33,21 @@ const audiowide = Audiowide({
   display: 'swap',
 })
 
-const Hero = () => {
+const Hero = memo(() => {
 
   //const router = useRouter();
   const [addDropoff, setAddDropoff] = useState<boolean>(false)
   const { carsList, setCars, loading, setIsAvailable } = useCars();
   const [ errors, setErrors ] = useState<FormErrors>({});
+  //const { formData, setFormData } = useFormContext();
+  const [isSearching, setIsSearching] = useState(false);
   const [ formValue, setFormValue ] = useState<FormValues>(() => {
     const nextHourDate = getNextHour();
     const formattedDate = formatDate(nextHourDate);
     const formattedTime = formatTime(nextHourDate);
     return {
-        pickUpLocation: 'Riviéra M&apos;badon, Abidjan',
-        dropoffLocation: 'Riviéra M&apos;badon, Abidjan',
+        pickUpLocation: 'Riviéra CIAD, Abidjan',
+        dropoffLocation: 'Riviéra CIAD, Abidjan',
         pickUpDate: formattedDate,
         dropOffDate: formattedDate,
         pickUpTime: formattedTime,
@@ -51,9 +55,14 @@ const Hero = () => {
     };
   });
 
+
+  const memoizedFormValue = useMemo(() => formValue, [formValue]);
+  const memoizedErrors = useMemo(() => errors, [errors]);
+
   const updateDropoffLocation = (e: React.ChangeEvent<HTMLInputElement>)  => {
      e.target.name == "returnAgency" && setAddDropoff(e.target.checked)
   }
+
 
   const fetchAvailability = async () => {
     const bookings = await GetAllBookings();
@@ -92,6 +101,10 @@ const Hero = () => {
       value = event.target.value;
     }
     setFormValue((prev) => ({ ...prev, [name]: value }));
+    /* setFormData({
+      ...formData,
+      [name]: value,
+    }); */
   }, []);
 
   // Fonction pour gérer la soumission du formulaire
@@ -112,12 +125,24 @@ const Hero = () => {
       console.error("Validation errors", errors);
       return;
     }
-    await fetchAvailability();
+    setIsSearching(true);
+
+    /* setFormData({
+      ...formData,
+      ...formValue,
+    }); */
+
+    try {
+      await fetchAvailability();
+    } finally {
+      setIsSearching(false);
+    }
   };
 
 
   return (
     <div id="reservez" className="bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">
+      {isSearching && <SpinnerSearch />}
       <div className={` wrapper  min-h-[200px]`}>
         <h1 className={`${audiowide.className} head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center font-bold uppercase`}>
           L'Élégance sur&nbsp;
@@ -136,10 +161,10 @@ const Hero = () => {
                   label="Lieu de récuperation ?"
                   name="pickUpLocation"
                   onChange={ (e) => handleChange( e, 'pickUpLocation' || '') }
-                  defaultValue={formValue.pickUpLocation}
+                  value={memoizedFormValue.pickUpLocation}
                   color="orange"
                 >
-                  <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                  <Option value="Riviéra CIAD, Abidjan">Riviéra CIAD, Abidjan</Option>
                   <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                 </Select>
                 {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" /> */}
@@ -151,19 +176,19 @@ const Hero = () => {
                       label="Lieu de retour ?"
                       name="dropoffLocation"
                       onChange={ (e) => handleChange( e , 'dropoffLocation' || '') }
-                      defaultValue={formValue.dropoffLocation}
+                      value={memoizedFormValue.dropoffLocation}
                       color="orange"
                       placeholder="Lieu de retour ?"
                     >
-                      <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                      <Option value="Riviéra CIAD, Abidjan">Riviéra CIAD, Abidjan</Option>
                       <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                     </Select>
                 )}
               </div>
             </div>
             <div className="flex flex-col md:flex-row gap-5 mb-5 w-full md:w-2/3">
-              <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={formValue.pickUpDate} valueTime={formValue.pickUpTime} errors={errors?.pickUpDate} onChange={handleChange} className="" />
-              <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={formValue.dropOffDate} valueTime={formValue.dropOffTime} errors={errors?.dropOffDate} onChange={handleChange} className="" />
+              <InputDateTime label="Date de récuperation" nameDate="pickUpDate" nameTime="pickUpTime" valueDate={memoizedFormValue.pickUpDate} valueTime={memoizedFormValue.pickUpTime} errors={memoizedErrors?.pickUpDate} onChange={handleChange} className="" />
+              <InputDateTime label="Date de retour" nameDate="dropOffDate" nameTime="dropOffTime" valueDate={memoizedFormValue.dropOffDate} valueTime={memoizedFormValue.dropOffTime} errors={memoizedErrors?.dropOffDate} onChange={handleChange} className="" />
             </div>
           </div>
           <div className="flex justify-end text-center">
@@ -173,7 +198,7 @@ const Hero = () => {
       </div>
     </div>
   )
-}
+});
 
 // Fonction pour recuperer un heure après
 function getNextHour() {

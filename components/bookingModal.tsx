@@ -10,16 +10,20 @@ import { TbManualGearbox } from "react-icons/tb";
 import { MdAirlineSeatReclineNormal } from "react-icons/md";
 import { MdOutlineCarRental } from "react-icons/md";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ButtonMain from '@/components/buttonMain';
 import { useCars } from '@/contexts/carsContext';
 import { Tooltip } from "@material-tailwind/react";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { Gallery } from '@/types'
+import { useFormContext } from "@/contexts/formContext";
 
 
 const BookingModal = ({ car }: any) => {
   //const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
   const { isAvailable } = useCars();
+  const { formData, setFormData } = useFormContext();
+  const router = useRouter();
   const getCategoryIcon = (categoryName: any) => {
     switch (categoryName) {
       case 'SUV':
@@ -33,12 +37,19 @@ const BookingModal = ({ car }: any) => {
     }
   };
 
+  const handleReserveClick = (carId: string) => {
+    setFormData(prevFormData => ({ ...prevFormData, carId }));
+    router.push(`/reservation/${carId}`); // Redirect to reservation page
+  };
+
   const gallery = car?.carACF?.gallery || [];
   const frontImage = car?.carACF?.image?.node.sourceUrl || "";
+  const frontImageId = car?.carACF?.image?.node.id || "";
   const description = { __html: car.carACF?.description } || "";
 
   function getImageUrls(gallery: Gallery): { id: number, url: string }[] {
     let urls: { id: number, url: string }[] = [];
+    urls.push({ id: frontImageId, url: frontImage });
     for (let i = 1; i <= 5; i++) {
       const imgKey = `img${i}` as keyof Gallery;
       const imageNode = gallery[imgKey];
@@ -199,7 +210,7 @@ const BookingModal = ({ car }: any) => {
           {
             isAvailable ?
               typeof (car.id) !== 'undefined' && car.id !== null &&
-              <ButtonMain label='Je reserve' link={`/reservation/${car?.id}`} className='py-3 px-6 uppercase ' />
+              <ButtonMain label='Je reserve' onClick={() => handleReserveClick(car.id)} className='py-3 px-6 uppercase ' />
               :
               <div className="float-right z-50">
                 <Tooltip id="#reservez" className="" content='Veuillez remplir le formulaire pour voir les voitures disponibles.'>

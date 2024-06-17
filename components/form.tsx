@@ -1,35 +1,47 @@
-import { createBooking } from "@/services";
-import { useEffect, useState } from "react";
+import { sendBooking } from "@/services";
+import { useEffect, useState, useMemo, memo } from "react";
 import InputDateTime from "./inputDateTime";
 import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind/react";
 import ButtonMain from '@/components/buttonMain';
 import EmailReservation from '@/components/emailReservation';
 import SkeletonPage from '@/components/SkeletonPage';
 import { useRouter } from 'next/router';
+import { useFormContext } from "@/contexts/formContext";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, FormValidators, ValidationParams } from '@/types';
 import { validators } from '@/services/validation';
+import { Car } from '@/types';
+import SpinnerSearch from "./spinnerSearch";
 
 
-const Form = ({ car, loading, className }: any) => {
+interface FormProps {
+  car: Car;
+  loading: boolean;
+  className: string;
+}
+
+
+const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
   const router = useRouter();
+  //const { formData, setFormData } = useFormContext();
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate); // YYYY-MM-DD
   const formattedTime = formatTime(nextHourDate); // HH:MM
-  const [carId, setCarId] = useState("");
-  const [finalPrice, setFinalPrice] = useState(0)
+  const [carId, setCarId] = useState(car.id || "");
+  const [finalPrice, setFinalPrice] = useState(car.carACF?.price || 0)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(loading);
+  const [isSearching, setIsSearching] = useState(false);
   const [formValue, setFormValue] = useState({
-    pickUpLocation: '',
+    pickUpLocation:  'riviera',
     dropOffLocation: '',
     pickUpDate: formattedDate,
     dropOffDate: formattedDate,
     pickUpTime: formattedTime,
     dropOffTime: "20:00",
-    firstName: '',
-    lastName: '',
-    emailAdress: '',
+    firstName:  '',
+    lastName:  '',
+    emailAdress:  '',
     age: '30+',
     phoneNumber: '',
     whatsAppNumber: '',
@@ -37,16 +49,19 @@ const Form = ({ car, loading, className }: any) => {
     finalPrice: finalPrice,
     withDriver: false,
     outCapital: false,
-  })
+  });
   const [withDriver, setWithDriver] = useState(false);
   const [outCapital, setOutCapital] = useState(false);
   const [addDropoff, setAddDropoff] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [rentWithDriver, setRentWithDriver] = useState(false);
 
+  const memoizedFormValue = useMemo(() => formValue, [formValue]);
+  const memoizedErrors = useMemo(() => errors, [errors]);
+
   const handleCloseModal = () => {
-    setIsModalOpen(false); // Ferme la modal
-    router.push('/'); // Redirige vers la page d'accueil
+    setIsModalOpen(false);
+    router.push('/');
   };
 
   const updatePrice = (e: any) => {
@@ -92,25 +107,25 @@ const Form = ({ car, loading, className }: any) => {
     sessionStorage.setItem("formData", JSON.stringify(formValue));
   }, [formValue]);
 
-  useEffect(() => {
-    const startDate = new Date(formValue.pickUpDate);
-    const endDate = new Date(formValue.dropOffDate);
-    const timeDiff = endDate.getTime() - startDate.getTime();
-    const daysDiff = (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1;
+  const startDate = useMemo(() => new Date(memoizedFormValue.pickUpDate), [memoizedFormValue.pickUpDate]);
+  const endDate = useMemo(() => new Date(memoizedFormValue.dropOffDate), [memoizedFormValue.dropOffDate]);
+  const timeDiff = useMemo(() => endDate.getTime() - startDate.getTime(), [endDate, startDate]);
+  const daysDiff = useMemo(() => (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1, [timeDiff]);
 
+  useEffect(() => {
     let price = car?.carACF?.price * daysDiff;
     if (withDriver || car?.carACF?.withDriver) {
       price += 5000 * daysDiff;
-      formValue.withDriver = true;
+      memoizedFormValue.withDriver = true;
       setRentWithDriver(true);
     }
     if (outCapital) {
       price += 10000 * daysDiff;
-      formValue.outCapital = true;
+      memoizedFormValue.outCapital = true;
     }
     setFinalPrice(price);
-    setFormValue({ ...formValue, finalPrice: price });
-  }, [withDriver, rentWithDriver, outCapital, car?.price, formValue.pickUpDate, formValue.dropOffDate]);
+    setFormValue({ ...memoizedFormValue, finalPrice: price });
+  }, [withDriver, rentWithDriver, outCapital, car?.carACF.price, memoizedFormValue.pickUpDate, memoizedFormValue.dropOffDate]);
 
 
   const validateForm = (values: FormValues): any => {
@@ -121,7 +136,6 @@ const Form = ({ car, loading, className }: any) => {
       const validator = validators[key as keyof typeof validators];
       if (validator) {
         let error;
-        // Exemple d'utilisation des validateurs avec plusieurs paramètres
         switch (key) {
           case 'pickUpDate':
             error = validator(values.pickUpDate);
@@ -177,22 +191,32 @@ const Form = ({ car, loading, className }: any) => {
       console.error("Erreurs de validation, soumission annulée.");
       return;
     }
+    setIsSearching(true);
     const currentCarId = carId || car?.id;
+    const carDBID = car?.databaseId;
+    const posTitle = "#" + car.title + " [" + formValue.pickUpDate + "_" + formValue.pickUpTime + "] - [" + formValue.dropOffDate + "_" + formValue.dropOffTime + "]";
 
     // Création de la reservation !
     try {
       const formSubmission = {
         ...formValue,
         carId: currentCarId,
+        carDBId: carDBID,
+        title: posTitle,
       };
 
-      console.log("Submitting with car ID: ", currentCarId);
-      const response = await createBooking(formSubmission);
+      const response = await sendBooking(formSubmission);
+
       console.log("Réservation créée avec succès", response);
-      setIsModalOpen(true);
-      sessionStorage.removeItem("formData");
+      if( response ){
+        setIsModalOpen(true);
+        sessionStorage.removeItem("formData");
+        document.getElementById("submitForm")?.classList.add("disabled:opacity-75")
+      }
     } catch (error) {
       console.error("Erreur lors de la création de la réservation :", error);
+    }finally {
+      setIsSearching(false);
     }
   };
 
@@ -209,36 +233,37 @@ const Form = ({ car, loading, className }: any) => {
     } else {
       value = event;
     }
-
     // Mise à jour de la valeur du champ
     setFormValue(prevState => ({ ...prevState, [fieldName]: value }));
+    //setFormData(prevState => ({ ...prevState, [fieldName]: value }));
     validateForm({ ...formValue, [fieldName]: value });
   }
 
   return (
     <>
       {
-        (isLoading) ?
+        (isLoading) ? (
           <div className="max-w-7xl bg-light-gray">
             <SkeletonPage />
-          </div> :
+          </div>
+        ) : (
           <>
+              {isSearching && <SpinnerSearch />}
             <form method="" onSubmit={handleSubmit} className={`${className} max-w-7xl bg-light-gray mb-3`}>
               <div>
                 <div className="shadow-md rounded-3xl p-5 my-3">
                   <h3 className="font-bold text-gold text-xl mb-3">Votre réservation</h3>
                   <div>
-                    <Select className="" placeholder="Lieu de récuperation ?" label="Lieu de récuperation ?" name="pickUpLocation" onChange={(value) => handleChange(value, 'pickUpLocation')} defaultValue={formValue.pickUpLocation} >
-                      <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
-                      <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
+                    <Select className="" placeholder="Lieu de récuperation ?" label="Lieu de récuperation ?" name="pickUpLocation" onChange={(value) => handleChange(value, 'pickUpLocation')} value={formValue.pickUpLocation} >
+                      <Option value="riviera">Riviéra CIAD, Abidjan</Option>
+                      <Option value="aeroport">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                     </Select>
                     <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updatedropOffLocation} containerProps={{ className: "my-5", }} crossOrigin="" />
-                    {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updatedropOffLocation} className="w-1/2 mb-2" /> */}
                     {
                       addDropoff == true && (
-                        <Select className="" label="Lieu de retour ?" name="dropOffLocation" onChange={(value) => handleChange(value, 'dropOffLocation')} defaultValue={formValue.dropOffLocation} placeholder="Lieu de retour ?">
-                          <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
-                          <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
+                        <Select className="" label="Lieu de retour ?" name="dropOffLocation" onChange={(value) => handleChange(value, 'dropOffLocation')} value={formValue.dropOffLocation} placeholder="Lieu de retour ?">
+                          <Option value="riviera">Riviéra CIAD, Abidjan</Option>
+                          <Option value="aeroport">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                         </Select>
                       )}
                     <div className="flex flex-col md:flex-row gap-5 mb-5">
@@ -292,7 +317,7 @@ const Form = ({ car, loading, className }: any) => {
                     </div>
                     <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
                       <Input label="Votre email" type='email' name="emailAdress" value={formValue.emailAdress} onChange={handleChange} crossOrigin="" />
-                      <Select label="Votre age" name="age" onChange={(value) => handleChange(value, 'age')} defaultValue={formValue.age} placeholder="Votre age"  >
+                      <Select label="Votre age" name="age" onChange={(value) => handleChange(value, 'age')} value={formValue.age} placeholder="Votre age"  >
                         <Option value="21-24">21-24</Option>
                         <Option value="25-29">25-29</Option>
                         <Option value="30+">30+</Option>
@@ -302,7 +327,7 @@ const Form = ({ car, loading, className }: any) => {
                       {
                         !isNaN(finalPrice) && <FinalPrice price={finalPrice} />
                       }
-                      <ButtonMain type="submit" label='Je valide' className='px-8' />
+                      <ButtonMain id="submitForm" type="submit" label='Je valide' className='px-8' />
                     </div>
                   </div>
                 </div>
@@ -312,10 +337,10 @@ const Form = ({ car, loading, className }: any) => {
             </form>
             <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
           </>
-      }
+      )}
     </>
   )
-}
+});
 
 const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -431,4 +456,4 @@ function validateTime(time: string): string | undefined {
   return undefined;
 }
 
-export default Form
+export default Form;
