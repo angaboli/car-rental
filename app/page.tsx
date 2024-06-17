@@ -22,12 +22,11 @@ export default function Home() {
     setIsLoading(loading);
   }, [loading])
 
-  console.log("page isLoading: ", isLoading);
 
 
   return (
     <CarsProvider>
-      <main className="scroll-smooth bg-light-gray">
+      <main className="bg-light-gray">
         <FormProvider>
           <Hero />
           <Suspense fallback={<Skeleton />}>

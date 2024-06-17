@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
+    <html lang="fr" className="scroll-smooth focus:scroll-auto">
       <body className="bg-white">
         <Header />
           {children}

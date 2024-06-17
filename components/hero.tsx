@@ -46,8 +46,8 @@ const Hero = memo(() => {
     const formattedDate = formatDate(nextHourDate);
     const formattedTime = formatTime(nextHourDate);
     return {
-        pickUpLocation: 'Riviéra M&apos;badon, Abidjan',
-        dropoffLocation: 'Riviéra M&apos;badon, Abidjan',
+        pickUpLocation: 'Riviéra CIAD, Abidjan',
+        dropoffLocation: 'Riviéra CIAD, Abidjan',
         pickUpDate: formattedDate,
         dropOffDate: formattedDate,
         pickUpTime: formattedTime,
@@ -164,7 +164,7 @@ const Hero = memo(() => {
                   value={memoizedFormValue.pickUpLocation}
                   color="orange"
                 >
-                  <Option value="Riviéra M&apos;badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                  <Option value="Riviéra CIAD, Abidjan">Riviéra CIAD, Abidjan</Option>
                   <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                 </Select>
                 {/* <ToggleCheck label="Retour dans une autre agence&nbsp;?" name="returnAgency" type="checkbox" onChange={updateDropoffLocation} className="w-1/2 mb-2" /> */}
@@ -180,7 +180,7 @@ const Hero = memo(() => {
                       color="orange"
                       placeholder="Lieu de retour ?"
                     >
-                      <Option value="Riviéra M'badon, Abidjan">Riviéra M'badon, Abidjan</Option>
+                      <Option value="Riviéra CIAD, Abidjan">Riviéra CIAD, Abidjan</Option>
                       <Option value="Aéroport Félix Houphouet Boigny, Abidjan">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                     </Select>
                 )}

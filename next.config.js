@@ -21,6 +21,11 @@ const nextConfig = {
         hostname: 'localhost',
         port: '8082',
       },
+      {
+        protocol: 'https',
+        hostname: 'cocogo.mizi.fr',
+        port: '',
+      },
     ],
   },
 }

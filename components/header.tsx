@@ -1,16 +1,7 @@
 "use client";
 import logo from '../public/logo.svg'
-import { TbMenuDeep } from "react-icons/tb"
-import Link from 'next/link'
-import { IoClose } from "react-icons/io5"
 import { useState } from "react"
 import  Hamburger  from "hamburger-react"
-import { Drawer } from "@material-tailwind/react"
-import { CgProfile } from "react-icons/cg";
-import { MdOutlineCarRental } from "react-icons/md";
-import { CiBoxList } from "react-icons/ci";
-import { FcAbout } from "react-icons/fc";
-import { GiCarWheel } from "react-icons/gi";
 
 const Header = () => {
   const [isOpen, setOpen] = useState(false)

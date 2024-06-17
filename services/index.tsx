@@ -321,9 +321,10 @@ export async function sendBooking(formValue: FormValues): Promise<any> {
   };
 
   console.log("Request Options:", requestOptions);
+  const WP_BOOKING_URL = process.env.NEXT_PUBLIC_WORDPRESS_API_BOOKING_URL || "";
 
   try {
-    const response = await fetch("http://api.cocogo.local:8082/wp-json/wp/v2/bookings", requestOptions);
+    const response = await fetch(WP_BOOKING_URL, requestOptions);
 
     console.log("Response Status:", response.status);
     console.log("Response :", response);

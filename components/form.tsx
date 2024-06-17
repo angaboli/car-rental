@@ -255,14 +255,14 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
                   <h3 className="font-bold text-gold text-xl mb-3">Votre réservation</h3>
                   <div>
                     <Select className="" placeholder="Lieu de récuperation ?" label="Lieu de récuperation ?" name="pickUpLocation" onChange={(value) => handleChange(value, 'pickUpLocation')} value={formValue.pickUpLocation} >
-                      <Option value="riviera">Riviéra M'badon, Abidjan</Option>
+                      <Option value="riviera">Riviéra CIAD, Abidjan</Option>
                       <Option value="aeroport">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                     </Select>
                     <Switch label="Retour dans une autre agence&nbsp;?" name="returnAgency" onChange={updatedropOffLocation} containerProps={{ className: "my-5", }} crossOrigin="" />
                     {
                       addDropoff == true && (
                         <Select className="" label="Lieu de retour ?" name="dropOffLocation" onChange={(value) => handleChange(value, 'dropOffLocation')} value={formValue.dropOffLocation} placeholder="Lieu de retour ?">
-                          <Option value="riviera">Riviéra M'badon, Abidjan</Option>
+                          <Option value="riviera">Riviéra CIAD, Abidjan</Option>
                           <Option value="aeroport">Aéroport Félix Houphouet Boigny, Abidjan</Option>
                         </Select>
                       )}

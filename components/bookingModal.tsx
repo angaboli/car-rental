@@ -44,10 +44,12 @@ const BookingModal = ({ car }: any) => {
 
   const gallery = car?.carACF?.gallery || [];
   const frontImage = car?.carACF?.image?.node.sourceUrl || "";
+  const frontImageId = car?.carACF?.image?.node.id || "";
   const description = { __html: car.carACF?.description } || "";
 
   function getImageUrls(gallery: Gallery): { id: number, url: string }[] {
     let urls: { id: number, url: string }[] = [];
+    urls.push({ id: frontImageId, url: frontImage });
     for (let i = 1; i <= 5; i++) {
       const imgKey = `img${i}` as keyof Gallery;
       const imageNode = gallery[imgKey];
