@@ -1,40 +1,48 @@
-"use client";
-import { useState } from "react";
+import React, { FC, useState } from "react";
 import { BsSend } from "react-icons/bs";
+import { useForm } from 'react-hook-form';
+import { sendEmail } from "@/services/sendEmail";
 
-const Contact = () => {
-  // Remplacer YOUR_ACCESS_KEY_HERE par votre clé d'accès de Web3Forms
-  const accessKey = "YOUR_ACCESS_KEY_HERE";
+export type FormData = {
+  name: string
+  email: string
+  message: string
+};
 
+const Contact: FC = () => {
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-
-  const handleChange = (e:any) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Vous pouvez ajouter la logique de soumission du formulaire ici
-  const handleSubmit = (e:any) => {
-    e.preventDefault();
-    // Traitement des données du formulaire
-  };
+  async function onSubmit(data: FormData) {
+    const responseMessage = await sendEmail(data);
+    setToastMessage(responseMessage);
+    setTimeout(() => setToastMessage(null), 5000);
+    if (responseMessage === 'E-mail envoyé avec succès') {
+      reset();
+    }
+  }
 
   return (
     <div id="contact" className="flex min-h-screen items-center justify-start bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">
       <div className="mx-auto w-5/6 md:w-full max-w-lg">
         <h2 className="head_text uppercase mb-3">Contactez-nous</h2>
-        <p className="mt-3">Envoyez-nous un e-mail à contact@ivoirewheels.com ou envoyez-nous un message ici&nbsp;:</p>
+        <p className="mt-3">Envoyez-nous un e-mail sur <a href="mailto:contact@cocogo.cloud">contact@cocogo.cloud</a> ou envoyez-nous un message ici&nbsp;:</p>
 
-        <form action="https://api.web3forms.com/submit" method="POST" className="mt-10">
-          <input type="hidden" name="access_key" value={accessKey} />
+        <form id="contactForm" method="POST" onSubmit={handleSubmit(onSubmit)} className="mt-10">
           <div className="grid gap-6 sm:grid-cols-2">
-            <InputField name="name" placeholder="Votre nom" value={formData.name} handleChange={handleChange} />
-            <InputField name="email" placeholder="Votre email" type="email" value={formData.email} handleChange={handleChange} />
-            <TextAreaField name="message" placeholder="Votre message" value={formData.message} handleChange={handleChange} />
+            <InputField
+              placeholder="Votre nom"
+              {...register('name', { required: true })}
+              />
+            <InputField
+              placeholder="Votre email"
+              type="email"
+              {...register('email', { required: true })}
+              />
+            <TextAreaField
+              placeholder="Votre message"
+              {...register('message', { required: true })}
+            />
           </div>
           <button type="submit" className="group overflow-hidden btn_base mt-5 mr-2 py-2 px-6 rounded  items-center flex gap-2 bg-gradient-to-r from-gold to-tacha  text-light-gray hover:text-primary-black hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
             <BsSend className="z-40 transition-all duration-300 group-hover:translate-x-1" />
@@ -43,24 +51,34 @@ const Contact = () => {
 	            </div>
           </button>
         </form>
+        {toastMessage && <Toast message={toastMessage} />}
       </div>
     </div>
   );
 };
 
+const Toast: FC<{ message: string }> = ({ message }) => {
+  return (
+    <div className="toast toast-top toast-end z-50">
+      <div className="alert alert-success">
+        <span className="text-white">{message}</span>
+      </div>
+    </div>
+  );
+}
 
-const InputField = ({ name, placeholder, type = "text", value, handleChange }: any) => (
+const InputField = React.forwardRef<HTMLInputElement, { placeholder: string; type?: string }>(({ placeholder, type='text', ...rest }, ref) => (
   <div className="relative z-0">
-    <input type={type} name={name} value={value} onChange={handleChange} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:gold focus:outline-none focus:ring-0" placeholder=" " />
+    <input ref={ref} {...rest} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:gold focus:outline-none focus:ring-0" placeholder={``} />
     <label className="absolute top-3 px-2 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-gold peer-focus:dark:text-gold">{placeholder}</label>
   </div>
-);
+));
 
-const TextAreaField = ({ name, placeholder, value, handleChange }: any) => (
+const TextAreaField = React.forwardRef<HTMLTextAreaElement, { placeholder: string }>(({ placeholder, ...rest }, ref) => (
   <div className="relative z-0 col-span-2">
-    <textarea name={name} rows={5} value={value} onChange={handleChange} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:gold focus:outline-none focus:ring-0" placeholder=" "></textarea>
+    <textarea ref={ref} {...rest} rows={5} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:gold focus:outline-none focus:ring-0" placeholder={``}></textarea>
     <label className="absolute top-3 px-2 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-gold peer-focus:dark:text-gold">{placeholder}</label>
   </div>
-);
+));
 
 export default Contact;

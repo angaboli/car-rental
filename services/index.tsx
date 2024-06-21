@@ -309,6 +309,8 @@ export async function sendBooking(formValue: FormValues): Promise<any> {
       whatsappnumber: formValue.whatsAppNumber,
     }
   });
+  console.log("Raw JSON sent: ", raw);
+  
 
   const requestOptions: RequestInit = {
     method: "POST",
