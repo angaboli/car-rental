@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "email": "email dev"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.5",
     "@material-tailwind/react": "^2.1.9",
+    "@react-email/components": "^0.0.19",
     "@types/node": "20.11.6",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
@@ -21,12 +23,15 @@
     "graphql-request": "^6.1.0",
     "hamburger-react": "^2.5.0",
     "next": "^14.2.3",
-    "nodemailer": "^6.9.12",
+    "nodemailer": "^6.9.14",
     "postcss": "8.4.33",
     "react": "18.2.0",
     "react-calendar": "^4.8.0",
     "react-dom": "18.2.0",
+    "react-email": "^2.1.4",
+    "react-hook-form": "^7.52.0",
     "react-icons": "^5.0.1",
+    "resend": "^3.3.0",
     "sharp": "^0.33.4",
     "swiper": "^11.0.6",
     "tailwindcss": "3.4.1",
@@ -35,7 +40,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
-    "@types/nodemailer": "^6.4.14",
+    "@types/nodemailer": "^6.4.15",
     "daisyui": "^4.6.0"
   }
 }

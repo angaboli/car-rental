@@ -126,7 +126,7 @@ export default function CarDetails(props: any) {
           :
           <img
             src={frontImage}
-            alt={props.car?.name}
+            alt={props.car?.carACF?.name}
             className="h-full w-full object-cover"
           />
       }
@@ -141,11 +141,11 @@ export default function CarDetails(props: any) {
             </div>
             <div className="flex items-center gap-1">
               <TbManualGearbox className="text-dark-gray" />
-              {props.car?.carType?.substr(0, 1)}
+              {props.car.carACF?.carType?.[0].substr(0, 1)}
             </div>
             <div className="flex items-center gap-1">
               <MdAirlineSeatReclineNormal className="text-dark-gray" />
-              {props.car?.places}
+              {props.car?.carACF?.places}
             </div>
           </div>
           <p className="text-lg font-semibold text-gray-900 mb-0">{props.car?.title}</p>

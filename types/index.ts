@@ -102,6 +102,19 @@ export interface FormErrors {
   [key: string]: string | boolean | undefined;
 }
 
+export interface EmailTemplateProps {
+  firstName: string;
+  contactEmail: string;
+  contactPhone: string;
+  pickUpLocation: string;
+  dropOffLocation: string;
+  pickUpDate: string;
+  pickUpTime: string;
+  dropOffDate: string;
+  dropOffTime: string;
+  finalPrice: number;
+}
+
 export interface AvailabilityState {
   loading: boolean;
   error: Error | null;

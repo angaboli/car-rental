@@ -3,12 +3,12 @@ import { useEffect, useState, useMemo, memo } from "react";
 import InputDateTime from "./inputDateTime";
 import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind/react";
 import ButtonMain from '@/components/buttonMain';
-import EmailReservation from '@/components/emailReservation';
+//import EmailTemplate from '@/components/EmailTemplate';
 import SkeletonPage from '@/components/SkeletonPage';
 import { useRouter } from 'next/router';
 import { useFormContext } from "@/contexts/formContext";
 import { BsInfoCircleFill } from "react-icons/bs";
-import { EmailParams, FormErrors, AvailabilityState, FormValues, ReservationModalProps, FormValidators, ValidationParams } from '@/types';
+import { EmailParams, FormErrors, EmailTemplateProps, FormValues, ReservationModalProps, FormValidators, ValidationParams } from '@/types';
 import { validators } from '@/services/validation';
 import { Car } from '@/types';
 import SpinnerSearch from "./spinnerSearch";
@@ -33,15 +33,15 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
   const [isLoading, setLoading] = useState<boolean>(loading);
   const [isSearching, setIsSearching] = useState(false);
   const [formValue, setFormValue] = useState({
-    pickUpLocation:  'riviera',
+    pickUpLocation: 'riviera',
     dropOffLocation: '',
     pickUpDate: formattedDate,
     dropOffDate: formattedDate,
     pickUpTime: formattedTime,
     dropOffTime: "20:00",
-    firstName:  '',
-    lastName:  '',
-    emailAdress:  '',
+    firstName: '',
+    lastName: '',
+    emailAdress: '',
     age: '30+',
     phoneNumber: '',
     whatsAppNumber: '',
@@ -208,14 +208,14 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
       const response = await sendBooking(formSubmission);
 
       console.log("Réservation créée avec succès", response);
-      if( response ){
+      if (response) {
         setIsModalOpen(true);
         sessionStorage.removeItem("formData");
         document.getElementById("submitForm")?.classList.add("disabled:opacity-75")
       }
     } catch (error) {
       console.error("Erreur lors de la création de la réservation :", error);
-    }finally {
+    } finally {
       setIsSearching(false);
     }
   };
@@ -248,7 +248,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
           </div>
         ) : (
           <>
-              {isSearching && <SpinnerSearch />}
+            {isSearching && <SpinnerSearch />}
             <form method="" onSubmit={handleSubmit} className={`${className} max-w-7xl bg-light-gray mb-3`}>
               <div>
                 <div className="shadow-md rounded-3xl p-5 my-3">
@@ -337,7 +337,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
             </form>
             <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
           </>
-      )}
+        )}
     </>
   )
 });
@@ -346,7 +346,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onClose }) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center z-50 items-center">
       <div className="relative m-4 w-1/4 min-w-[25%] max-w-[25%] rounded-lg bg-white leading-relaxed text-primary-black antialiased shadow-2xl">
         <div
           className="flex items-center p-4 text-2xl leading-snug shrink-0 font-light text-gold">Votre réservation
@@ -405,7 +405,7 @@ function formatTime(date: Date) {
   return `${formattedHours}:${formattedMinutes}`;
 }
 
-const sendEmail = async ({ firstName, contactEmail, contactPhone, pickUpLocation, dropOffLocation, pickUpDate, pickUpTime, dropOffDate, dropOffTime, finalPrice }: EmailParams) => {
+/* const sendEmail = async ({ firstName, contactEmail, contactPhone, pickUpLocation, dropOffLocation, pickUpDate, pickUpTime, dropOffDate, dropOffTime, finalPrice }: EmailParams) => {
   const html = <EmailReservation
     firstName={firstName}
     contactEmail={contactEmail}
@@ -435,7 +435,9 @@ const sendEmail = async ({ firstName, contactEmail, contactPhone, pickUpLocation
   } else {
     console.error('Erreur lors de l\'envoi de l\'email', data.error);
   }
-};
+}; */
+
+
 
 function validateDate(date: string, referenceDate?: string): string | undefined {
   if (!date) return "La date est obligatoire";
