@@ -11,15 +11,15 @@ export type FormData = {
 
 const Contact: FC = () => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null >(null);
 
   async function onSubmit(data: FormData) {
     const responseMessage = await sendEmail(data);
     setToastMessage(responseMessage);
-    setTimeout(() => setToastMessage(null), 5000);
     if (responseMessage === 'E-mail envoyé avec succès') {
       reset();
     }
+    setTimeout(() => setToastMessage(null), 5000);
   }
 
   return (
@@ -33,12 +33,12 @@ const Contact: FC = () => {
             <InputField
               placeholder="Votre nom"
               {...register('name', { required: true })}
-              />
+            />
             <InputField
               placeholder="Votre email"
               type="email"
               {...register('email', { required: true })}
-              />
+            />
             <TextAreaField
               placeholder="Votre message"
               {...register('message', { required: true })}
@@ -47,27 +47,29 @@ const Contact: FC = () => {
           <button type="submit" className="group overflow-hidden btn_base mt-5 mr-2 py-2 px-6 rounded  items-center flex gap-2 bg-gradient-to-r from-gold to-tacha  text-light-gray hover:text-primary-black hover:bg-primary-black hover:border-transparent transition ease-in duration-200 transform hover:-translate-y-1 active:translate-y-0">
             <BsSend className="z-40 transition-all duration-300 group-hover:translate-x-1" />
             <span className="z-40">Envoyer</span>
-              <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
-	            </div>
+            <div className="absolute inset-0 h-[200%] w-[200%] rotate-45 translate-x-[-70%] transition-all group-hover:scale-100 bg-white/30 group-hover:translate-x-[50%] z-20 duration-1000">
+            </div>
           </button>
         </form>
-        {toastMessage && <Toast message={toastMessage} />}
+        {toastMessage && (
+          <Toast alert={toastMessage === "E-mail envoyé avec succès" ? "success" : "error"} message={toastMessage} />
+        )}
       </div>
     </div>
   );
 };
 
-const Toast: FC<{ message: string }> = ({ message }) => {
+const Toast: FC<{ message: string, alert: string }> = ({ message, alert }) => {
   return (
-    <div className="toast toast-top toast-end z-50">
-      <div className="alert alert-success">
+    <div className="toast toast-end z-50">
+      <div role="alert" className={`alert alert-${alert}`}>
         <span className="text-white">{message}</span>
       </div>
     </div>
   );
 }
 
-const InputField = React.forwardRef<HTMLInputElement, { placeholder: string; type?: string }>(({ placeholder, type='text', ...rest }, ref) => (
+const InputField = React.forwardRef<HTMLInputElement, { placeholder: string; type?: string }>(({ placeholder, type = 'text', ...rest }, ref) => (
   <div className="relative z-0">
     <input ref={ref} {...rest} className="peer block w-full  appearance-none border-0 border-b border-gray-500 bg-transparent py-2.5 px-0 text-sm text-dark-gray focus:gold focus:outline-none focus:ring-0" placeholder={``} />
     <label className="absolute top-3 px-2 -z-10 origin-[0] -translate-y-6 scale-75 transform text-sm text-gray-500 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:left-0 peer-focus:-translate-y-6 peer-focus:scale-75 peer-focus:text-gold peer-focus:dark:text-gold">{placeholder}</label>

@@ -289,8 +289,7 @@ export async function sendBooking(formValue: FormValues): Promise<any> {
 
   const raw = JSON.stringify({
     status: "publish",
-    title: {
-      rendered: formValue.title},
+    title: formValue.title,
     acf: {
       car_id: formValue.carDBId,
       pickuplocation: formValue.pickUpLocation,
@@ -299,18 +298,18 @@ export async function sendBooking(formValue: FormValues): Promise<any> {
       dropOffLocation: formValue.dropOffLocation,
       dropOffDate: formValue.dropOffDate,
       dropOffTime: formValue.dropOffTime,
-      finalprice: formValue.finalPrice,
-      emailadress: formValue.emailAdress,
-      firstname: formValue.firstName,
-      lastname: formValue.lastName,
-      phonenumber: formValue.phoneNumber,
-      withdriver: formValue.withDriver,
-      outcapital: formValue.outCapital,
-      whatsappnumber: formValue.whatsAppNumber,
+      finalPrice: formValue.finalPrice !== undefined ? formValue.finalPrice.toString() : '0',
+      emailAdress: formValue.emailAdress,
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      phoneNumber: formValue.phoneNumber,
+      withDriver: formValue.withDriver ? 'true' : 'false',
+      outCapital: formValue.outCapital ? 'true' : 'false',
+      whatsAppNumber: formValue.whatsAppNumber,
     }
   });
   console.log("Raw JSON sent: ", raw);
-  
+
 
   const requestOptions: RequestInit = {
     method: "POST",

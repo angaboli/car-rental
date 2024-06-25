@@ -1,10 +1,11 @@
+'use client';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { Audiowide } from 'next/font/google'
 import Form from '@/components/form';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { getCarsList, getCar } from '@/services';
 import CryptoJS from 'crypto-js';
 import SkeletonPage from '@/components/SkeletonPage';
@@ -13,10 +14,10 @@ import type { Metadata } from 'next';
 import { Car } from '@/types';
 import { FormProvider } from '@/contexts/formContext';
 
-export const metadata: Metadata = {
+/* export const metadata: Metadata = {
   title: 'COCOGO - Réservation',
   description: 'Car rental App developped by D3',
-}
+} */
 
 const audiowide = Audiowide({
   weight: '400',
@@ -24,9 +25,9 @@ const audiowide = Audiowide({
   display: 'swap',
 })
 
-export default function CarReservation() {
-  const router = useRouter();
-  const { carId } = router.query;
+export default function CarReservation({ params }: { params: { carId: string } }) {
+  const { carId } = params;
+  //const { carId } = router.query;
   const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET_KEY || "";
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,12 +66,12 @@ export default function CarReservation() {
 
   return (
     <>
-      <FormProvider>
+      {/* <FormProvider>
         <Head>
           <title>{car ? `COCOGO - Réservation de la voiture ${car?.title}` : "COCOGO - Réservation"}</title>
           <meta name="description" content={car?.carACF?.shortDescription} />
         </Head>
-        <Header />
+        <Header /> */}
         <main className="scroll-smooth bg-light-gray">
           <div id="reservez" className=" bg-gradient-to-r from-gray-200 to-slate-300">
             <div className="wrapper  min-h-[200px]">
@@ -100,8 +101,8 @@ export default function CarReservation() {
             }
           </div>
         </main>
-        <Footer />
-      </FormProvider>
+        {/* <Footer />
+      </FormProvider> */}
     </>
   );
 }

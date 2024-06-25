@@ -6,7 +6,7 @@ import  Hamburger  from "hamburger-react"
 const Header = () => {
   const [isOpen, setOpen] = useState(false)
   return (
-    <header className="shadow-3xl sticky top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70">
+    <header className="w-full shadow-3xl sticky top-0 left-0 right-0 z-50 backdrop-blur-sm bg-white/70">
         <div className="wrapper flex justify-between items-center">
           <a href="/" className="p-3">
             {/* <img src={logo.src} width={231} height={80} alt="COCO GO Logo" /> */}
