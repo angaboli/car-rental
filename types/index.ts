@@ -24,6 +24,7 @@ export interface CarsListResponse {
 }
 
 export interface FormValues {
+  title?: string;
   pickUpLocation: string;
   dropOffLocation: string;
   pickUpDate: string;

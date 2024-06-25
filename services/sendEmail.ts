@@ -1,7 +1,7 @@
 import { FormData } from '@/components/contact';
 
 export async function sendEmail(data: FormData): Promise<string> {
-  const apiEndpoint = '/api/email/route';
+  const apiEndpoint = '/api/email';
 
   try {
     const response = await fetch(apiEndpoint, {

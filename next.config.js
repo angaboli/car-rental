@@ -4,9 +4,6 @@ const nextConfig = {
     // Remove all console logs
     //removeConsole: process.env.NODE_ENV === "production"
   },
-  api:{
-    bodyParser: true,
-  },
   images: {
     remotePatterns: [
       {

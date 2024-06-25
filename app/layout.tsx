@@ -1,8 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-//import { ClerkProvider, SignIn, SignedIn } from '@clerk/nextjs'
-//import { SignedOut } from '@clerk/nextjs'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 

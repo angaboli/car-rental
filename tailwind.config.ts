@@ -46,6 +46,8 @@ const config: Config = {
         "cyan-700": "#0369a1",
         "sky-600": "#0284c7",
         "rose-700": "#be123c",
+        "alert-error": "#ff6f70",
+        "alert-succes": "#00ca92",
       },
     },
   },

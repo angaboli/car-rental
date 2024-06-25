@@ -5,7 +5,7 @@ import { Input, Select, Option, Switch, Tooltip, Chip } from "@material-tailwind
 import ButtonMain from '@/components/buttonMain';
 //import EmailTemplate from '@/components/EmailTemplate';
 import SkeletonPage from '@/components/SkeletonPage';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useFormContext } from "@/contexts/formContext";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { EmailParams, FormErrors, EmailTemplateProps, FormValues, ReservationModalProps, FormValidators, ValidationParams } from '@/types';
@@ -32,7 +32,9 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(loading);
   const [isSearching, setIsSearching] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [formValue, setFormValue] = useState({
+    title: "",
     pickUpLocation: 'riviera',
     dropOffLocation: '',
     pickUpDate: formattedDate,
@@ -50,6 +52,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
     withDriver: false,
     outCapital: false,
   });
+  const [posTitle, setPosTitle] = useState(`#${car.title}  [ ${formValue?.pickUpDate}_${formValue?.pickUpTime}]-[${formValue?.dropOffDate}_${formValue?.dropOffTime}`);
   const [withDriver, setWithDriver] = useState(false);
   const [outCapital, setOutCapital] = useState(false);
   const [addDropoff, setAddDropoff] = useState(false);
@@ -194,7 +197,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
     setIsSearching(true);
     const currentCarId = carId || car?.id;
     const carDBID = car?.databaseId;
-    const posTitle = "#" + car.title + " [" + formValue.pickUpDate + "_" + formValue.pickUpTime + "] - [" + formValue.dropOffDate + "_" + formValue.dropOffTime + "]";
+    setPosTitle(`#${car.title} [${formValue?.pickUpDate}_${formValue?.pickUpTime}]-[${formValue?.dropOffDate}_${formValue?.dropOffTime}]`)
 
     // Création de la reservation !
     try {
@@ -207,11 +210,26 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
 
       const response = await sendBooking(formSubmission);
 
-      console.log("Réservation créée avec succès", response);
-      if (response) {
+      if (response && response.ok) {
+        /* const emailResponse = await sendBookingEmail({
+          firstName: formValue.firstName,
+          contactEmail: formValue.emailAdress,
+          contactPhone: formValue.phoneNumber,
+          pickUpLocation: formValue.pickUpLocation,
+          dropOffLocation: formValue.dropOffLocation,
+          pickUpDate: formValue.pickUpDate,
+          pickUpTime: formValue.pickUpTime,
+          dropOffDate: formValue.dropOffDate,
+          dropOffTime: formValue.dropOffTime,
+          finalPrice: formValue.finalPrice,
+        }); */
+        setToastMessage('E-mail envoyé avec succès');
         setIsModalOpen(true);
         sessionStorage.removeItem("formData");
+        //resetForm();
         document.getElementById("submitForm")?.classList.add("disabled:opacity-75")
+      } else {
+        setToastMessage('Erreur lors de la création de la réservation');
       }
     } catch (error) {
       console.error("Erreur lors de la création de la réservation :", error);
