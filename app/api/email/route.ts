@@ -3,8 +3,6 @@ import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
 export async function POST(request: NextRequest) {
-  console.log('request', request);
-
   try {
     const { email, name, message } = await request.json();
 
@@ -15,58 +13,20 @@ export async function POST(request: NextRequest) {
         pass: process.env.NEXT_PUBLIC_EMAIL_PASS,
       },
     });
+    const bodyMessage = `Hello Admin, \nYou have got a message from ${name} (${email}). \n\n<strong>Message</strong> : \n${message}`;
 
     const mailOptions: Mail.Options = {
       from: process.env.NEXT_PUBLIC_EMAIL_USER,
       to: process.env.NEXT_PUBLIC_EMAIL_USER,
       subject: `Message from ${name} (${email})`,
-      text: message,
+      text: bodyMessage,
     };
 
     const info = await transport.sendMail(mailOptions);
-    console.log('Message sent: %s', info.messageId);
+    //console.log('Message sent: %s', info.messageId);
     return NextResponse.json({ message: 'E-mail envoyé avec succès' });
   } catch (err) {
     console.error('Error sending email:', err);
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
   }
 }
-
-/* import type { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer from 'nodemailer';
-import Mail from 'nodemailer/lib/mailer';
-
-export default async function handler(request: NextApiRequest, res: NextApiResponse) {
-
-  if (request.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
-
-  const { email, name, message } = request.body;
-
-  const transport = nodemailer.createTransport({
-    service: 'gmail',
-
-    auth: {
-      user: process.env.NEXT_PUBLIC_EMAIL_USER,
-      pass: process.env.NEXT_PUBLIC_EMAIL_PASS,
-    },
-  });
-
-  const mailOptions: Mail.Options = {
-    from: process.env.NEXT_PUBLIC_EMAIL_USER,
-    to: process.env.NEXT_PUBLIC_EMAIL_USER,
-    // cc: email, (uncomment this line if you want to send a copy to the sender)
-    subject: `Message from ${name} (${email})`,
-    text: message,
-  };
-
-  try {
-    const info = await transport.sendMail(mailOptions);
-    //console.log('Message sent: %s', info.accepted);
-    res.status(200).json({ message: 'E-mail envoyé avec succès' });
-  } catch (err) {
-    console.error('Error sending email:', err);
-    res.status(500).json({ error: 'Failed to send email' });
-  }
-} */

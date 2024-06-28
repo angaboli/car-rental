@@ -23,24 +23,28 @@ export interface CarsListResponse {
   carLists: Car[];
 }
 
-export interface FormValues {
-  title?: string;
+export interface IFormValues {
   pickUpLocation: string;
-  dropOffLocation: string;
+  dropOffLocation?: string;
   pickUpDate: string;
   dropOffDate: string;
   pickUpTime: string;
   dropOffTime: string;
   firstName: string;
   lastName: string;
-  emailAdress?: string;
-  phoneNumber?: string;
+  emailAdress: string;
+  phoneNumber: string;
   whatsAppNumber?: string;
-  finalPrice?: number;
+  finalPrice: number;
+  age?: string;
   withDriver?: boolean;
   outCapital?: boolean;
-  [key: string]: any;
+  carId: string;
+  carDBId: number;
+  title?: string;
+  returnAgency?: boolean;
 }
+
 
 export interface FormData {
   pickUpLocation?: string;

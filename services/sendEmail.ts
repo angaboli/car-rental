@@ -1,8 +1,7 @@
 import { FormData } from '@/components/contact';
+import { IFormValues } from '@/types';
 
-export async function sendEmail(data: FormData): Promise<string> {
-  const apiEndpoint = '/api/email';
-
+async function sendRequest(apiEndpoint: string, data: object): Promise<string> {
   try {
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -11,11 +10,19 @@ export async function sendEmail(data: FormData): Promise<string> {
       },
       body: JSON.stringify(data),
     });
+
     const result = await response.json();
-    //console.log("response:", result);
     return result.message || 'E-mail envoyé avec succès';
   } catch (err) {
-    console.error('Error sending email:', err);
+    console.error('Error sending request:', err);
     return 'Failed to send email';
   }
+}
+
+export function sendEmail(data: FormData): Promise<string> {
+  return sendRequest('/api/email', data);
+}
+
+export function sendBookingEmail(data: IFormValues): Promise<string> {
+  return sendRequest('/api/bookingEmail', data);
 }
