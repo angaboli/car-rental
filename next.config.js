@@ -2,7 +2,7 @@
 const nextConfig = {
   compiler: {
     // Remove all console logs
-    //removeConsole: process.env.NODE_ENV === "production"
+    removeConsole: process.env.NODE_ENV === "production"
   },
   images: {
     remotePatterns: [

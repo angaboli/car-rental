@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import { BsSend } from "react-icons/bs";
 import { useForm } from 'react-hook-form';
 import { sendEmail } from "@/services/sendEmail";
+import ToastMessage from '@/components/ToastMessage';
 
 export type FormData = {
   name: string
@@ -52,22 +53,12 @@ const Contact: FC = () => {
           </button>
         </form>
         {toastMessage && (
-          <Toast alert={toastMessage === "E-mail envoyé avec succès" ? "success" : "error"} message={toastMessage} />
+          <ToastMessage alert={toastMessage === "E-mail envoyé avec succès" ? "success" : "error"} message={toastMessage} />
         )}
       </div>
     </div>
   );
 };
-
-const Toast: FC<{ message: string, alert: string }> = ({ message, alert }) => {
-  return (
-    <div className="toast toast-end z-50">
-      <div role="alert" className={`alert alert-${alert}`}>
-        <span className="text-white">{message}</span>
-      </div>
-    </div>
-  );
-}
 
 const InputField = React.forwardRef<HTMLInputElement, { placeholder: string; type?: string }>(({ placeholder, type = 'text', ...rest }, ref) => (
   <div className="relative z-0">

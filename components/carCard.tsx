@@ -30,7 +30,7 @@ export default function CarCard(props: any) {
         {props.car?.carACF?.image ?
           <Image
             src={props.car?.carACF?.image?.node.sourceUrl}
-            priority={false}
+            loading='lazy'
             className=" rounded-2xl w-full object-cover"
             alt={props.car.title}
             width={520}

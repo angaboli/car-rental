@@ -1,6 +1,6 @@
 import { request, gql } from "graphql-request";
 import axios from 'axios';
-import { CarsListResponse, Car, FormValues } from "@/types/";
+import { CarsListResponse, Car, IFormValues } from "@/types/";
 //import { gql, useQuery } from '@apollo/client';
 
 //const MASTER_URL= process.env.NEXT_PUBLIC_HYGRAPH_KEY || "";
@@ -94,7 +94,7 @@ export async function getCarsList() {
   return data?.cars;
 }
 
-export const createBooking = async (formValue: FormValues) => {
+export const createBooking = async (formValue: IFormValues) => {
   const mutation = `
     mutation CreateBooking($input: CreateBookingInput!) {
       createBooking(input: $input) {
@@ -272,7 +272,7 @@ async function getToken(): Promise<string | null> {
   }
 }
 
-export async function sendBooking(formValue: FormValues): Promise<any> {
+export async function sendBooking(formValue: IFormValues): Promise<any> {
   const token = await getToken();
 
   if (!token) {
