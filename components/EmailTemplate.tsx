@@ -11,31 +11,17 @@ import {
   Row,
   Section,
   Text,
+  Link
 } from "@react-email/components";
 import * as React from "react";
-import logo from '@/public/logo.svg';
+import logo from '../public/logo.svg';
+import { EmailTemplateProps } from "@/types";
 
 
-interface EmailTemplateProps {
-  firstName: string;
-  contactEmail: string;
-  contactPhone: string;
-  pickUpLocation: string;
-  dropOffLocation: string;
-  pickUpDate: string;
-  pickUpTime: string;
-  dropOffDate: string;
-  dropOffTime: string;
-  finalPrice: number;
-}
-
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
-
-const EmailTemplate: React.FC<EmailTemplateProps> = ({
-  firstName, contactEmail, contactPhone, pickUpLocation, dropOffLocation, pickUpDate, pickUpTime, dropOffDate, dropOffTime, finalPrice
+const EmailTemplate: React.FC<EmailTemplateProps | any> = ({
+  firstName, lastName, phoneNumber, whatsAppNumber, pickUpLocation, dropOffLocation, pickUpDate, pickUpTime, dropOffDate, dropOffTime, finalPrice, age, carTitle, carDBId, outCapital, withDriver
 }) => {
+  console.log("logo email: ", logo)
   return (
     <Html>
       <Head />
@@ -58,7 +44,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
                     textAlign: "center",
                   }}
                 >
-                  Cher(e) {firstName},
+                  Cher(e) {firstName} {lastName},
                 </Heading>
 
                 <Text style={paragraph}>
@@ -69,24 +55,25 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
                 </Text>
 
                 <Text style={{ ...paragraph, marginTop: -5 }}>
-                  <b>Lieu de récuperation :</b>
-                  {pickUpLocation}
+                  Récuperation au <b>{pickUpLocation}</b> le <b>{pickUpDate}</b> à <b>{pickUpTime}</b>
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
-                  <b>Lieu de retour : </b>
-                  {dropOffLocation}
+                  Retour au : <b>{dropOffLocation}</b> le <b>{dropOffDate}</b> à <b>{dropOffTime}</b>
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
-                  <b>Date et heure de récuperaiton : </b>
-                  {pickUpDate} à {pickUpTime}
+                  Votre numéro de tél : <b>{phoneNumber}</b>{ whatsAppNumber && ` et numéro whatssApp <b>${whatsAppNumber}</b>`}
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
-                  <b>Date et heure de retour : </b>
-                  {dropOffDate} à {dropOffTime}
+                  Age : <b>{age}</b>
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
-                  <b>Total de la reservation : </b>
-                  {finalPrice}
+                  Service ajouté : <b>Avec chaffeur ({withDriver})</b> - <b>Hors Capital ({outCapital})</b>
+                </Text>
+                <Text style={{ ...paragraph, marginTop: -5 }}>
+                  Voiture reservé : <b>{carTitle} ({carDBId})</b>
+                </Text>
+                <Text style={{ ...paragraph, marginTop: -5 }}>
+                  Le total de la reservation : <b>{finalPrice}</b>
                 </Text>
 
 
@@ -94,21 +81,16 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
                     de votre réservation ainsi que pour vous fournir tous les détails nécessaires et les étapes suivantes.
                   </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>Si vous avez des questions ou si vous avez besoin d'assistance supplémentaire en attendant,
-                  n'hésitez pas à nous contacter à {contactEmail} ou par téléphone au {contactPhone}.
+                  n'hésitez pas à nous contacter à contact@cocogo.cloud.
                 </Text>
 
                 <Text style={{ ...paragraph, marginTop: -5 }}>Cordialement,</Text>
 
-
-                <Text style={{ ...paragraph, marginTop: -5 }}>
-                  If this wasn't you or if you have additional questions, please
-                  see our support page.
-                </Text>
               </Column>
             </Row>
             <Row style={{ ...boxInfos, paddingTop: "0" }}>
               <Column style={containerButton} colSpan={2}>
-                <Button style={button}>Learn More</Button>
+                <link href="https://cocogo.cloud" style={button}>En savoir plus</link>
               </Column>
             </Row>
             <Text
@@ -118,7 +100,7 @@ const EmailTemplate: React.FC<EmailTemplateProps> = ({
                 color: "rgb(0,0,0, 0.7)",
               }}
             >
-              © 2024 | COCOGO, Riviera CIAD, Abidjan, Côte d'ivoire | www.cocogo.cloud
+              © {new Date().getFullYear()} | COCOGO, Riviera CIAD, Abidjan, Côte d'ivoire | www.cocogo.cloud
             </Text>
           </Section>
         </Container>
@@ -147,7 +129,7 @@ const containerButton = {
 };
 
 const button = {
-  backgroundColor: "#e00707",
+  backgroundColor: "#C4842C",
   borderRadius: 3,
   color: "#FFF",
   fontWeight: "bold",

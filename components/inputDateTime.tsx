@@ -75,7 +75,7 @@ const InputDateTime: React.FC<InputDateTimeProps> = ({
           required
         />
       </div>
-      {localErrors && <p className="mt-1 text-xs text-red-500">{localErrors}</p>}
+      {localErrors && <p className="mt-1 text-xs text-alert-error">{localErrors}</p>}
     </div>
   );
 };

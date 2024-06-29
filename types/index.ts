@@ -109,14 +109,21 @@ export interface FormErrors {
 
 export interface EmailTemplateProps {
   firstName: string;
-  contactEmail: string;
-  contactPhone: string;
+  lastName: string;
+  emailAdress: string;
   pickUpLocation: string;
   dropOffLocation: string;
   pickUpDate: string;
   pickUpTime: string;
   dropOffDate: string;
   dropOffTime: string;
+  phoneNumber: number;
+  whatsAppNumber: number;
+  age: number;
+  withDriver: boolean;
+  outCapital: boolean;
+  carTitle: string;
+  carDBId: number;
   finalPrice: number;
 }
 

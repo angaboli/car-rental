@@ -12,9 +12,8 @@ const nextConfig = {
         port: '8082',
       },
       {
-        protocol: 'http',
+        protocol: 'https',
         hostname: 'api.cocogo.cloud',
-        port: '8082',
       },
       {
         protocol: 'http',

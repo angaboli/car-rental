@@ -4,12 +4,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Audiowide } from 'next/font/google';
 import InputDateTime from "@/components/inputDateTime";
-import { useState, useEffect, useMemo, memo } from "react";
+import { useState, useEffect, memo } from "react";
 import { GetAllBookings } from "@/services";
-import { Select, Option, Switch } from "@material-tailwind/react";
+import { Select, Option } from "@material-tailwind/react";
 import { Car } from '@/types';
 import { useCars } from '@/contexts/carsContext';
 import SpinnerSearch from '@/components/spinnerSearch';
+import Skeleton from "./skeleton";
 
 const audiowide = Audiowide({
   weight: '400',
@@ -84,10 +85,11 @@ const validationSchema = yup.object().shape({
 });
 
 const Hero = memo(() => {
-  const { carsList, setCars, loading, setIsAvailable } = useCars();
+  const { carsList, setCars, setIsAvailable } = useCars();
   const [addDropoff, setAddDropoff] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState(false);
   const [initialValuesLoaded, setInitialValuesLoaded] = useState(false);
+
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate);
   const formattedTime = formatTime(nextHourDate);
@@ -99,24 +101,25 @@ const Hero = memo(() => {
     dropOffDate: formattedDate,
     dropOffTime: '20:00',
   }
-  const { register, handleSubmit, control, setValue, formState: { errors }, watch } = useForm<IHeroForm>({
+
+  const { register, handleSubmit, control, setValue, formState: { errors }, watch, reset } = useForm<IHeroForm>({
     defaultValues: initialValues,
     resolver: yupResolver(validationSchema),
   });
 
-  useFormPersist("formData", { watch, setValue });
+  useFormPersist("formData", { watch, setValue, storage: window.localStorage });
 
-  useEffect(() => {
-    const loadPersistedData = async () => {
+/*   useEffect(() => {
+    const loadPersistedData = () => {
       const persistedData = JSON.parse(localStorage.getItem("formData") || '{}');
-      Object.keys(persistedData).forEach(key => {
-        setValue(key as keyof IHeroForm, persistedData[key]);
-      });
+      if (Object.keys(persistedData).length > 0) {
+        reset(persistedData);
+      }
       setInitialValuesLoaded(true);
     };
 
     loadPersistedData();
-  }, [setValue]);
+  }, [reset]); */
 
   const watchPickUpDate = watch("pickUpDate", formattedDate);
   const watchPickUpTime = watch("pickUpTime", formattedTime);
@@ -152,13 +155,9 @@ const Hero = memo(() => {
     }
   };
 
-  if (!initialValuesLoaded) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div id="reservez" className="bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">
-      {(isSearching ) && <SpinnerSearch />}
+      {(isSearching) && <SpinnerSearch />}
       <div className={`wrapper min-h-[200px]`}>
         <h1 className={`${audiowide.className} head_text xs:w-full sm:w-1/2 mx-auto mb-10 pt-20 text-center font-bold uppercase`}>
           L'Élégance sur&nbsp;
@@ -168,16 +167,6 @@ const Hero = memo(() => {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
           <div className={`relative items-center flex flex-col lg:flex-row xs:text-xs sm:text-xs md:text-sm gap-4 `}>
             <div className="w-full md:w-1/3">
-              {/* <input
-                type="checkbox"
-                className="toggle"
-                defaultChecked={addDropoff}
-                {...register("returnAgency")}
-                onChange={(e) => {
-                  setValue("returnAgency", e.target.checked);
-                  updateDropoffLocation(e.target.checked);
-                }}
-              /> */}
               <div className="flex flex-wrap gap-5">
                 <Controller
                   name="pickUpLocation"
@@ -197,27 +186,7 @@ const Hero = memo(() => {
                     </Select>
                   )}
                 />
-                {errors.pickUpLocation && <p className="text-red-500">{errors.pickUpLocation.message}</p>}
-                {/* {addDropoff && (
-                  <Controller
-                    name="dropoffLocation"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        className="shadow-md"
-                        containerProps={{ className: "", }}
-                        label="Lieu de retour ?"
-                        color="orange"
-                        placeholder="Lieu de retour ?"
-                      >
-                        <Option value="riviera">Riviéra CIAD, Abidjan</Option>
-                        <Option value="aeroport">Aéroport Félix Houphouet Boigny, Abidjan</Option>
-                      </Select>
-                    )}
-                  />
-                )}
-                {errors.dropoffLocation && <p className="text-red-500">{errors.dropoffLocation.message}</p>} */}
+                {errors.pickUpLocation && <p className="text-alert-error">{errors.pickUpLocation.message}</p>}
               </div>
             </div>
             <div className="flex flex-col md:flex-row gap-5 mb-5 w-full md:w-2/3">
@@ -227,7 +196,7 @@ const Hero = memo(() => {
                 nameTime="pickUpTime"
                 valueDate={watchPickUpDate}
                 valueTime={watchPickUpTime}
-                errors={errors.pickUpDate?.message}
+                errors={errors.pickUpDate?.message || errors.pickUpTime?.message}
                 onChangeDate={(e) => setValue('pickUpDate', e.target.value)}
                 onChangeTime={(e) => setValue('pickUpTime', e.target.value)}
                 className=""
@@ -238,7 +207,7 @@ const Hero = memo(() => {
                 nameTime="dropOffTime"
                 valueDate={watchDropOffDate}
                 valueTime={watchDropOffTime}
-                errors={errors.dropOffDate?.message}
+                errors={errors.dropOffDate?.message || errors.dropOffTime?.message}
                 onChangeDate={(e) => setValue('dropOffDate', e.target.value)}
                 onChangeTime={(e) => setValue('dropOffTime', e.target.value)}
                 className=""

@@ -24,7 +24,6 @@ interface FormProps {
 
 const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
 
-
   const router = useRouter();
   const nextHourDate = getNextHour();
   const formattedDate = formatDate(nextHourDate);
@@ -60,7 +59,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
     title: '',
   }
   const { register, handleSubmit, setValue, control, formState: { errors }, reset, watch } = useForm<IFormValues>({
-    //defaultValues: initialValues,
+    defaultValues: initialValues,
     resolver: yupResolver(validationSchema),
   });
 
@@ -133,11 +132,9 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
       const response = await sendBooking(data);
       const responseMessage = await sendBookingEmail(data);
       if (response === true) {
-        console.log('setToast');
         setToastMessage(responseMessage);
         //setToastMessage('E-mail envoyé avec succès');
         setIsModalOpen(true);
-        console.log('setModalTrue', isModalOpen);
         sessionStorage.removeItem("formData");
         reset();
       } else {
@@ -148,6 +145,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
       setToastMessage('Erreur lors de la création de la réservation');
     } finally {
       setIsSearching(false);
+      setTimeout(() => setToastMessage(null), 5000);
     }
   };
 
@@ -234,7 +232,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
                       )}
                     />
                   )}
-                  {errors.dropOffLocation && <p className="text-red-500">{errors.dropOffLocation.message}</p>}
+                  {errors.dropOffLocation && <p className="text-alert-error">{errors.dropOffLocation.message}</p>}
                   <div className="flex flex-col md:flex-row gap-5 mb-5">
                     <InputDateTime
                       label="Date de récuperation"
@@ -364,7 +362,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
                         {...register('firstName', { required: 'Prénom est requis' })}
                         crossOrigin=""
                       />
-                      {errors.firstName && <div className="text-red-500">{errors.firstName.message}</div>}
+                      {errors.firstName && <div className="text-alert-error">{errors.firstName.message}</div>}
                     </div>
                     <div className='flex flex-col w-full sm:w-1/2'>
                       <Input
@@ -373,7 +371,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
                         {...register('lastName', { required: 'Nom est requis' })}
                         crossOrigin=""
                       />
-                      {errors.lastName && <div className="text-red-500">{errors.lastName.message}</div>}
+                      {errors.lastName && <div className="text-alert-error">{errors.lastName.message}</div>}
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row w-full mb-5 gap-5">
@@ -384,7 +382,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
                         {...register('phoneNumber', { required: 'Numéro de téléphone est requis' })}
                         crossOrigin=""
                       />
-                      {errors.phoneNumber && <div className="text-red-500">{errors.phoneNumber.message}</div>}
+                      {errors.phoneNumber && <div className="text-alert-error">{errors.phoneNumber.message}</div>}
                     </div>
                     <div className='flex flex-col w-full sm:w-1/2'>
                       <Input
@@ -403,7 +401,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
                         {...register('emailAdress', { required: 'Email est requis' })}
                         crossOrigin=""
                       />
-                      {errors.emailAdress && <div className="text-red-500">{errors.emailAdress.message}</div>}
+                      {errors.emailAdress && <div className="text-alert-error">{errors.emailAdress.message}</div>}
                     </div>
                     <div className="w-1/2">
                       <Controller
@@ -447,7 +445,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({ isOpen, onClose }) 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center z-50 items-center">
-      <div className="relative m-4 w-1/4 min-w-[25%] max-w-[25%] rounded-lg bg-white leading-relaxed text-primary-black antialiased shadow-2xl">
+      <div className="relative m-4 w-2/3 md:w-1/2 min-w-[50%] max-w-[75%] rounded-lg bg-white leading-relaxed text-primary-black antialiased shadow-2xl">
         <div className="flex items-center p-4 text-2xl leading-snug shrink-0 font-light text-gold">Votre réservation</div>
         <p className="relative p-4 leading-relaxed border-t border-b border-t-tacha-100 border-b-tacha-100">
           Votre réservation a été prise en compte, nous reviendrons vers vous dans les plus brefs délais.
