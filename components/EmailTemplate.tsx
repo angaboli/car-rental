@@ -14,14 +14,15 @@ import {
   Link
 } from "@react-email/components";
 import * as React from "react";
-import logo from '../public/logo.svg';
+///import logo from '/static/logo.svg';
 import { EmailTemplateProps } from "@/types";
+
+const baseUrl = "https://cocogo.cloud/_next/static/media/logo.85142789.svg";
 
 
 const EmailTemplate: React.FC<EmailTemplateProps | any> = ({
   firstName, lastName, phoneNumber, whatsAppNumber, pickUpLocation, dropOffLocation, pickUpDate, pickUpTime, dropOffDate, dropOffTime, finalPrice, age, carTitle, carDBId, outCapital, withDriver
 }) => {
-  console.log("logo email: ", logo)
   return (
     <Html>
       <Head />
@@ -29,7 +30,13 @@ const EmailTemplate: React.FC<EmailTemplateProps | any> = ({
       <Body style={main}>
         <Container>
           <Section style={logo}>
-            <Img src={`${logo}`} />
+            <Img
+              src={`${baseUrl}`}
+              width="380"
+              height="119"
+              alt="Logo"
+              style={{width: "100%", height: "auto"}}
+            />
           </Section>
           <Section style={content}>
             <Row style={{ ...boxInfos, paddingBottom: "0" }}>
@@ -61,13 +68,13 @@ const EmailTemplate: React.FC<EmailTemplateProps | any> = ({
                   Retour au : <b>{dropOffLocation}</b> le <b>{dropOffDate}</b> à <b>{dropOffTime}</b>
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
-                  Votre numéro de tél : <b>{phoneNumber}</b>{ whatsAppNumber && ` et numéro whatssApp <b>${whatsAppNumber}</b>`}
+                  Votre numéro de tél : <b>{phoneNumber}</b>{whatsAppNumber && ` et numéro whatssApp <b>${whatsAppNumber}</b>`}
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
                   Age : <b>{age}</b>
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
-                  Service ajouté : <b>Avec chaffeur ({withDriver})</b> - <b>Hors Capital ({outCapital})</b>
+                  Service ajouté : <b>Avec chaffeur ({withDriver === true ? "Oui" : "Non"})</b> - <b>Hors Capital ({outCapital ? "Oui" : "Non" })</b>
                 </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>
                   Voiture reservé : <b>{carTitle} ({carDBId})</b>
@@ -78,8 +85,8 @@ const EmailTemplate: React.FC<EmailTemplateProps | any> = ({
 
 
                 <Text style={{ ...paragraph, marginTop: -5 }}>Nous vous contacterons dans les plus brefs délais par email ou par SMS pour confirmer la disponibilité
-                    de votre réservation ainsi que pour vous fournir tous les détails nécessaires et les étapes suivantes.
-                  </Text>
+                  de votre réservation ainsi que pour vous fournir tous les détails nécessaires et les étapes suivantes.
+                </Text>
                 <Text style={{ ...paragraph, marginTop: -5 }}>Si vous avez des questions ou si vous avez besoin d'assistance supplémentaire en attendant,
                   n'hésitez pas à nous contacter à contact@cocogo.cloud.
                 </Text>
@@ -90,7 +97,7 @@ const EmailTemplate: React.FC<EmailTemplateProps | any> = ({
             </Row>
             <Row style={{ ...boxInfos, paddingTop: "0" }}>
               <Column style={containerButton} colSpan={2}>
-                <link href="https://cocogo.cloud" style={button}>En savoir plus</link>
+                <Link href="https://cocogo.cloud" style={button}>En savoir plus</Link>
               </Column>
             </Row>
             <Text
@@ -116,6 +123,10 @@ const main = {
   backgroundColor: "#fff",
   fontFamily:
     '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+};
+
+const logo = {
+  padding: "30px 20px",
 };
 
 const paragraph = {

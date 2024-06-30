@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
 
     const car = await getCar(carId);
     const carTitle= car.title
+    console.log('whithDriver: ', withDriver);
+    console.log('whithDriver: ', outCapital);
+
 
     const emailHtml = render(
       EmailTemplate({

@@ -107,9 +107,9 @@ const Hero = memo(() => {
     resolver: yupResolver(validationSchema),
   });
 
-  useFormPersist("formData", { watch, setValue, storage: window.localStorage });
+  useFormPersist("formData", { watch, setValue });
 
-/*   useEffect(() => {
+  useEffect(() => {
     const loadPersistedData = () => {
       const persistedData = JSON.parse(localStorage.getItem("formData") || '{}');
       if (Object.keys(persistedData).length > 0) {
@@ -119,7 +119,14 @@ const Hero = memo(() => {
     };
 
     loadPersistedData();
-  }, [reset]); */
+  }, [reset]);
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      localStorage.setItem("formData", JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const watchPickUpDate = watch("pickUpDate", formattedDate);
   const watchPickUpTime = watch("pickUpTime", formattedTime);
@@ -154,6 +161,10 @@ const Hero = memo(() => {
       setIsSearching(false);
     }
   };
+
+  if (!initialValuesLoaded) {
+    return <Skeleton />
+  }
 
   return (
     <div id="reservez" className="bg-light-gray bg-gradient-to-r from-gray-200 to-slate-300">

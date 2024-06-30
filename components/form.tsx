@@ -37,6 +37,7 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
   const [addDropoff, setAddDropoff] = useState(false);
   const [withDriver, setWithDriver] = useState(false);
   const [outCapital, setOutCapital] = useState(false);
+  const [initialValuesLoaded, setInitialValuesLoaded] = useState(false);
   const initialValues: IFormValues = {
     pickUpLocation: 'riviera',
     dropOffLocation: 'riviera',
@@ -71,9 +72,26 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
   const watchWithDriver = watch("withDriver", false);
   const watchOutCapital = watch("outCapital", false);
 
-  useFormPersist("formData", { watch, setValue });
+  useFormPersist("formData", { watch, setValue, storage: window.sessionStorage });
 
+  useEffect(() => {
+    const loadPersistedData = () => {
+      const persistedData = JSON.parse(localStorage.getItem("formData") || '{}');
+      if (Object.keys(persistedData).length > 0) {
+        reset(persistedData);
+      }
+      setInitialValuesLoaded(true);
+    };
 
+    loadPersistedData();
+  }, [reset]);
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      localStorage.setItem("formData", JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -93,19 +111,25 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
     }
   }
 
+  const startDate = useMemo(() => new Date(watchPickUpDate), [watchPickUpDate]);
+  const endDate = useMemo(() => new Date(watchDropOffDate), [watchDropOffDate]);
+  const timeDiff = useMemo(() => endDate.getTime() - startDate.getTime(), [endDate, startDate]);
+  const daysDiff = useMemo(() => (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1, [timeDiff]);
+
+  useEffect(() => {
+    daysDiff
+  }, [])
+
   useEffect(() => {
     if (car) {
       setCarId(car.id || "");
       setFinalPrice(car.carACF?.price || 0);
       setValue("carId", car.id || "");
       setValue("finalPrice", car.carACF?.price || 0);
+      updatePrice("withDriver", car.carACF?.withDriver);
+      daysDiff
     }
   }, [car, setValue]);
-
-  const startDate = useMemo(() => new Date(watchPickUpDate), [watchPickUpDate]);
-  const endDate = useMemo(() => new Date(watchDropOffDate), [watchDropOffDate]);
-  const timeDiff = useMemo(() => endDate.getTime() - startDate.getTime(), [endDate, startDate]);
-  const daysDiff = useMemo(() => (Math.ceil(timeDiff / (1000 * 3600 * 24))) + 1, [timeDiff]);
 
   useEffect(() => {
     let price = car?.carACF?.price * daysDiff;
@@ -120,8 +144,8 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
     setValue("finalPrice", price);
   }, [watchWithDriver, watchOutCapital, car?.carACF?.price, watchPickUpDate, watchDropOffDate, setValue, daysDiff]);
 
-  const onSubmit = async(data: typeof initialValues) => {
-    console.log(data);
+  const onSubmit = async (data: typeof initialValues) => {
+    //console.log(data);
 
     const posTitle = `#${car.title} [${data.pickUpDate}_${data.pickUpTime}]-[${data.dropOffDate}_${data.dropOffTime}]`;
     data.title = posTitle;
@@ -149,6 +173,9 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
     }
   };
 
+  if (!initialValuesLoaded) {
+    return <SkeletonPage />
+  }
 
   return (
     <>
@@ -430,9 +457,9 @@ const Form: React.FC<FormProps> = memo(({ car, loading, className }) => {
               </div>
             </div>
           </form>
-            {toastMessage && (
-              <ToastMessage alert={toastMessage === "E-mail envoyé avec succès" ? "success" : "error"} message={toastMessage} />
-            )}
+          {toastMessage && (
+            <ToastMessage alert={toastMessage === "E-mail envoyé avec succès" ? "success" : "error"} message={toastMessage} />
+          )}
           <ReservationModal isOpen={isModalOpen} onClose={handleCloseModal} />
         </>
       )}
